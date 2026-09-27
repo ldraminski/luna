@@ -2,16 +2,80 @@
 <html lang="pl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
 <title>Oboe</title>
-<style>
-  body{margin:0;min-height:100vh;display:grid;place-items:center;background:#e6f0f2;color:#0f2a33;
-       font:16px/1.5 system-ui,-apple-system,sans-serif}
-  .card{background:#fdffff;border-radius:28px;padding:32px 36px;text-align:center}
-  h1{margin:0 0 4px;color:#094457;font-size:28px}
-  p{margin:0;color:#48636b}
-</style>
+<meta name="theme-color" content="#e6f0f2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Oboe">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/app.css">
+<script type="module" src="/app.js"></script>
 </head>
-<body><div class="card"><h1>Oboe</h1><p>覚え · wkrótce</p></div></body>
+<body>
+
+<!-- EKRAN 0 · wklejenie klucza -->
+<section class="hello" id="screen-hello" hidden>
+  <img class="logo" src="/icons/icon-192.png" alt="">
+  <h1>Oboe<b>pamięta za Ciebie</b></h1>
+  <p id="hello-lead">Wklej klucz, który przyszedł mailem.</p>
+  <div class="note" id="ios-note" hidden>
+    <b>Na iPhonie najpierw zainstaluj:</b> Udostępnij → „Do ekranu początkowego”. Potem otwórz Oboe
+    z ekranu początkowego i dopiero tam wklej klucz — tylko wtedy działają powiadomienia.
+  </div>
+  <form class="tok" id="tok-form" autocomplete="off">
+    <label for="tok" class="sr">Klucz</label>
+    <input id="tok" type="text" inputmode="text" spellcheck="false" autocapitalize="off" placeholder="Wklej klucz…">
+    <button type="button" id="tok-paste">Wklej</button>
+  </form>
+  <p class="err" id="tok-err" role="alert"></p>
+  <button class="cta" type="submit" form="tok-form">Zaczynamy</button>
+</section>
+
+<!-- EKRAN 1 · główny -->
+<main class="app" id="screen-main" hidden>
+  <header class="top">
+    <h1 id="hello-name">Dzień dobry</h1>
+    <button class="round" id="bell" type="button" aria-label="Powiadomienia">
+      <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.3 20a1.9 1.9 0 0 0 3.4 0"/></svg>
+      <span class="badge" id="bell-badge" hidden></span>
+    </button>
+  </header>
+
+  <div class="date">
+    <p id="today"></p>
+    <button class="plus" id="plus" type="button" aria-label="Nowe przypomnienie" style="border:0;cursor:pointer">
+      <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+  </div>
+
+  <nav aria-label="Najbliższe dni"><ol class="days" id="days"></ol></nav>
+
+  <div id="list" aria-live="polite"><div class="skel"></div></div>
+</main>
+
+<!-- GŁÓWNE WEJŚCIE -->
+<div class="dock" id="dock" hidden>
+  <form id="wpisz" aria-label="Nowe przypomnienie">
+    <label for="q" class="sr">Napisz, co zapamiętać</label>
+    <input id="q" type="text" placeholder="Napisz, co zapamiętać…" autocomplete="off" enterkeyhint="send" maxlength="1000">
+    <button class="btn-ic mic" type="button" id="mic" aria-label="Podyktuj">
+      <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+    </button>
+    <button class="btn-ic send" type="submit" aria-label="Zapisz">
+      <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4z"/></svg>
+    </button>
+  </form>
+</div>
+
+<!-- EKRAN 2 · szczegół -->
+<section class="detail" id="detail" aria-label="Szczegóły" aria-modal="true" role="dialog"></section>
+
+</body>
 </html>

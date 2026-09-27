@@ -25,7 +25,9 @@ WITH {ME}
 SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
   ELSE json_build_object('status', 200, 'items', coalesce((SELECT json_agg(t ORDER BY t.next_at NULLS LAST, t.created_at DESC) FROM (
     SELECT i.id, i.kind, i.title, i.source_text, i.spec, i.data, i.widget_slug, i.status, i.created_at,
-      (SELECT min(n.due_at) FROM notifications n WHERE n.item_id = i.id AND n.sent_at IS NULL) AS next_at
+      (SELECT min(n.due_at) FROM notifications n WHERE n.item_id = i.id AND n.sent_at IS NULL) AS next_at,
+      coalesce((SELECT json_agg(n.due_at ORDER BY n.due_at) FROM notifications n
+                WHERE n.item_id = i.id AND n.sent_at IS NULL), '[]'::json) AS notify_at
     FROM items i WHERE i.user_id = (SELECT user_id FROM me) AND i.status = 'active') t), '[]'::json)) END AS result""",
    "={{ [ " + TOKEN + " ] }}"),
 
@@ -72,6 +74,19 @@ SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
   WHEN NOT EXISTS (SELECT 1 FROM upd) THEN json_build_object('status', 404, 'error', 'Nie ma takiej rzeczy')
   ELSE json_build_object('status', 200, 'ok', true) END AS result""",
    "={{ [ " + TOKEN + ", /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000' ] }}"),
+
+  ("POST", "items/check", "Odhacz pozycję", f"""
+WITH {ME},
+upd AS (
+  UPDATE items SET updated_at = now(),
+    data = jsonb_set(data, ARRAY['checklist', $3::text, 'done'], to_jsonb($4::boolean))
+  WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me)
+    AND jsonb_typeof(data->'checklist') = 'array' AND $3::int < jsonb_array_length(data->'checklist')
+  RETURNING data)
+SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
+  WHEN NOT EXISTS (SELECT 1 FROM upd) THEN json_build_object('status', 404, 'error', 'Nie ma takiej pozycji')
+  ELSE json_build_object('status', 200, 'data', (SELECT data FROM upd)) END AS result""",
+   "={{ [ " + TOKEN + ", /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000', String(Math.max(0, Math.min(99, parseInt($json.body.index, 10) || 0))), $json.body.done === true ] }}"),
 
   ("POST", "items/delete", "Usuń", f"""
 WITH {ME},

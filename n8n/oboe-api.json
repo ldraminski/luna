@@ -2,7 +2,7 @@
  "name": "Oboe: API",
  "nodes": [
   {
-   "id": "9d46c66a-3725-4522-a209-a17c2d4ff9f2",
+   "id": "a03e8fbb-4012-4929-83c6-9be4c208db91",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "e1cc5957-62cb-4850-a883-349e92a7dd99",
+   "id": "35fbc6c9-b8ec-4dbe-8b32-4aede821a9cb",
    "name": "GET me",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -25,7 +25,7 @@
     0,
     0
    ],
-   "webhookId": "cebb594d-c1a3-4eb2-8357-6e956fa522b9",
+   "webhookId": "2f9e3149-c2cd-4b58-a49b-ccee37b3a03a",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/me",
@@ -34,7 +34,7 @@
    }
   },
   {
-   "id": "86de8c85-36f1-458e-bd40-a18f55408d62",
+   "id": "73b29ad0-fa92-40f2-a5b9-48a81f9cde93",
    "name": "Kim jestem",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -58,7 +58,7 @@
    }
   },
   {
-   "id": "d05614f4-fe14-4b22-b52a-a77b986b5732",
+   "id": "233de997-5aa5-4cd2-8c4b-bd0c7ced23b7",
    "name": "Odpowiedz: Kim jestem",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -75,7 +75,7 @@
    }
   },
   {
-   "id": "1ef67783-9b6e-4d31-be34-0ca9f9af07b1",
+   "id": "7eea3dc9-c5da-4bb0-a9d8-9fb2faf11618",
    "name": "GET items",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -83,7 +83,7 @@
     0,
     200
    ],
-   "webhookId": "3fce266f-3598-423e-bb4a-04e0cb732a3e",
+   "webhookId": "8dfa9750-d3a9-4eea-8390-ab498a1a6f35",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/items",
@@ -92,7 +92,7 @@
    }
   },
   {
-   "id": "99c8411c-aef0-4045-82c2-77d9708d0a02",
+   "id": "b5f0b0d5-5f54-4ccf-b604-488c50c5ff21",
    "name": "Lista rzeczy",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -109,14 +109,14 @@
    "alwaysOutputData": false,
    "parameters": {
     "operation": "executeQuery",
-    "query": "WITH me AS (\n  UPDATE sessions SET last_used_at = now()\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id)\nSELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN json_build_object('status', 401, 'error', 'Zaloguj się ponownie')\n  ELSE json_build_object('status', 200, 'items', coalesce((SELECT json_agg(t ORDER BY t.next_at NULLS LAST, t.created_at DESC) FROM (\n    SELECT i.id, i.kind, i.title, i.source_text, i.spec, i.data, i.widget_slug, i.status, i.created_at,\n      (SELECT min(n.due_at) FROM notifications n WHERE n.item_id = i.id AND n.sent_at IS NULL) AS next_at\n    FROM items i WHERE i.user_id = (SELECT user_id FROM me) AND i.status = 'active') t), '[]'::json)) END AS result",
+    "query": "WITH me AS (\n  UPDATE sessions SET last_used_at = now()\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id)\nSELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN json_build_object('status', 401, 'error', 'Zaloguj się ponownie')\n  ELSE json_build_object('status', 200, 'items', coalesce((SELECT json_agg(t ORDER BY t.next_at NULLS LAST, t.created_at DESC) FROM (\n    SELECT i.id, i.kind, i.title, i.source_text, i.spec, i.data, i.widget_slug, i.status, i.created_at,\n      (SELECT min(n.due_at) FROM notifications n WHERE n.item_id = i.id AND n.sent_at IS NULL) AS next_at,\n      coalesce((SELECT json_agg(n.due_at ORDER BY n.due_at) FROM notifications n\n                WHERE n.item_id = i.id AND n.sent_at IS NULL), '[]'::json) AS notify_at\n    FROM items i WHERE i.user_id = (SELECT user_id FROM me) AND i.status = 'active') t), '[]'::json)) END AS result",
     "options": {
      "queryReplacement": "={{ [ ($json.headers.authorization || '').replace(/^Bearer\\s+/i, '') ] }}"
     }
    }
   },
   {
-   "id": "a47a058b-3719-4a95-8789-e78c8e24fed3",
+   "id": "24fe212c-0662-4aef-9a45-a5504faee230",
    "name": "Odpowiedz: Lista rzeczy",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -133,7 +133,7 @@
    }
   },
   {
-   "id": "a0b5c9cf-b1ca-490e-8078-49c0496e06f6",
+   "id": "34d50c7d-ad65-4538-af66-898633e15492",
    "name": "GET pending",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -141,7 +141,7 @@
     0,
     400
    ],
-   "webhookId": "4f89fe7d-3089-461d-83fc-c469452ae9c9",
+   "webhookId": "6307d8a1-1dfb-4089-92fd-51aac68035ab",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/pending",
@@ -150,7 +150,7 @@
    }
   },
   {
-   "id": "5b4e162b-875b-47b0-b7ea-053979bbd62c",
+   "id": "0029c0fc-3f0f-48ab-a38d-f8f4efbf8c1f",
    "name": "Do pokazania",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -174,7 +174,7 @@
    }
   },
   {
-   "id": "7ef9e8fa-c376-4cd5-b4b5-bd9053668709",
+   "id": "7b22da54-9334-4df5-8b2b-7ccda11252c7",
    "name": "Odpowiedz: Do pokazania",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -191,7 +191,7 @@
    }
   },
   {
-   "id": "496444cd-e82e-41d0-9fc9-94cfe1fead64",
+   "id": "351c7b95-c2c9-47a7-9b38-aed2e1ee5e72",
    "name": "POST push/subscribe",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -199,7 +199,7 @@
     0,
     600
    ],
-   "webhookId": "50ac53e7-59b0-4cbf-bc15-aa1d0a78a5a2",
+   "webhookId": "55828b34-df82-4b0f-a73a-fd8fedfe9d54",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/push/subscribe",
@@ -208,7 +208,7 @@
    }
   },
   {
-   "id": "c22375d2-c586-4b56-984a-a538dad1fc04",
+   "id": "f733863c-de20-4746-8dc2-32a2bb02ff53",
    "name": "Zapisz urządzenie",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -232,7 +232,7 @@
    }
   },
   {
-   "id": "fb22143c-db68-44b9-b243-f7312150b123",
+   "id": "89462fc3-3c3d-4fc9-9da7-f6d400cd171e",
    "name": "Odpowiedz: Zapisz urządzenie",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -249,7 +249,7 @@
    }
   },
   {
-   "id": "a871a959-09db-4ba8-8184-54705d14577c",
+   "id": "0c3e4960-0152-416e-a451-dd2b3260d6db",
    "name": "POST push/unsubscribe",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -257,7 +257,7 @@
     0,
     800
    ],
-   "webhookId": "fab80bf6-5cd3-46f3-89ea-361eded56194",
+   "webhookId": "20e22da5-e01d-4a54-b497-5cb943f07eca",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/push/unsubscribe",
@@ -266,7 +266,7 @@
    }
   },
   {
-   "id": "3bf364b7-395b-4f44-a725-a92ab582a448",
+   "id": "fd5c29f1-9a59-40e8-b8ed-35fa69a92cda",
    "name": "Usuń urządzenie",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -290,7 +290,7 @@
    }
   },
   {
-   "id": "3d0d2ac5-f217-4118-a48c-98d1b5928fc5",
+   "id": "4a23598e-0d55-40d2-ae46-baa65eb7c781",
    "name": "Odpowiedz: Usuń urządzenie",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -307,7 +307,7 @@
    }
   },
   {
-   "id": "01d68bdd-afbb-4947-8030-5fac8e88a0fb",
+   "id": "447aab5c-ee02-4d8a-8c2c-afcafc522633",
    "name": "POST items/done",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -315,7 +315,7 @@
     0,
     1000
    ],
-   "webhookId": "37d26df5-5203-4652-844c-980ce6068abf",
+   "webhookId": "14028c6e-6b1b-49de-a7dc-0919b4b2658d",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/done",
@@ -324,7 +324,7 @@
    }
   },
   {
-   "id": "1776cffe-d915-4ade-b15d-68e53e410a19",
+   "id": "a87abbc1-4042-43ac-8b7c-07a0620ce90d",
    "name": "Odhacz",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -348,7 +348,7 @@
    }
   },
   {
-   "id": "9453d75e-07c5-425b-9ad7-fa784f3b896a",
+   "id": "b14b9df5-bb64-4ce0-a959-60f797c6ed72",
    "name": "Odpowiedz: Odhacz",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -365,15 +365,73 @@
    }
   },
   {
-   "id": "35ab53d2-8bc2-4f2f-a64d-cf5218234c5a",
-   "name": "POST items/delete",
+   "id": "12b97548-32ed-46e8-b7d2-b5fac7799cee",
+   "name": "POST items/check",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
    "position": [
     0,
     1200
    ],
-   "webhookId": "1ee91d26-a8fd-4317-ba5e-3166fcbcfb89",
+   "webhookId": "3772d7f3-ba9a-4427-ad61-9ad7dfa6856b",
+   "parameters": {
+    "httpMethod": "POST",
+    "path": "oboe/items/check",
+    "responseMode": "responseNode",
+    "options": {}
+   }
+  },
+  {
+   "id": "a7fade92-8b7c-4f5a-b9a0-b42d4774cf50",
+   "name": "Odhacz pozycję",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    240,
+    1200
+   ],
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   },
+   "alwaysOutputData": false,
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "WITH me AS (\n  UPDATE sessions SET last_used_at = now()\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id),\nupd AS (\n  UPDATE items SET updated_at = now(),\n    data = jsonb_set(data, ARRAY['checklist', $3::text, 'done'], to_jsonb($4::boolean))\n  WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me)\n    AND jsonb_typeof(data->'checklist') = 'array' AND $3::int < jsonb_array_length(data->'checklist')\n  RETURNING data)\nSELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN json_build_object('status', 401, 'error', 'Zaloguj się ponownie')\n  WHEN NOT EXISTS (SELECT 1 FROM upd) THEN json_build_object('status', 404, 'error', 'Nie ma takiej pozycji')\n  ELSE json_build_object('status', 200, 'data', (SELECT data FROM upd)) END AS result",
+    "options": {
+     "queryReplacement": "={{ [ ($json.headers.authorization || '').replace(/^Bearer\\s+/i, ''), /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000', String(Math.max(0, Math.min(99, parseInt($json.body.index, 10) || 0))), $json.body.done === true ] }}"
+    }
+   }
+  },
+  {
+   "id": "5a0f1e44-1e60-44c8-a868-f22de67e8dc0",
+   "name": "Odpowiedz: Odhacz pozycję",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    480,
+    1200
+   ],
+   "parameters": {
+    "respondWith": "json",
+    "responseBody": "={{ $json.result }}",
+    "options": {
+     "responseCode": "={{ $json.result.status || 200 }}"
+    }
+   }
+  },
+  {
+   "id": "5d44df10-aa1f-4f6e-ad22-bf6d30be3c77",
+   "name": "POST items/delete",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    1400
+   ],
+   "webhookId": "975dd4f7-8796-44a6-9741-c8df077e292c",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/delete",
@@ -382,13 +440,13 @@
    }
   },
   {
-   "id": "753d6347-b680-4606-b3f7-9e6749d2c22b",
+   "id": "90e6b2cd-6f5b-4eae-bb81-c48ed0688ee0",
    "name": "Usuń",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
    "position": [
     240,
-    1200
+    1400
    ],
    "credentials": {
     "postgres": {
@@ -406,13 +464,13 @@
    }
   },
   {
-   "id": "e709b8e2-00c5-438c-8e26-0512b0faff9d",
+   "id": "3d711716-6a83-4120-b9af-0593cf859cf9",
    "name": "Odpowiedz: Usuń",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
    "position": [
     480,
-    1200
+    1400
    ],
    "parameters": {
     "respondWith": "json",
@@ -423,13 +481,13 @@
    }
   },
   {
-   "id": "51e3037a-ecdd-4547-bcea-d3974317f002",
+   "id": "d3619627-6de8-48e5-9ab5-b00045c28d09",
    "name": "POST items",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
    "position": [
     0,
-    1500
+    1700
    ],
    "parameters": {
     "httpMethod": "POST",
@@ -437,16 +495,16 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "b0946087-a68d-49b4-a556-8fa60c0b860f"
+   "webhookId": "50b17de2-fcde-43c9-be5b-cf33868a4202"
   },
   {
-   "id": "0cc1607c-a1ca-4174-b7c2-64e07a1c7e7d",
+   "id": "81c3e242-333f-4825-8e3c-57372d5dc2bf",
    "name": "Sesja",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
    "position": [
     220,
-    1500
+    1700
    ],
    "parameters": {
     "operation": "executeQuery",
@@ -463,13 +521,13 @@
    }
   },
   {
-   "id": "d908ffb6-42fc-48e4-b460-a7dd66f0ac97",
+   "id": "4435c66a-a44c-4332-baa9-b01fd9e0c91d",
    "name": "Zalogowany i jest tekst?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
    "position": [
     440,
-    1500
+    1700
    ],
    "parameters": {
     "conditions": {
@@ -481,7 +539,7 @@
      },
      "conditions": [
       {
-       "id": "7ae8d057-5e6f-47c6-b859-acc2cb5d698d",
+       "id": "c2095095-c51b-4a2d-8834-4de4a2bf8398",
        "leftValue": "={{ $json.user_id }}",
        "rightValue": "",
        "operator": {
@@ -491,7 +549,7 @@
        }
       },
       {
-       "id": "e75921f3-f8fa-44b2-b501-b7826d4379af",
+       "id": "8d1cb71e-ded9-4885-b561-344aa94447fc",
        "leftValue": "={{ String($('POST items').item.json.body.text || '').trim() }}",
        "rightValue": "",
        "operator": {
@@ -507,13 +565,13 @@
    }
   },
   {
-   "id": "9a3ecd69-be30-4cc4-aa1d-e41bc573cd3f",
+   "id": "f94044e3-c828-4478-8e66-360596fe255e",
    "name": "Odmów",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
    "position": [
     660,
-    1680
+    1880
    ],
    "parameters": {
     "respondWith": "json",
@@ -524,26 +582,26 @@
    }
   },
   {
-   "id": "14127a05-479a-4aac-8829-78a4e72f1f30",
+   "id": "62f75634-edad-4b78-a0f2-adaf4835e2e2",
    "name": "Kalendarz",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
    "position": [
     660,
-    1500
+    1700
    ],
    "parameters": {
     "jsCode": "// Model źle liczy daty (\"za 3 dni\", \"w piątek\"), więc dostaje gotowy kalendarz liczony tutaj (Luxon, strefa workflow = Europe/Warsaw).\nconst DNI = ['poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela'];\nconst now = $now.setZone('Europe/Warsaw');\nconst lines = [];\nfor (let i = 0; i < 35; i++) {\n  const d = now.plus({ days: i });\n  const label = i === 0 ? 'dziś' : i === 1 ? 'jutro' : i === 2 ? 'pojutrze' : `za ${i} dni`;\n  lines.push(`${d.toFormat('yyyy-MM-dd')} ${DNI[d.weekday - 1]} (${label}), przesunięcie ${d.set({ hour: 12 }).toFormat('ZZ')}`);\n}\nreturn [{ json: {\n  teraz: `${now.toFormat('yyyy-MM-dd HH:mm')} (${DNI[now.weekday - 1]}), strefa Europe/Warsaw, przesunięcie ${now.toFormat('ZZ')}`,\n  kalendarz: lines.join('\\n'),\n} }];\n"
    }
   },
   {
-   "id": "9b6a9815-26fc-42e4-bdab-d39a7bab056b",
+   "id": "b47cc439-1c2f-4166-bdd2-e6d75bca955b",
    "name": "DeepSeek: zrozum",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
    "position": [
     880,
-    1500
+    1700
    ],
    "parameters": {
     "method": "POST",
@@ -581,26 +639,26 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "74921d2d-5e45-4612-a372-ff0dff81fffd",
+   "id": "a4350550-1fcf-4ef1-8171-ca4672c74afb",
    "name": "Sprawdź odpowiedź",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
    "position": [
     1100,
-    1500
+    1700
    ],
    "parameters": {
     "jsCode": "// Sprawdza odpowiedź modelu; niczego nie zgaduje — przy błędzie zwraca ok:false z komunikatem.\nconst src = String($('POST items').first().json.body.text || '').trim().slice(0, 1000);\nconst fail = (error) => [{ json: { ok: false, error, notify: [], spec: {}, data: {}, source_text: src } }];\n\nconst raw = $json.choices?.[0]?.message?.content;\nif (!raw) return fail('Model nie odpowiedział. Spróbuj jeszcze raz.');\nlet m;\ntry { m = JSON.parse(raw.replace(/^```(json)?|```$/g, '').trim()); } catch (e) { return fail('Nie zrozumiałem. Spróbuj napisać inaczej.'); }\n\nconst KINDS = ['reminder-once', 'reminder-recurring', 'page-summary', 'checklist', 'note'];\nconst kind = KINDS.includes(m.kind) ? m.kind : 'note';\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst now = Date.now();\nconst iso = (v) => { const t = Date.parse(v); return Number.isFinite(t) ? new Date(t).toISOString() : null; };\n\nlet notify = (Array.isArray(m.notify) ? m.notify : [])\n  .map((n) => ({ at: iso(n.at), title: cut(n.title, 50) || cut(m.title, 50), body: cut(n.body, 120) }))\n  .filter((n) => n.at && Date.parse(n.at) > now - 60000 && Date.parse(n.at) < now + 400 * 864e5)\n  .slice(0, 10);\n\nlet url = null;\nif (kind === 'page-summary') {\n  // Code node nie ma URL — prosta walidacja wyrażeniem.\n  const u = String(m.url || '').trim();\n  if (/^https?:\\/\\/[a-z0-9.-]+\\.[a-z]{2,}(:\\d+)?(\\/\\S*)?$/i.test(u)) url = u.slice(0, 500);\n  if (!url) return fail('Nie widzę adresu strony. Podaj pełny link.');\n}\n\nconst title = cut(m.title, 40) || src.slice(0, 40);\nconst rec = kind === 'reminder-recurring' && m.recurrence && Number(m.recurrence.every) > 0 &&\n  ['day', 'week', 'month'].includes(m.recurrence.unit) ? {\n    every: Math.min(Number(m.recurrence.every), 365), unit: m.recurrence.unit,\n    lead: m.recurrence.lead && ['hour', 'day'].includes(m.recurrence.lead.unit)\n      ? { value: Math.min(Number(m.recurrence.lead.value) || 0, 30), unit: m.recurrence.lead.unit } : null,\n  } : null;\nif (kind === 'reminder-recurring' && !rec) return fail('Nie rozumiem, co ile to powtarzać.');\n\nreturn [{ json: {\n  ok: true, kind, title, source_text: src, widget_slug: kind,\n  spec: { understood: cut(m.understood, 300), event_at: iso(m.event_at), recurrence: rec, url, model: 'deepseek/deepseek-v4.1-flash' },\n  data: {\n    tip: cut(m.tip, 80) || null,\n    checklist: kind === 'checklist' ? (Array.isArray(m.checklist) ? m.checklist : []).map((x) => ({ text: cut(String(x), 80), done: false })).filter((x) => x.text).slice(0, 30) : undefined,\n  },\n  notify,\n} }];\n"
    }
   },
   {
-   "id": "e00498bd-7914-484f-a6ba-bee8ffe85178",
+   "id": "0f13a376-1972-4ea4-95e6-d3642811b459",
    "name": "Zapisz",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
    "position": [
     1320,
-    1500
+    1700
    ],
    "parameters": {
     "operation": "executeQuery",
@@ -617,13 +675,13 @@
    }
   },
   {
-   "id": "e8ac6007-a2a4-41bb-9ab4-5db5c025781b",
+   "id": "86439083-b5cf-40da-8674-bcb666eb1247",
    "name": "Odpowiedz: dodano",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
    "position": [
     1540,
-    1500
+    1700
    ],
    "parameters": {
     "respondWith": "json",
@@ -761,6 +819,28 @@
     [
      {
       "node": "Odpowiedz: Odhacz",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "POST items/check": {
+   "main": [
+    [
+     {
+      "node": "Odhacz pozycję",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Odhacz pozycję": {
+   "main": [
+    [
+     {
+      "node": "Odpowiedz: Odhacz pozycję",
       "type": "main",
       "index": 0
      }

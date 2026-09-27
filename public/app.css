@@ -1,0 +1,210 @@
+/* Oboe — style 1:1 z makiety Sekkei (wariant A, ~/Work/agents/hikari/sekkei/oboe/wariant-a.html) + elementy aplikacji na dole. */
+/* ============================================================
+   OBOE · wariant A · tokeny
+   Każdy widget (także wygenerowany przez AI) składa się WYŁĄCZNIE
+   z tych tokenów i z anatomii .w (ikona · typ · tytuł · treść · stopka).
+   ============================================================ */
+:root{
+  --outer:#98bfc8;          /* tło poza telefonem (desktop) */
+  --bg:#e6f0f2;             /* tło aplikacji */
+  --surface:#fdffff;        /* karta domyślna */
+  --surface-2:#f3f7f8;      /* pole wpisywania, wnętrza kart */
+  --line:#d3e0e3;           /* obrysy 1px */
+  --ink:#0f2a33;            /* tekst główny */
+  --ink-2:#48636b;          /* tekst drugorzędny */
+  --navy:#094457;           /* akcent: aktywne, wykres, CTA */
+  --on-navy:#ffffff;
+  --tint-lavender:#c5c6ed;  /* rodzina: jednorazowe */
+  --tint-blue:#c4e1ee;      /* rodzina: strony / wiedza */
+  --tint-mint:#caefc8;      /* rodzina: cykliczne */
+  --tint-pink:#ecc3e4;      /* rodzina: akcje / dodaj */
+  --tint-sky:#87c2d4;       /* karta wyróżniona (najbliższy termin) */
+  --bar:#c2d1d3;            /* słupki nieaktywne */
+  --dot:#e0359f;            /* kropka powiadomienia */
+  --r-card:28px; --r-tile:22px; --r-pill:999px;
+  --gap:12px; --pad:18px;
+  --shadow:0 1px 2px rgba(9,68,87,.06), 0 8px 24px -12px rgba(9,68,87,.18);
+  --ease:cubic-bezier(.16,1,.3,1);
+  --f:"Lexend", system-ui, -apple-system, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--f);color:var(--ink);background:var(--outer);font-size:15px;line-height:1.45;font-weight:400}
+.app{max-width:430px;min-height:100dvh;margin:0 auto;background:var(--bg);padding:18px 16px 120px;position:relative}
+@media (min-width:480px){body{padding:32px 0}.app{border-radius:44px;min-height:auto;box-shadow:0 30px 60px -30px rgba(9,68,87,.45)}}
+h1,h2,h3{font-weight:500;letter-spacing:-.01em}
+button,input{font:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--navy);outline-offset:3px;border-radius:12px}
+svg{display:block}
+.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* --- nagłówek --- */
+.top{display:flex;justify-content:space-between;align-items:flex-start;padding:6px 4px 0}
+.top h1{font-size:25px;line-height:1.15}
+.round{width:52px;height:52px;border-radius:50%;background:var(--surface);border:0;display:grid;place-items:center;position:relative;box-shadow:var(--shadow);cursor:pointer;text-decoration:none}
+.round .badge{position:absolute;top:9px;right:10px;width:9px;height:9px;border-radius:50%;background:var(--dot);border:2px solid var(--surface)}
+.date{display:flex;justify-content:space-between;align-items:center;margin:26px 4px 12px}
+.date p{font-size:14px;font-weight:500}
+.plus{width:44px;height:44px;border-radius:50%;background:var(--tint-pink);display:grid;place-items:center;text-decoration:none}
+
+/* --- pasek dni --- */
+.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;list-style:none;margin-bottom:26px}
+.days a{display:flex;flex-direction:column;align-items:center;gap:5px;text-decoration:none;padding:2px 0}
+.days .d{width:100%;max-width:44px;aspect-ratio:1;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-size:14px;font-weight:500}
+.days .wd{font-size:11px;color:var(--ink-2)}
+.days .mk{width:5px;height:5px;border-radius:50%;background:transparent}
+.days .has .mk{background:var(--navy)}
+.days .today .d{background:var(--navy);color:var(--on-navy);box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--navy)}
+
+.sec{font-size:22px;margin:30px 4px 14px}
+
+/* --- WIDGET: jedna anatomia dla wszystkich --- */
+.w{background:var(--surface);border-radius:var(--r-card);padding:var(--pad);box-shadow:var(--shadow);position:relative;display:block;text-decoration:none;transition:transform .2s var(--ease)}
+.w + .w{margin-top:var(--gap)}
+a.w:active{transform:scale(.985)}
+.w-h{display:flex;gap:12px;align-items:center}
+.ico{flex:none;width:56px;height:56px;border-radius:18px;display:grid;place-items:center;color:var(--navy)}
+.ico .i{width:28px;height:28px;stroke-width:1.6}
+.kind{font-size:12px;color:var(--ink-2);font-weight:500;display:flex;gap:6px;align-items:center}
+.w h3{font-size:17px;line-height:1.25}
+.w-f{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px;font-size:13px;color:var(--ink-2)}
+.meta{display:flex;align-items:center;gap:6px}
+.meta .i{width:17px;height:17px}
+.chev{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;color:var(--ink);flex:none}
+.chev .i{width:16px;height:16px}
+
+/* 2 · jednorazowe — wyróżnione */
+.w--hero{background:var(--tint-sky);overflow:hidden;padding:20px 20px 18px}
+.w--hero .kind{color:var(--ink)}
+.big{font-size:44px;line-height:1;font-weight:600;letter-spacing:-.03em;margin:14px 0 8px;display:inline-block;position:relative}
+.big::after{content:"";position:absolute;left:0;right:10%;bottom:-4px;height:3px;border-radius:3px;background:var(--surface)}
+.w--hero h3{font-size:18px;max-width:14ch;margin-top:10px}
+.w--hero .w-f{color:var(--ink)}
+.blob{position:absolute;right:-18px;top:28px;width:150px;height:150px;border-radius:50%;background:var(--tint-blue);display:grid;place-items:center;color:var(--navy)}
+.blob svg{width:78px;height:78px;margin:-10px 18px 0 0}
+
+/* 3 · cykliczne */
+.cycle{display:grid;grid-template-columns:repeat(14,1fr);gap:4px;margin-top:16px}
+.cycle i{height:8px;border-radius:4px;background:var(--bar)}
+.cycle i.on{background:var(--navy)}
+.cycle i.rem{background:var(--tint-mint);outline:2px solid var(--navy);outline-offset:-2px}
+.cyc-l{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-2);margin-top:8px}
+
+/* 4 · streszczenie */
+.sum{font-size:14px;line-height:1.55;margin-top:14px;color:var(--ink)}
+.sum li{margin-left:1.1em;padding-left:2px}
+.sum li + li{margin-top:4px}
+.dom{font-size:13px;color:var(--ink-2)}
+
+/* 5 · dziś */
+.todo{list-style:none;margin-top:8px}
+.todo li + li{border-top:1px solid var(--line)}
+.todo label{display:flex;align-items:center;gap:12px;min-height:52px;cursor:pointer;font-size:15px}
+.todo input{appearance:none;flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--navy);display:grid;place-items:center;cursor:pointer;transition:background .15s}
+.todo input:checked{background:var(--navy)}
+.todo input:checked::after{content:"";width:10px;height:6px;border:solid var(--on-navy);border-width:0 0 2px 2px;transform:translateY(-1px) rotate(-45deg)}
+.todo input:checked + span{color:var(--ink-2);text-decoration:line-through;text-decoration-thickness:1px}
+.todo small{margin-left:auto;font-size:12px;color:var(--ink-2);white-space:nowrap}
+
+/* 6 · widget wygenerowany — wykres */
+.gen{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;background:var(--tint-pink);padding:4px 10px 4px 7px;border-radius:var(--r-pill);color:var(--ink)}
+.gen .i{width:14px;height:14px}
+.chart{position:relative;display:grid;grid-template-columns:repeat(7,1fr);gap:7px;align-items:end;height:140px;margin-top:22px}
+.chart .b{background:var(--bar);border-radius:10px 10px 6px 6px}
+.chart .b.on{background:var(--navy);position:relative}
+.chart .b.on span{position:absolute;top:8px;left:0;right:0;text-align:center;color:var(--on-navy);font-size:12px;font-weight:500}
+.avg{position:absolute;left:0;right:0;border-top:2px dotted var(--ink);opacity:.55}
+.avg b{position:absolute;left:0;top:-13px;background:var(--ink);color:var(--surface);font-size:11px;font-weight:500;padding:3px 9px;border-radius:var(--r-pill);opacity:1}
+.wd7{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-top:8px}
+.wd7 span{text-align:center;font-size:11px;border:1px solid var(--line);border-radius:var(--r-pill);padding:3px 0;color:var(--ink-2)}
+.wd7 span.on{background:var(--tint-blue);color:var(--ink);border-color:transparent}
+.stats{display:flex;gap:18px;margin-top:14px}
+.stats div{font-size:12px;color:var(--ink-2)}
+.stats b{display:block;font-size:17px;font-weight:600;color:var(--ink);white-space:nowrap}
+
+/* 7 · pole wpisywania */
+.dock{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 38%);z-index:5}
+.dock form{max-width:398px;margin:0 auto;display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:var(--r-pill);padding:6px 6px 6px 20px;box-shadow:0 10px 30px -10px rgba(9,68,87,.35)}
+.dock input{flex:1;min-width:0;border:0;background:transparent;font-size:15px;height:44px;outline:none}
+.dock input::placeholder{color:var(--ink-2)}
+.dock form:focus-within{box-shadow:0 0 0 3px var(--navy),0 10px 30px -10px rgba(9,68,87,.35)}
+.btn-ic{width:44px;height:44px;border-radius:50%;border:0;display:grid;place-items:center;cursor:pointer;flex:none}
+.mic{background:var(--surface-2);color:var(--navy)}
+.send{background:var(--navy);color:var(--on-navy)}
+
+/* --- ekran szczegółu (:target, bez JS) --- */
+.detail{position:fixed;inset:0;z-index:20;background:var(--outer);overflow:auto;display:none}
+.detail:target{display:block;animation:up .28s var(--ease)}
+@keyframes up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.detail .app{padding:0 0 40px;overflow:hidden}
+.d-top{background:var(--tint-lavender);padding:18px 16px 30px;border-radius:0 0 40px 40px;position:relative;overflow:hidden}
+.d-top .ring{position:absolute;right:-60px;top:40px;width:260px;height:260px;border-radius:50%;border:34px solid rgba(255,255,255,.28)}
+.d-nav{display:flex;justify-content:space-between;position:relative}
+.d-top h1{font-size:32px;line-height:1.12;margin-top:38px;position:relative;font-weight:300}
+.d-top h1 b{font-weight:600;display:block}
+.pill{display:inline-block;font-size:12px;font-weight:500;background:var(--surface);border-radius:var(--r-pill);padding:6px 12px;margin-top:14px;position:relative}
+.d-body{padding:20px 16px}
+.quote{background:var(--surface);border-radius:var(--r-tile);padding:16px 18px;font-size:14px;color:var(--ink-2);box-shadow:var(--shadow)}
+.quote q{display:block;color:var(--ink);font-size:16px;margin-top:6px;quotes:"„" "”"}
+.rows{list-style:none;margin-top:12px;background:var(--surface);border-radius:var(--r-tile);box-shadow:var(--shadow);padding:4px 18px}
+.rows li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;padding:14px 0;font-size:14px;align-items:baseline}
+.rows li + li{border-top:1px solid var(--line)}
+.rows span{color:var(--ink-2);white-space:nowrap}
+.rows b{font-weight:500;text-align:right;overflow-wrap:anywhere}
+.d-cta{display:flex;gap:10px;margin-top:20px}
+.cta{flex:1;height:54px;border-radius:var(--r-pill);background:var(--navy);color:var(--on-navy);border:0;font-weight:500;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;text-decoration:none}
+.ghost{width:54px;height:54px;border-radius:50%;background:var(--surface);border:0;display:grid;place-items:center;box-shadow:var(--shadow);cursor:pointer;text-decoration:none}
+
+
+/* ============================================================
+   Poza makietą: stany aplikacji (Hikari, 27.09)
+   ============================================================ */
+[hidden]{display:none!important}
+.w{cursor:pointer}
+.w h3{overflow-wrap:anywhere}
+.date p::first-letter{text-transform:uppercase}
+
+/* ekran wklejenia tokenu */
+.hello{min-height:100dvh;display:flex;flex-direction:column;justify-content:center;gap:18px;padding:32px 20px calc(32px + env(safe-area-inset-bottom));max-width:430px;margin:0 auto;background:var(--bg)}
+@media (min-width:480px){.hello{min-height:auto;border-radius:44px;margin-top:32px}}
+.hello .logo{width:72px;height:72px;border-radius:22px}
+.hello h1{font-size:30px;line-height:1.1;font-weight:300}
+.hello h1 b{font-weight:600;display:block}
+.hello p{color:var(--ink-2)}
+.tok{display:flex;gap:8px;background:var(--surface);border-radius:var(--r-pill);padding:6px 6px 6px 20px;box-shadow:var(--shadow)}
+.tok:focus-within{box-shadow:0 0 0 3px var(--navy)}
+.tok input{flex:1;min-width:0;border:0;background:transparent;height:44px;outline:none;font-size:15px}
+.tok button{height:44px;padding:0 18px;border-radius:var(--r-pill);border:0;background:var(--surface-2);color:var(--navy);font-weight:500;cursor:pointer}
+.hello .cta{flex:none}
+.note{background:var(--tint-lavender);border-radius:var(--r-tile);padding:14px 16px;font-size:14px;color:var(--ink)}
+.note b{font-weight:600}
+.err{color:#9b1c5a;font-size:14px;min-height:1.4em}
+
+/* stan pusty i ładowanie */
+.empty{background:var(--surface);border-radius:var(--r-card);padding:26px 22px;box-shadow:var(--shadow);margin-top:6px}
+.empty h3{font-size:18px;margin-bottom:8px}
+.empty p{color:var(--ink-2);font-size:14px}
+.empty ul{margin:12px 0 0 1.1em;font-size:14px;color:var(--ink)}
+.empty li + li{margin-top:6px}
+.skel{height:150px;border-radius:var(--r-card);background:linear-gradient(90deg,var(--surface) 25%,var(--surface-2) 50%,var(--surface) 75%);background-size:200% 100%;animation:sh 1.2s infinite linear}
+@keyframes sh{to{background-position:-200% 0}}
+
+/* karta „następne” w sekcji jednorazowych (poza wyróżnioną) */
+.nx{display:flex;align-items:center;gap:14px}
+.nx .when{flex:none;width:56px;height:56px;border-radius:18px;background:var(--tint-lavender);display:grid;place-items:center;text-align:center;font-size:12px;line-height:1.1;font-weight:500}
+.nx .when b{display:block;font-size:19px;font-weight:600}
+
+/* dock w trakcie zapisu */
+.dock form.busy{opacity:.7;pointer-events:none}
+.dock form.busy .send svg{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* komunikat */
+.toast{position:fixed;left:16px;right:16px;margin:0 auto;width:fit-content;bottom:calc(92px + env(safe-area-inset-bottom));max-width:398px;background:var(--ink);color:var(--surface);padding:12px 18px;border-radius:18px;font-size:14px;z-index:40;box-shadow:0 10px 30px -10px rgba(0,0,0,.4);animation:up .25s var(--ease)}
+
+/* szczegół — wersja z JS (makieta używała :target) */
+.detail.open{display:block;animation:up .28s var(--ease)}
+.d-cta .danger{background:var(--surface);color:#9b1c5a}
+.chk-sum{font-size:13px;color:var(--ink-2);margin-top:4px}
