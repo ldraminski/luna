@@ -1,0 +1,421 @@
+{
+ "name": "Oboe: Harmonogram",
+ "nodes": [
+  {
+   "id": "7f9b01c4-fc3f-4879-942d-6d6b88cc5c38",
+   "name": "Opis",
+   "type": "n8n-nodes-base.stickyNote",
+   "typeVersion": 1,
+   "position": [
+    -420,
+    -320
+   ],
+   "parameters": {
+    "width": 600,
+    "height": 280,
+    "content": "## Oboe: Harmonogram\nCo minutę: bierze zaległe powiadomienia (`sent_at IS NULL AND due_at <= now()`), od razu oznacza je jako wysłane (najwyżej raz — lepiej zgubić niż wysłać dwa razy), a dla cyklicznych planuje następne (+ `oboe_period(spec)`).\n\n**Push** bez treści, jak w Alertach — telefon pobiera ją z `/api/pending`. Jeden push na urządzenie na przebieg.\n**Mail** gdy kanał `email` albo osoba nie ma działającego urządzenia z pushem.\nŹródło: `~/Work/oboe/n8n/build_scheduler.py`."
+   }
+  },
+  {
+   "id": "b07d3aa4-d7ef-46c5-a652-ecd97c2f77f4",
+   "name": "Co minutę",
+   "type": "n8n-nodes-base.scheduleTrigger",
+   "typeVersion": 1.2,
+   "position": [
+    0,
+    0
+   ],
+   "parameters": {
+    "rule": {
+     "interval": [
+      {
+       "field": "minutes",
+       "minutesInterval": 1
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "6af21fe5-f6cc-4387-8f97-4f856b263c0c",
+   "name": "Weź zaległe",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    220,
+    0
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "WITH due AS (\n  SELECT id FROM notifications WHERE sent_at IS NULL AND due_at <= now()\n  ORDER BY due_at LIMIT 100 FOR UPDATE SKIP LOCKED),\nclaimed AS (\n  UPDATE notifications n SET sent_at = now() FROM due WHERE n.id = due.id RETURNING n.*),\nrec AS (\n  SELECT DISTINCT ON (c.item_id) c.*, i.spec FROM claimed c JOIN items i ON i.id = c.item_id\n  WHERE i.status = 'active' AND oboe_period(i.spec) IS NOT NULL\n    -- CTE widzą stan sprzed UPDATE w claimed, więc właśnie wzięte trzeba wykluczyć jawnie\n    AND NOT EXISTS (SELECT 1 FROM notifications x WHERE x.item_id = c.item_id AND x.sent_at IS NULL\n                    AND x.id NOT IN (SELECT id FROM claimed))\n  ORDER BY c.item_id, c.due_at DESC),\nnxt AS (\n  INSERT INTO notifications (item_id, user_id, due_at, channels, title, body)\n  SELECT item_id, user_id, due_at + oboe_period(spec), channels, title, body FROM rec RETURNING item_id),\nev AS (\n  UPDATE items i SET updated_at = now(),\n    spec = jsonb_set(i.spec, '{event_at}', to_jsonb(to_char(((i.spec->>'event_at')::timestamptz + oboe_period(i.spec)) AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"')))\n  WHERE i.id IN (SELECT item_id FROM nxt) AND i.spec->>'event_at' IS NOT NULL\n  RETURNING 1)\nSELECT c.id, c.user_id, c.title, coalesce(c.body, '') AS body, u.email, coalesce(u.name, '') AS name,\n  ('email' = ANY(c.channels) OR NOT EXISTS (\n     SELECT 1 FROM push_subscriptions s WHERE s.user_id = c.user_id AND s.failures < 3)) AS send_email,\n  ('push' = ANY(c.channels)) AS send_push,\n  (SELECT count(*) FROM ev) AS next_planned\nFROM claimed c JOIN users u ON u.id = c.user_id\nORDER BY c.due_at",
+    "options": {}
+   },
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   }
+  },
+  {
+   "id": "8ea629f1-3025-443f-bc0d-d1e46b7ed1e6",
+   "name": "Tylko mail",
+   "type": "n8n-nodes-base.filter",
+   "typeVersion": 2.2,
+   "position": [
+    460,
+    -140
+   ],
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "loose",
+      "version": 2
+     },
+     "conditions": [
+      {
+       "id": "e5ed0663-c4a6-43a3-ba99-0c9067eb5f0b",
+       "leftValue": "={{ $json.send_email }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "638f3617-b5ff-4e4d-9f20-5559b926dc04",
+   "name": "Wyślij mail",
+   "type": "n8n-nodes-base.emailSend",
+   "typeVersion": 2.1,
+   "position": [
+    680,
+    -140
+   ],
+   "parameters": {
+    "fromEmail": "Oboe <n8n@renlab.ovh>",
+    "toEmail": "={{ $json.email }}",
+    "subject": "={{ '⏰ ' + $json.title }}",
+    "emailFormat": "text",
+    "text": "={{ ($json.body ? $json.body + '\\n\\n' : '') + '— Oboe' }}",
+    "options": {
+     "appendAttribution": false
+    }
+   },
+   "credentials": {
+    "smtp": {
+     "id": "DY5t4HkHVBfxB2gY",
+     "name": "SMTP n8n renlab"
+    }
+   },
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "d1f51636-a635-455b-b6bd-e692c40e6fb3",
+   "name": "Oznacz wysłane mailem",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    900,
+    -140
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "UPDATE notifications SET emailed = true, error = CASE WHEN $2 = '' THEN error ELSE left($2, 300) END WHERE id = $1",
+    "options": {
+     "queryReplacement": "={{ [ $('Tylko mail').item.json.id, $json.error ? String($json.error.message || $json.error) : '' ] }}"
+    }
+   },
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   }
+  },
+  {
+   "id": "5cc0a062-c5c1-49fb-b7b4-3821e99ec89f",
+   "name": "Urządzenia",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    460,
+    140
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "SELECT endpoint FROM push_subscriptions WHERE user_id = ANY($1::uuid[]) AND failures < 10",
+    "options": {
+     "queryReplacement": "={{ [ '{' + [...new Set($('Weź zaległe').all().filter(i => i.json.send_push).map(i => i.json.user_id))].join(',') + '}' ] }}"
+    }
+   },
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   },
+   "executeOnce": true
+  },
+  {
+   "id": "0271def2-e09d-49db-9d44-1a6a145f1225",
+   "name": "Podpisz JWT",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    680,
+    140
+   ],
+   "parameters": {
+    "jsCode": "// Nagłówek VAPID (RFC 8292): JWT ES256 z aud = origin usługi push. Podpis robi węzeł Crypto.\nconst b64u = (s) => Buffer.from(s).toString('base64').replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');\nreturn $input.all().filter((it) => it.json.endpoint).map((it) => {\n  const aud = (it.json.endpoint.match(/^https:\\/\\/[^/]+/) || [''])[0];\n  const header = b64u(JSON.stringify({ typ: 'JWT', alg: 'ES256' }));\n  const payload = b64u(JSON.stringify({ aud, exp: Math.floor(Date.now() / 1000) + 3600, sub: 'https://push.draminski.dev' }));\n  return { json: { endpoint: it.json.endpoint, unsigned: header + '.' + payload } };\n});"
+   }
+  },
+  {
+   "id": "f2f4f5c1-e70c-401e-a633-270971f1d191",
+   "name": "Podpis ES256",
+   "type": "n8n-nodes-base.crypto",
+   "typeVersion": 2,
+   "position": [
+    900,
+    140
+   ],
+   "parameters": {
+    "action": "sign",
+    "value": "={{ $json.unsigned }}",
+    "dataPropertyName": "sig",
+    "algorithm": "RSA-SHA256",
+    "encoding": "base64"
+   },
+   "credentials": {
+    "crypto": {
+     "id": "INg6KASgJTytqlBu",
+     "name": "Alerty VAPID (klucz podpisu Web Push)"
+    }
+   }
+  },
+  {
+   "id": "740213ed-6e12-43d4-99d3-40159eb4fba5",
+   "name": "Złóż nagłówek VAPID",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1120,
+    140
+   ],
+   "parameters": {
+    "jsCode": "// Crypto node zwraca podpis ECDSA w DER, JWT wymaga surowego r||s (64 bajty).\nconst VAPID_PUB = 'BCsLF3E2-p-L9Cpw_smlVGOtpdBEXgDJKEyexxG28crg4SiZkqoFbAuJAlEKOS5YyMVpdw_ISLaWMtbBTqwpYA4';\nconst b64u = (buf) => buf.toString('base64').replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');\nfunction derToRaw(der) {\n  let o = 2;\n  if (der[1] & 0x80) o += der[1] & 0x7f;\n  const int = () => {\n    if (der[o] !== 0x02) throw new Error('Zły DER');\n    const len = der[o + 1];\n    let v = der.slice(o + 2, o + 2 + len);\n    o += 2 + len;\n    while (v.length > 32 && v[0] === 0) v = v.slice(1);\n    return Buffer.concat([Buffer.alloc(32 - v.length), v]);\n  };\n  return Buffer.concat([int(), int()]);\n}\nreturn $input.all().map((it) => ({ json: { endpoint: it.json.endpoint,\n  authorization: `vapid t=${it.json.unsigned + '.' + b64u(derToRaw(Buffer.from(it.json.sig, 'base64')))}, k=${VAPID_PUB}` } }));"
+   }
+  },
+  {
+   "id": "5c52ca93-2854-4759-8bd7-d20c40e3e904",
+   "name": "Wyślij push",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    1340,
+    140
+   ],
+   "parameters": {
+    "method": "POST",
+    "url": "={{ $json.endpoint }}",
+    "sendHeaders": true,
+    "headerParameters": {
+     "parameters": [
+      {
+       "name": "Authorization",
+       "value": "={{ $json.authorization }}"
+      },
+      {
+       "name": "TTL",
+       "value": "86400"
+      },
+      {
+       "name": "Urgency",
+       "value": "high"
+      },
+      {
+       "name": "Content-Length",
+       "value": "0"
+      }
+     ]
+    },
+    "options": {
+     "timeout": 10000,
+     "response": {
+      "response": {
+       "fullResponse": true,
+       "neverError": true,
+       "responseFormat": "text"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "8533f8d7-eb59-45d2-9358-9742e849b718",
+   "name": "Wynik wysyłki",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1560,
+    140
+   ],
+   "parameters": {
+    "jsCode": "// 201 = OK, 404/410 = subskrypcja martwa (kasujemy), reszta = błąd.\nconst subs = $('Złóż nagłówek VAPID').all();\nreturn $input.all().map((it, i) => ({ json: { endpoint: subs[i].json.endpoint,\n  status: Number(it.json.statusCode ?? it.json.error?.status ?? it.json.error?.httpCode ?? 0) || 0 } }));"
+   }
+  },
+  {
+   "id": "87ad29d6-d021-4b68-8fbd-10004381e7bf",
+   "name": "Aktualizuj urządzenia",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    1780,
+    140
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "WITH d AS (DELETE FROM push_subscriptions WHERE endpoint = $1 AND $2 IN (404, 410) RETURNING 1)\nUPDATE push_subscriptions SET last_status = $2,\n  last_ok_at = CASE WHEN $2 BETWEEN 200 AND 299 THEN now() ELSE last_ok_at END,\n  failures = CASE WHEN $2 BETWEEN 200 AND 299 THEN 0 ELSE failures + 1 END\nWHERE endpoint = $1 AND $2 NOT IN (404, 410)",
+    "options": {
+     "queryReplacement": "={{ [ $json.endpoint, $json.status ] }}"
+    }
+   },
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   }
+  }
+ ],
+ "connections": {
+  "Co minutę": {
+   "main": [
+    [
+     {
+      "node": "Weź zaległe",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Weź zaległe": {
+   "main": [
+    [
+     {
+      "node": "Tylko mail",
+      "type": "main",
+      "index": 0
+     },
+     {
+      "node": "Urządzenia",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Tylko mail": {
+   "main": [
+    [
+     {
+      "node": "Wyślij mail",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Wyślij mail": {
+   "main": [
+    [
+     {
+      "node": "Oznacz wysłane mailem",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Urządzenia": {
+   "main": [
+    [
+     {
+      "node": "Podpisz JWT",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Podpisz JWT": {
+   "main": [
+    [
+     {
+      "node": "Podpis ES256",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Podpis ES256": {
+   "main": [
+    [
+     {
+      "node": "Złóż nagłówek VAPID",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Złóż nagłówek VAPID": {
+   "main": [
+    [
+     {
+      "node": "Wyślij push",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Wyślij push": {
+   "main": [
+    [
+     {
+      "node": "Wynik wysyłki",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Wynik wysyłki": {
+   "main": [
+    [
+     {
+      "node": "Aktualizuj urządzenia",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1",
+  "timezone": "Europe/Warsaw",
+  "saveDataSuccessExecution": "none"
+ }
+}

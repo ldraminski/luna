@@ -29,6 +29,40 @@ SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
     FROM items i WHERE i.user_id = (SELECT user_id FROM me) AND i.status = 'active') t), '[]'::json)) END AS result""",
    "={{ [ " + TOKEN + " ] }}"),
 
+  ("GET", "pending", "Do pokazania", f"""
+WITH {ME},
+p AS (
+  UPDATE notifications SET shown_at = now()
+  WHERE user_id = (SELECT user_id FROM me) AND sent_at IS NOT NULL AND shown_at IS NULL
+    AND sent_at > now() - interval '1 day'
+  RETURNING id, item_id, title, body, sent_at)
+SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
+  ELSE json_build_object('status', 200, 'items',
+       coalesce((SELECT json_agg(p ORDER BY p.sent_at DESC) FROM p), '[]'::json)) END AS result""",
+   "={{ [ " + TOKEN + " ] }}"),
+
+  # Endpoint dostaje od nas POST-a, więc wpuszczamy tylko znane usługi push (inaczej SSRF) — jak w Alertach.
+  ("POST", "push/subscribe", "Zapisz urządzenie", f"""
+WITH {ME},
+ok AS (SELECT $2::text AS ep WHERE $2 ~ '^https://(web\\.push\\.apple\\.com|fcm\\.googleapis\\.com|updates\\.push\\.services\\.mozilla\\.com|[a-z0-9-]+\\.notify\\.windows\\.com)/'),
+ins AS (
+  INSERT INTO push_subscriptions (endpoint, user_id, p256dh, auth, user_agent)
+  SELECT ep, (SELECT user_id FROM me), nullif($3, ''), nullif($4, ''), nullif($5, '') FROM ok WHERE EXISTS (SELECT 1 FROM me)
+  ON CONFLICT (endpoint) DO UPDATE SET user_id = excluded.user_id, p256dh = excluded.p256dh, auth = excluded.auth,
+    user_agent = excluded.user_agent, failures = 0
+  RETURNING 1)
+SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
+  WHEN NOT EXISTS (SELECT 1 FROM ins) THEN json_build_object('status', 400, 'error', 'Nieznana usługa push')
+  ELSE json_build_object('status', 200, 'ok', true) END AS result""",
+   "={{ [ " + TOKEN + ", String($json.body.endpoint || '').slice(0, 1000), String(($json.body.keys || {}).p256dh || '').slice(0, 200), String(($json.body.keys || {}).auth || '').slice(0, 100), String($json.body.ua || '').slice(0, 400) ] }}"),
+
+  ("POST", "push/unsubscribe", "Usuń urządzenie", f"""
+WITH {ME},
+d AS (DELETE FROM push_subscriptions WHERE endpoint = $2 AND user_id = (SELECT user_id FROM me) RETURNING 1)
+SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
+  ELSE json_build_object('status', 200, 'ok', true) END AS result""",
+   "={{ [ " + TOKEN + ", String($json.body.endpoint || '').slice(0, 1000) ] }}"),
+
   ("POST", "items/done", "Odhacz", f"""
 WITH {ME},
 upd AS (UPDATE items SET status = 'done', updated_at = now()
