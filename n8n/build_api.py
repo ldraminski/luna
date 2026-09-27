@@ -90,7 +90,7 @@ ins AS (
     user_agent = excluded.user_agent, failures = 0
   RETURNING 1)
 SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
-  WHEN NOT EXISTS (SELECT 1 FROM ins) THEN json_build_object('status', 400, 'error', 'Nieznana usługa push')
+  WHEN NOT EXISTS (SELECT 1 FROM ins) THEN json_build_object('status', 400, 'error', 'Ta przeglądarka używa nieznanej usługi powiadomień.')
   ELSE json_build_object('status', 200, 'ok', true) END AS result""",
    "={{ [ " + TOKEN + ", String($json.body.endpoint || '').slice(0, 1000), String(($json.body.keys || {}).p256dh || '').slice(0, 200), String(($json.body.keys || {}).auth || '').slice(0, 100), String($json.body.ua || '').slice(0, 400) ] }}"),
 
@@ -107,7 +107,7 @@ upd AS (UPDATE items SET status = 'done', updated_at = now()
         WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) RETURNING id),
 cancel AS (DELETE FROM notifications WHERE item_id IN (SELECT id FROM upd) AND sent_at IS NULL RETURNING 1)
 SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
-  WHEN NOT EXISTS (SELECT 1 FROM upd) THEN json_build_object('status', 404, 'error', 'Nie ma takiej rzeczy')
+  WHEN NOT EXISTS (SELECT 1 FROM upd) THEN json_build_object('status', 404, 'error', 'Nie ma już tej rzeczy.')
   ELSE json_build_object('status', 200, 'ok', true) END AS result""",
    "={{ [ " + TOKEN + ", /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000' ] }}"),
 
@@ -150,7 +150,7 @@ SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
 WITH {ME},
 d AS (DELETE FROM items WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) RETURNING id)
 SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
-  WHEN NOT EXISTS (SELECT 1 FROM d) THEN json_build_object('status', 404, 'error', 'Nie ma takiej rzeczy')
+  WHEN NOT EXISTS (SELECT 1 FROM d) THEN json_build_object('status', 404, 'error', 'Nie ma już tej rzeczy.')
   ELSE json_build_object('status', 200, 'ok', true) END AS result""",
    "={{ [ " + TOKEN + ", /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000' ] }}"),
 ]
@@ -218,7 +218,7 @@ iff = node("Zalogowany i jest tekst?", "n8n-nodes-base.if", 2.2, [440, y], {
     "combinator": "and"}, "options": {}})
 deny = node("Odmów", "n8n-nodes-base.respondToWebhook", 1.1, [660, y + 180],
   {"respondWith": "json", "options": {"responseCode": "={{ $json.user_id ? 400 : 401 }}"},
-   "responseBody": "={{ $json.user_id ? { status: 400, error: 'Napisz, co zapamiętać' } : { status: 401, error: 'Zaloguj się ponownie' } }}"})
+   "responseBody": "={{ $json.user_id ? { status: 400, error: 'Napisz, co mam zapamiętać.' } : { status: 401, error: 'Zaloguj się ponownie' } }}"})
 cal = node("Kalendarz", "n8n-nodes-base.code", 2, [660, y], {"jsCode": open("kalendarz.js").read()})
 llm = node("DeepSeek: zrozum", "n8n-nodes-base.httpRequest", 4.2, [880, y], {
   "method": "POST", "url": "https://openrouter.ai/api/v1/chat/completions",
@@ -435,7 +435,7 @@ ch AS (
         proposal = CASE WHEN EXCLUDED.messages = '[]'::jsonb THEN widget_chats.proposal ELSE NULL END
   RETURNING id, messages, proposal)
 SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
-  WHEN NOT EXISTS (SELECT 1 FROM it) THEN json_build_object('status', 404, 'error', 'Nie ma takiej rzeczy')
+  WHEN NOT EXISTS (SELECT 1 FROM it) THEN json_build_object('status', 404, 'error', 'Nie ma już tej rzeczy.')
   WHEN NOT EXISTS (SELECT 1 FROM ch) THEN json_build_object('status', 429, 'error', 'Ta rozmowa jest już za długa — zacznij od nowa.')
   ELSE json_build_object('status', 200, 'ask', $3 <> '', 'chat_id', (SELECT id FROM ch), 'messages', (SELECT messages FROM ch), 'proposal', (SELECT proposal FROM ch),
     'item', (SELECT json_build_object('title', title, 'source_text', source_text, 'kind', kind,

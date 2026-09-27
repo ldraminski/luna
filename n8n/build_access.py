@@ -18,7 +18,7 @@ ME = """me AS (
   RETURNING user_id),
 adm AS (SELECT id FROM users WHERE id = (SELECT user_id FROM me) AND is_admin)"""
 UNAUTH = "json_build_object('status', 401, 'error', 'Zaloguj się ponownie')"
-FORBID = "json_build_object('status', 403, 'error', 'To może tylko Łukasz')"
+FORBID = "json_build_object('status', 403, 'error', 'To może zrobić tylko Łukasz.')"
 
 nodes, conns = [], {}
 def node(name, typ, ver, pos, params, **kw):
@@ -129,8 +129,7 @@ END AS result""",
 i3 = when("Zaakceptowana?", [440, 640], "={{ $json.result.action === 'accepted' }}")
 i3b = when("Odrzucona?", [660, 800], "={{ $json.result.action === 'rejected' }}")
 m3a = mail("Mail: witaj", [660, 560], "Łukasz zaakceptował Twoją prośbę — tu Luna",
-           maile.klucz_powitalny("$json.result", "Łukasz zaakceptował Twoją prośbę o dostęp. Jestem Luna — Twoja prywatna asystentka. "
-           "Zapisuję sprawy, terminy, listy i notatki, a potem pilnuję, żeby nic Ci nie umknęło."))
+           maile.klucz_powitalny("$json.result", "Łukasz zaakceptował Twoją prośbę o dostęp — witaj!\\n\\n" + maile.O_LUNIE))
 m3b = mail("Mail: przykro mi", [880, 760], "Twoja prośba o dostęp do Luny", maile.odrzucenie("$json.result"))
 r3 = respond("Odpowiedz: decyzja", [1100, 700],
   "={{ (R => Object.assign(" + SAFE.replace("}", ", email: R.email }") + ", { emailed: !$json.error }))($('Decyzja').item.json.result) }}")

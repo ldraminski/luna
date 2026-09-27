@@ -2,7 +2,7 @@
  "name": "Oboe: Dostęp",
  "nodes": [
   {
-   "id": "9de5caae-5e0d-4aa2-b5e5-77e718cf928f",
+   "id": "41f4cb2b-a200-4def-83f9-4a2e3d6b6159",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "bbf246db-4e45-4745-ae3d-969857b14ade",
+   "id": "68bf8ef7-47b2-4d0c-966c-1dfe37f9207f",
    "name": "POST access/request",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -31,10 +31,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "a6fd1dca-4c3a-4aef-9b6e-7b2d567ef956"
+   "webhookId": "216156ec-9a17-446a-84e4-67da05ce6478"
   },
   {
-   "id": "4c86c250-2139-4335-8abb-32030a3f989e",
+   "id": "260c5bb6-11ff-418b-b5ec-5d294b4a3d5c",
    "name": "Prośba",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -57,7 +57,7 @@
    }
   },
   {
-   "id": "e59425e4-186c-4d57-b754-5d12057708a6",
+   "id": "287cfd7c-2920-401b-854f-5f856aa217b3",
    "name": "Istniejące konto?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -75,7 +75,7 @@
      },
      "conditions": [
       {
-       "id": "44edb792-abb2-4b84-b42f-1ef0f57130ad",
+       "id": "a9361aa5-a6da-441f-97ff-60716bef0470",
        "leftValue": "={{ $json.result.action === 'token' }}",
        "rightValue": "",
        "operator": {
@@ -91,7 +91,7 @@
    }
   },
   {
-   "id": "61c7029c-d623-4a68-8eab-aed9da7eab40",
+   "id": "ffc6a4f7-db0c-4e20-a478-d347e49f5fe9",
    "name": "Mail: nowy klucz",
    "type": "n8n-nodes-base.emailSend",
    "typeVersion": 2.1,
@@ -118,7 +118,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "4537a5ab-c97f-4c8b-9528-7432828d5fb3",
+   "id": "33d9d717-b0d4-47a5-bd4b-c437102612c4",
    "name": "Odpowiedz: prośba",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -135,7 +135,7 @@
    }
   },
   {
-   "id": "1e0869bf-7f37-401f-ae84-097e56502173",
+   "id": "b048590a-e8d0-46f9-9660-09ad91851fe9",
    "name": "GET access/requests",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -149,10 +149,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "12b1ce60-d87c-428b-b9e8-ea8465c6a907"
+   "webhookId": "f7ecebec-14b1-49c1-bfb5-d0e594bd468d"
   },
   {
-   "id": "47f1e6e5-2cd9-4aa5-ad0a-1dea3b8c3426",
+   "id": "8afda05d-e562-4dee-84e6-0bed18b06fd8",
    "name": "Prośby czekające",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -162,7 +162,7 @@
    ],
    "parameters": {
     "operation": "executeQuery",
-    "query": "WITH me AS (\n  UPDATE sessions SET last_used_at = now()\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id),\nadm AS (SELECT id FROM users WHERE id = (SELECT user_id FROM me) AND is_admin)\nSELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN json_build_object('status', 401, 'error', 'Zaloguj się ponownie')\n  WHEN NOT EXISTS (SELECT 1 FROM adm) THEN json_build_object('status', 403, 'error', 'To może tylko Łukasz')\n  ELSE json_build_object('status', 200, 'requests', coalesce((SELECT json_agg(r ORDER BY r.created_at) FROM\n       (SELECT id, email, name, created_at FROM access_requests WHERE status = 'pending') r), '[]'::json)) END AS result",
+    "query": "WITH me AS (\n  UPDATE sessions SET last_used_at = now()\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id),\nadm AS (SELECT id FROM users WHERE id = (SELECT user_id FROM me) AND is_admin)\nSELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN json_build_object('status', 401, 'error', 'Zaloguj się ponownie')\n  WHEN NOT EXISTS (SELECT 1 FROM adm) THEN json_build_object('status', 403, 'error', 'To może zrobić tylko Łukasz.')\n  ELSE json_build_object('status', 200, 'requests', coalesce((SELECT json_agg(r ORDER BY r.created_at) FROM\n       (SELECT id, email, name, created_at FROM access_requests WHERE status = 'pending') r), '[]'::json)) END AS result",
     "options": {
      "queryReplacement": "={{ [ ($json.headers.authorization || '').replace(/^Bearer\\s+/i, '') ] }}"
     }
@@ -175,7 +175,7 @@
    }
   },
   {
-   "id": "998daca3-edc9-40b3-b4ee-51248748cd0a",
+   "id": "d37465b7-70f6-4a6b-b44a-ea6eedfcc62b",
    "name": "Odpowiedz: prośby",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -192,7 +192,7 @@
    }
   },
   {
-   "id": "bfc0d21f-871c-4133-b0f9-1ee67b5c4229",
+   "id": "279906a7-9504-4b8f-aa0e-0083af06ce95",
    "name": "POST access/decide",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -206,10 +206,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "15cf4f12-ab87-4f1d-becb-6a3b24c1f6e1"
+   "webhookId": "fa192f7e-ec34-4531-8c69-b30e0e32a450"
   },
   {
-   "id": "64b9c640-e028-42e0-8052-c4cf9d0b2c21",
+   "id": "b15bc639-b84d-463f-9b1c-26be712f21dd",
    "name": "Decyzja",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -219,7 +219,7 @@
    ],
    "parameters": {
     "operation": "executeQuery",
-    "query": "WITH me AS (\n  UPDATE sessions SET last_used_at = now()\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id),\nadm AS (SELECT id FROM users WHERE id = (SELECT user_id FROM me) AND is_admin),\nd AS (UPDATE access_requests SET status = CASE WHEN $3::boolean THEN 'accepted' ELSE 'rejected' END,\n        decided_at = now(), decided_by = (SELECT id FROM adm)\n      WHERE id = $2::bigint AND status = 'pending' AND EXISTS (SELECT 1 FROM adm) RETURNING email, name, status),\nu AS (INSERT INTO users (email, name) SELECT email, name FROM d WHERE status = 'accepted'\n      ON CONFLICT (email) DO UPDATE SET name = coalesce(users.name, excluded.name) RETURNING id, email, name),\ntok AS (SELECT encode(gen_random_bytes(32), 'hex') AS t),\ns AS (INSERT INTO sessions (token_hash, user_id)\n      SELECT encode(digest((SELECT t FROM tok), 'sha256'), 'hex'), id FROM u RETURNING 1)\nSELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN json_build_object('status', 401, 'error', 'Zaloguj się ponownie')\n  WHEN NOT EXISTS (SELECT 1 FROM adm) THEN json_build_object('status', 403, 'error', 'To może tylko Łukasz')\n  WHEN NOT EXISTS (SELECT 1 FROM d) THEN json_build_object('status', 404, 'error', 'Tej prośby już nie ma — jest rozpatrzona.')\n  WHEN (SELECT status FROM d) = 'accepted' THEN json_build_object('status', 200, 'action', 'accepted',\n       'email', (SELECT email FROM u), 'name', coalesce((SELECT name FROM u), ''), 'token', (SELECT t FROM tok), 'issued', (SELECT count(*) FROM s))\n  ELSE json_build_object('status', 200, 'action', 'rejected', 'email', (SELECT email FROM d), 'name', coalesce((SELECT name FROM d), ''))\nEND AS result",
+    "query": "WITH me AS (\n  UPDATE sessions SET last_used_at = now()\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id),\nadm AS (SELECT id FROM users WHERE id = (SELECT user_id FROM me) AND is_admin),\nd AS (UPDATE access_requests SET status = CASE WHEN $3::boolean THEN 'accepted' ELSE 'rejected' END,\n        decided_at = now(), decided_by = (SELECT id FROM adm)\n      WHERE id = $2::bigint AND status = 'pending' AND EXISTS (SELECT 1 FROM adm) RETURNING email, name, status),\nu AS (INSERT INTO users (email, name) SELECT email, name FROM d WHERE status = 'accepted'\n      ON CONFLICT (email) DO UPDATE SET name = coalesce(users.name, excluded.name) RETURNING id, email, name),\ntok AS (SELECT encode(gen_random_bytes(32), 'hex') AS t),\ns AS (INSERT INTO sessions (token_hash, user_id)\n      SELECT encode(digest((SELECT t FROM tok), 'sha256'), 'hex'), id FROM u RETURNING 1)\nSELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN json_build_object('status', 401, 'error', 'Zaloguj się ponownie')\n  WHEN NOT EXISTS (SELECT 1 FROM adm) THEN json_build_object('status', 403, 'error', 'To może zrobić tylko Łukasz.')\n  WHEN NOT EXISTS (SELECT 1 FROM d) THEN json_build_object('status', 404, 'error', 'Tej prośby już nie ma — jest rozpatrzona.')\n  WHEN (SELECT status FROM d) = 'accepted' THEN json_build_object('status', 200, 'action', 'accepted',\n       'email', (SELECT email FROM u), 'name', coalesce((SELECT name FROM u), ''), 'token', (SELECT t FROM tok), 'issued', (SELECT count(*) FROM s))\n  ELSE json_build_object('status', 200, 'action', 'rejected', 'email', (SELECT email FROM d), 'name', coalesce((SELECT name FROM d), ''))\nEND AS result",
     "options": {
      "queryReplacement": "={{ [ ($json.headers.authorization || '').replace(/^Bearer\\s+/i, ''), /^[0-9]{1,18}$/.test(String($json.body.id)) ? String($json.body.id) : '0', $json.body.accept === true ? 'true' : 'false' ] }}"
     }
@@ -232,7 +232,7 @@
    }
   },
   {
-   "id": "02e08202-d2af-45d2-9374-503da70f1404",
+   "id": "897a3c04-c987-4b79-be7d-73ccfa40d8e3",
    "name": "Zaakceptowana?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -250,7 +250,7 @@
      },
      "conditions": [
       {
-       "id": "d8cfea49-b061-4257-861c-cc811beb9405",
+       "id": "53263f60-1484-4b8c-919f-3972b05c8022",
        "leftValue": "={{ $json.result.action === 'accepted' }}",
        "rightValue": "",
        "operator": {
@@ -266,7 +266,7 @@
    }
   },
   {
-   "id": "267754c7-b67c-4bb0-b564-e4bed3e31ea2",
+   "id": "952794cd-046b-4e4e-9aa5-5658cb8e1ba3",
    "name": "Odrzucona?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -284,7 +284,7 @@
      },
      "conditions": [
       {
-       "id": "c98e80ba-4b85-4f28-9579-94ca6bfbe481",
+       "id": "8856092a-4450-41be-9d2b-241d081e044d",
        "leftValue": "={{ $json.result.action === 'rejected' }}",
        "rightValue": "",
        "operator": {
@@ -300,7 +300,7 @@
    }
   },
   {
-   "id": "fb927c33-6774-4882-a1c7-9127308a464b",
+   "id": "2ce25578-d537-4a40-9ae1-b2289f0daea6",
    "name": "Mail: witaj",
    "type": "n8n-nodes-base.emailSend",
    "typeVersion": 2.1,
@@ -313,7 +313,7 @@
     "toEmail": "={{ $json.result.email }}",
     "subject": "Łukasz zaakceptował Twoją prośbę — tu Luna",
     "emailFormat": "text",
-    "text": "={{ 'Cześć' + ($json.result.name ? ' ' + $json.result.name : '') + '!\\n\\nŁukasz zaakceptował Twoją prośbę o dostęp. Jestem Luna — Twoja prywatna asystentka. Zapisuję sprawy, terminy, listy i notatki, a potem pilnuję, żeby nic Ci nie umknęło.\\n\\nOto Twój klucz:\\n\\n' + $json.result.token + '\\n\\nJak zacząć:\\n1. Otwórz na telefonie: https://luna.draminski.dev\\n2. iPhone: Udostępnij → „Do ekranu początkowego”. Android: menu → „Zainstaluj aplikację”.\\n3. Uruchom Lunę Z EKRANU POCZĄTKOWEGO i dopiero tam wklej klucz. (Na iPhonie aplikacja z ekranu początkowego nie widzi tego, co wpiszesz w Safari.)\\n\\nKlucz działa bez końca. Nie przesyłaj go nikomu — kto go ma, widzi Twoje sprawy.\\nZgubisz go? Wejdź na https://luna.draminski.dev, wpisz swój e-mail, a wyślę Ci nowy.\\n\\nDo usłyszenia!\\n— Luna' }}",
+    "text": "={{ 'Cześć' + ($json.result.name ? ' ' + $json.result.name : '') + '!\\n\\nŁukasz zaakceptował Twoją prośbę o dostęp — witaj!\\n\\nJestem Luna — Twoja prywatna asystentka w telefonie. Piszesz mi zwykłym zdaniem (albo wysyłasz zdjęcie), co masz na głowie, a ja to zapisuję i pilnuję za Ciebie:\\n• przypominam o terminach — dzień wcześniej i tuż przed wydarzeniem,\\n• pilnuję rzeczy, które się powtarzają (opłaty, przeglądy, cotygodniowe obowiązki),\\n• robię listy do odhaczania i notatki — także ze zdjęć,\\n• sprawdzam informacje w internecie i streszczam strony,\\n• co rano wysyłam krótki plan dnia, a w poniedziałki plan całego tygodnia.\\n\\nLuna działa w przeglądarce — dodajesz ją do ekranu początkowego jak zwykłą aplikację, niczego nie pobierasz ze sklepu. Twoje sprawy widzisz tylko Ty.\\n\\nOto Twój klucz:\\n\\n' + $json.result.token + '\\n\\nJak zacząć:\\n1. Otwórz na telefonie: https://luna.draminski.dev\\n2. iPhone: Udostępnij → „Do ekranu początkowego”. Android: menu → „Zainstaluj aplikację”.\\n3. Uruchom Lunę Z EKRANU POCZĄTKOWEGO i dopiero tam wklej klucz. (Na iPhonie aplikacja z ekranu początkowego nie widzi tego, co wpiszesz w Safari.)\\n\\nKlucz działa bez końca. Nie przesyłaj go nikomu — kto go ma, widzi Twoje sprawy.\\nZgubisz go? Wejdź na https://luna.draminski.dev, wpisz swój e-mail, a wyślę Ci nowy.\\n\\nDo usłyszenia!\\n— Luna' }}",
     "options": {
      "appendAttribution": false
     }
@@ -327,7 +327,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "d7ec3f9d-75ff-4c68-8f7a-2a0754744c0e",
+   "id": "d2fa28ce-2eb8-4fdc-850a-99cc347d63bc",
    "name": "Mail: przykro mi",
    "type": "n8n-nodes-base.emailSend",
    "typeVersion": 2.1,
@@ -354,7 +354,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "e69fc5cc-b0ff-43d8-8a31-0eb0c526d184",
+   "id": "7f8f9045-9b40-496b-a1f1-37dfaac96495",
    "name": "Odpowiedz: decyzja",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,

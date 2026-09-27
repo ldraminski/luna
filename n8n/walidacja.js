@@ -4,9 +4,9 @@ const src = String($('POST items').first().json.body.text || '').trim().slice(0,
 const fail = (error) => [{ json: { ok: false, error, notify: [], spec: {}, data: {}, source_text: src } }];
 
 const raw = $json.choices?.[0]?.message?.content;
-if (!raw) return fail('Model nie odpowiedział. Spróbuj jeszcze raz.');
+if (!raw) return fail('Nie udało mi się odpowiedzieć — spróbuj jeszcze raz.');
 let m;
-try { m = JSON.parse(raw.replace(/^```(json)?|```$/g, '').trim()); } catch (e) { return fail('Nie zrozumiałem. Spróbuj napisać inaczej.'); }
+try { m = JSON.parse(raw.replace(/^```(json)?|```$/g, '').trim()); } catch (e) { return fail('Nie zrozumiałam. Spróbuj napisać to inaczej.'); }
 
 const cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');
 const now = Date.now();

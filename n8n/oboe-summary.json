@@ -2,7 +2,7 @@
  "name": "Oboe: Streść stronę",
  "nodes": [
   {
-   "id": "0973ad48-ab4e-441c-9072-780d5b024223",
+   "id": "f928ed43-97d5-468d-990e-bf88081da408",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "3c1241a5-4077-4fbb-9bc9-d10d391ded33",
+   "id": "47463efa-166f-49ae-a11d-5194f1d2cc6c",
    "name": "Z innego workflow",
    "type": "n8n-nodes-base.executeWorkflowTrigger",
    "typeVersion": 1.1,
@@ -30,7 +30,7 @@
    }
   },
   {
-   "id": "7c4fad5c-dab8-4d65-9145-f9bc434ab403",
+   "id": "e80a6937-65c5-4b7f-a0a5-91670db33e4f",
    "name": "POST admin/summarize",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -51,10 +51,10 @@
      "name": "Oboe - admin (X-Admin-Token)"
     }
    },
-   "webhookId": "7ad34aae-f0da-44bc-905d-a628827c44b7"
+   "webhookId": "fb199bd9-ddc8-438b-a05c-44786055e226"
   },
   {
-   "id": "415456a9-ab81-4569-8d94-b08e24f474fe",
+   "id": "b5188baa-419d-4d28-b748-03db4be62760",
    "name": "Wejście",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -67,7 +67,7 @@
    }
   },
   {
-   "id": "68a259e9-6778-4c6c-8d6d-60a6424d5bf9",
+   "id": "7f2cc799-e026-4722-b57c-9ffbc9a9da4d",
    "name": "Wczytaj",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -90,7 +90,7 @@
    }
   },
   {
-   "id": "61f86f97-a923-4b6b-83f0-56fb99b72bdd",
+   "id": "72b2bd47-0bbd-42d2-bebc-a762678a2fa2",
    "name": "Adres do pobrania",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -99,11 +99,11 @@
     80
    ],
    "parameters": {
-    "jsCode": "const url = $('Wczytaj').first().json.url;\nconst m = /^https?:\\/\\/([a-z0-9.-]+\\.[a-z]{2,})(:\\d+)?(\\/|$|\\?)/i.exec(url || '');\nif (!m) return [{ json: { ok: false, url, host: '', error: 'Niepoprawny adres strony.' } }];\nif (m[2] && ![':80', ':443'].includes(m[2])) return [{ json: { ok: false, url, host: m[1], error: 'Niestandardowy port — nie pobieram.' } }];\nreturn [{ json: { ok: true, url, host: m[1].toLowerCase() } }];"
+    "jsCode": "const url = $('Wczytaj').first().json.url;\nconst m = /^https?:\\/\\/([a-z0-9.-]+\\.[a-z]{2,})(:\\d+)?(\\/|$|\\?)/i.exec(url || '');\nif (!m) return [{ json: { ok: false, url, host: '', error: 'To nie wygląda na adres strony.' } }];\nif (m[2] && ![':80', ':443'].includes(m[2])) return [{ json: { ok: false, url, host: m[1], error: 'Tego adresu nie otworzę — nietypowy port.' } }];\nreturn [{ json: { ok: true, url, host: m[1].toLowerCase() } }];"
    }
   },
   {
-   "id": "6c9f0811-b9aa-44f0-bd3d-cbc8ccf7bdcc",
+   "id": "124414e5-df55-42b5-a6e0-61b58fe7f341",
    "name": "DNS A",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -137,7 +137,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "059a3c3e-7d32-4e26-a89f-f1fa2506dd2b",
+   "id": "54f89d53-1ffc-42d9-85a2-e1a7716f3c9f",
    "name": "DNS AAAA",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -171,7 +171,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "831e0741-dd88-4b14-8d16-94a8a5a33727",
+   "id": "61f58302-87b3-488c-89fd-30f6b47be3c8",
    "name": "Sprawdź adres",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -180,11 +180,11 @@
     80
    ],
    "parameters": {
-    "jsCode": "// Ochrona przed SSRF: adres podaje użytkownik, a pobiera nasz serwer. Wpuszczamy tylko http(s) na publiczne IP.\n// Odpowiedzi DNS (DoH Cloudflare, A i AAAA) przychodzą z dwóch węzłów HTTP przed tym.\nif (!$('Adres do pobrania').first().json.ok) return [{ json: $('Adres do pobrania').first().json }];\nconst url = $('Adres do pobrania').first().json.url;\nconst answers = [];\nfor (const src of [$('DNS A').first().json, $json]) for (const a of (src.Answer || [])) if (a.type === 1 || a.type === 28) answers.push(String(a.data));\nconst priv4 = (ip) => {\n  const p = ip.split('.').map(Number); if (p.length !== 4 || p.some((x) => !(x >= 0 && x <= 255))) return true;\n  return p[0] === 10 || p[0] === 127 || p[0] === 0 || (p[0] === 169 && p[1] === 254) || (p[0] === 172 && p[1] >= 16 && p[1] <= 31)\n    || (p[0] === 192 && p[1] === 168) || (p[0] === 100 && p[1] >= 64 && p[1] <= 127) || p[0] >= 224;\n};\nconst priv6 = (ip) => { const s = ip.toLowerCase(); return s === '::1' || s === '::' || /^(fc|fd|fe8|fe9|fea|feb)/.test(s) || s.startsWith('::ffff:'); };\nconst ips = answers.filter((a) => /^[\\d.]+$/.test(a) || a.includes(':'));\nif (!ips.length) return [{ json: { ok: false, url, error: 'Nie znalazłem tej domeny (DNS).' } }];\nconst bad = ips.filter((ip) => (ip.includes(':') ? priv6(ip) : priv4(ip)));\nif (bad.length) return [{ json: { ok: false, url, error: 'Ten adres prowadzi do sieci wewnętrznej — nie pobieram go.' } }];\nreturn [{ json: { ok: true, url, ips } }];\n"
+    "jsCode": "// Ochrona przed SSRF: adres podaje użytkownik, a pobiera nasz serwer. Wpuszczamy tylko http(s) na publiczne IP.\n// Odpowiedzi DNS (DoH Cloudflare, A i AAAA) przychodzą z dwóch węzłów HTTP przed tym.\nif (!$('Adres do pobrania').first().json.ok) return [{ json: $('Adres do pobrania').first().json }];\nconst url = $('Adres do pobrania').first().json.url;\nconst answers = [];\nfor (const src of [$('DNS A').first().json, $json]) for (const a of (src.Answer || [])) if (a.type === 1 || a.type === 28) answers.push(String(a.data));\nconst priv4 = (ip) => {\n  const p = ip.split('.').map(Number); if (p.length !== 4 || p.some((x) => !(x >= 0 && x <= 255))) return true;\n  return p[0] === 10 || p[0] === 127 || p[0] === 0 || (p[0] === 169 && p[1] === 254) || (p[0] === 172 && p[1] >= 16 && p[1] <= 31)\n    || (p[0] === 192 && p[1] === 168) || (p[0] === 100 && p[1] >= 64 && p[1] <= 127) || p[0] >= 224;\n};\nconst priv6 = (ip) => { const s = ip.toLowerCase(); return s === '::1' || s === '::' || /^(fc|fd|fe8|fe9|fea|feb)/.test(s) || s.startsWith('::ffff:'); };\nconst ips = answers.filter((a) => /^[\\d.]+$/.test(a) || a.includes(':'));\nif (!ips.length) return [{ json: { ok: false, url, error: 'Nie znalazłam takiej strony — sprawdź adres.' } }];\nconst bad = ips.filter((ip) => (ip.includes(':') ? priv6(ip) : priv4(ip)));\nif (bad.length) return [{ json: { ok: false, url, error: 'Ten adres prowadzi do sieci wewnętrznej — nie pobieram go.' } }];\nreturn [{ json: { ok: true, url, ips } }];\n"
    }
   },
   {
-   "id": "8e66656b-d0dc-401c-96b9-c892d94e68c2",
+   "id": "4fcf17bd-07a6-413c-b456-c71308febd0a",
    "name": "Adres OK?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -202,7 +202,7 @@
      },
      "conditions": [
       {
-       "id": "701960e3-baa9-41d4-8b66-e2fd021599f1",
+       "id": "b3023771-c5b6-4e41-9f7b-c7138adecef1",
        "leftValue": "={{ $json.ok }}",
        "rightValue": "",
        "operator": {
@@ -218,7 +218,7 @@
    }
   },
   {
-   "id": "4df92652-6002-4596-8b1e-6d6207ad475c",
+   "id": "2066f36e-2087-41ea-9776-493aacc1ff19",
    "name": "Pobierz stronę",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -265,7 +265,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "b59f305d-20d6-4d60-9f49-0b63ec75c327",
+   "id": "8b75b1a3-e6dd-4160-ad59-6e79bfe28cad",
    "name": "Przekierowanie?",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -278,7 +278,7 @@
    }
   },
   {
-   "id": "3cdae99c-87b3-4372-85a4-33f578821a42",
+   "id": "0fa7422e-1382-4712-b862-1d941594259f",
    "name": "Jest przekierowanie?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -296,7 +296,7 @@
      },
      "conditions": [
       {
-       "id": "83d89352-5380-4ab1-99ec-ad9ec62f3c24",
+       "id": "dc8ef0ac-8012-465b-bbbe-66e0035d7736",
        "leftValue": "={{ $json.redirect }}",
        "rightValue": "",
        "operator": {
@@ -312,7 +312,7 @@
    }
   },
   {
-   "id": "538b245b-5386-4780-aad9-4861818edd94",
+   "id": "58aab2e2-91ad-4e2e-843e-ed06382e8064",
    "name": "Adres do pobrania 2",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -321,11 +321,11 @@
     260
    ],
    "parameters": {
-    "jsCode": "const url = $('Przekierowanie?').first().json.next;\nconst m = /^https?:\\/\\/([a-z0-9.-]+\\.[a-z]{2,})(:\\d+)?(\\/|$|\\?)/i.exec(url || '');\nif (!m) return [{ json: { ok: false, url, host: '', error: 'Niepoprawny adres strony.' } }];\nif (m[2] && ![':80', ':443'].includes(m[2])) return [{ json: { ok: false, url, host: m[1], error: 'Niestandardowy port — nie pobieram.' } }];\nreturn [{ json: { ok: true, url, host: m[1].toLowerCase() } }];"
+    "jsCode": "const url = $('Przekierowanie?').first().json.next;\nconst m = /^https?:\\/\\/([a-z0-9.-]+\\.[a-z]{2,})(:\\d+)?(\\/|$|\\?)/i.exec(url || '');\nif (!m) return [{ json: { ok: false, url, host: '', error: 'To nie wygląda na adres strony.' } }];\nif (m[2] && ![':80', ':443'].includes(m[2])) return [{ json: { ok: false, url, host: m[1], error: 'Tego adresu nie otworzę — nietypowy port.' } }];\nreturn [{ json: { ok: true, url, host: m[1].toLowerCase() } }];"
    }
   },
   {
-   "id": "f90c4913-6b8c-444e-afff-1ed28896577e",
+   "id": "26b36e6e-83f8-4a3c-b0ee-546165cee340",
    "name": "DNS A 2",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -359,7 +359,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "cc019f32-4bdc-43a4-b9c4-16573cd92fb0",
+   "id": "cfdb07b3-4564-4b2e-8f36-73af4dfed83b",
    "name": "DNS AAAA 2",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -393,7 +393,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "1af54041-11ca-4b80-8402-461b28075a3a",
+   "id": "fc464377-9161-4053-a7d4-54ad02958581",
    "name": "Sprawdź adres 2",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -402,11 +402,11 @@
     260
    ],
    "parameters": {
-    "jsCode": "// Ochrona przed SSRF: adres podaje użytkownik, a pobiera nasz serwer. Wpuszczamy tylko http(s) na publiczne IP.\n// Odpowiedzi DNS (DoH Cloudflare, A i AAAA) przychodzą z dwóch węzłów HTTP przed tym.\nif (!$('Adres do pobrania 2').first().json.ok) return [{ json: $('Adres do pobrania 2').first().json }];\nconst url = $('Adres do pobrania 2').first().json.url;\nconst answers = [];\nfor (const src of [$('DNS A 2').first().json, $json]) for (const a of (src.Answer || [])) if (a.type === 1 || a.type === 28) answers.push(String(a.data));\nconst priv4 = (ip) => {\n  const p = ip.split('.').map(Number); if (p.length !== 4 || p.some((x) => !(x >= 0 && x <= 255))) return true;\n  return p[0] === 10 || p[0] === 127 || p[0] === 0 || (p[0] === 169 && p[1] === 254) || (p[0] === 172 && p[1] >= 16 && p[1] <= 31)\n    || (p[0] === 192 && p[1] === 168) || (p[0] === 100 && p[1] >= 64 && p[1] <= 127) || p[0] >= 224;\n};\nconst priv6 = (ip) => { const s = ip.toLowerCase(); return s === '::1' || s === '::' || /^(fc|fd|fe8|fe9|fea|feb)/.test(s) || s.startsWith('::ffff:'); };\nconst ips = answers.filter((a) => /^[\\d.]+$/.test(a) || a.includes(':'));\nif (!ips.length) return [{ json: { ok: false, url, error: 'Nie znalazłem tej domeny (DNS).' } }];\nconst bad = ips.filter((ip) => (ip.includes(':') ? priv6(ip) : priv4(ip)));\nif (bad.length) return [{ json: { ok: false, url, error: 'Ten adres prowadzi do sieci wewnętrznej — nie pobieram go.' } }];\nreturn [{ json: { ok: true, url, ips } }];\n"
+    "jsCode": "// Ochrona przed SSRF: adres podaje użytkownik, a pobiera nasz serwer. Wpuszczamy tylko http(s) na publiczne IP.\n// Odpowiedzi DNS (DoH Cloudflare, A i AAAA) przychodzą z dwóch węzłów HTTP przed tym.\nif (!$('Adres do pobrania 2').first().json.ok) return [{ json: $('Adres do pobrania 2').first().json }];\nconst url = $('Adres do pobrania 2').first().json.url;\nconst answers = [];\nfor (const src of [$('DNS A 2').first().json, $json]) for (const a of (src.Answer || [])) if (a.type === 1 || a.type === 28) answers.push(String(a.data));\nconst priv4 = (ip) => {\n  const p = ip.split('.').map(Number); if (p.length !== 4 || p.some((x) => !(x >= 0 && x <= 255))) return true;\n  return p[0] === 10 || p[0] === 127 || p[0] === 0 || (p[0] === 169 && p[1] === 254) || (p[0] === 172 && p[1] >= 16 && p[1] <= 31)\n    || (p[0] === 192 && p[1] === 168) || (p[0] === 100 && p[1] >= 64 && p[1] <= 127) || p[0] >= 224;\n};\nconst priv6 = (ip) => { const s = ip.toLowerCase(); return s === '::1' || s === '::' || /^(fc|fd|fe8|fe9|fea|feb)/.test(s) || s.startsWith('::ffff:'); };\nconst ips = answers.filter((a) => /^[\\d.]+$/.test(a) || a.includes(':'));\nif (!ips.length) return [{ json: { ok: false, url, error: 'Nie znalazłam takiej strony — sprawdź adres.' } }];\nconst bad = ips.filter((ip) => (ip.includes(':') ? priv6(ip) : priv4(ip)));\nif (bad.length) return [{ json: { ok: false, url, error: 'Ten adres prowadzi do sieci wewnętrznej — nie pobieram go.' } }];\nreturn [{ json: { ok: true, url, ips } }];\n"
    }
   },
   {
-   "id": "eae07c6d-0375-40ef-a464-35788bed7e09",
+   "id": "d1771afd-08c1-48b5-a85f-fc6d2ec389ed",
    "name": "Adres OK? 2",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -424,7 +424,7 @@
      },
      "conditions": [
       {
-       "id": "06c2b1b9-2ef9-49a6-9301-7a9f10f2346b",
+       "id": "f47d6db9-90d4-49c0-9241-79eb12e767fa",
        "leftValue": "={{ $json.ok }}",
        "rightValue": "",
        "operator": {
@@ -440,7 +440,7 @@
    }
   },
   {
-   "id": "62fe604c-1ee3-4341-ac16-e53ef5b9b30c",
+   "id": "56e3f432-dcbf-4dc0-87e3-c94153d9d399",
    "name": "Pobierz stronę 2",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -487,7 +487,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "523aa88c-d48e-4859-bb91-52528c7d7a17",
+   "id": "ffbbb0ab-8443-45c1-90cd-3be47a578f34",
    "name": "Wyciągnij tekst",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -496,11 +496,11 @@
     80
    ],
    "parameters": {
-    "jsCode": "// HTML → tytuł, opis i sam tekst (Code node nie ma DOM-u, więc wyrażeniami). Wynik przycięty do 20 000 znaków.\nconst r = $json; const status = Number(r.statusCode || 0);\nconst body = typeof r.data === 'string' ? r.data : typeof r.body === 'string' ? r.body : '';\nif (status < 200 || status >= 300) return [{ json: { ok: false, error: status ? `Strona odpowiedziała kodem ${status}.` : 'Nie udało się pobrać strony.' } }];\nconst ctype = String((r.headers || {})['content-type'] || '');\nif (ctype && !/text\\/html|text\\/plain|application\\/xhtml/i.test(ctype)) return [{ json: { ok: false, error: 'To nie jest strona HTML (' + ctype.split(';')[0] + ').' } }];\nconst ent = (s) => s.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '\"')\n  .replace(/&#39;|&apos;/g, \"'\").replace(/&#(\\d+);/g, (_, n) => String.fromCodePoint(Number(n))).replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)));\nconst title = ent(((body.match(/<title[^>]*>([\\s\\S]*?)<\\/title>/i) || [])[1] || '').replace(/\\s+/g, ' ').trim()).slice(0, 200);\nconst desc = ent(((body.match(/<meta[^>]+name=[\"']description[\"'][^>]*content=[\"']([^\"']*)/i) || [])[1] || '').trim()).slice(0, 300);\nlet t = body\n  .replace(/<(script|style|noscript|svg|template|iframe|head)[\\s\\S]*?<\\/\\1>/gi, ' ')\n  .replace(/<(nav|footer)[\\s\\S]*?<\\/\\1>/gi, ' ')\n  .replace(/<!--[\\s\\S]*?-->/g, ' ')\n  .replace(/<(br|\\/p|\\/div|\\/li|\\/h[1-6]|\\/tr|\\/section|\\/article)[^>]*>/gi, '\\n')\n  .replace(/<[^>]+>/g, ' ');\nt = ent(t).replace(/[ \\t\\f\\v]+/g, ' ').replace(/\\n\\s*\\n+/g, '\\n').trim();\n// Odcisk treści (FNV-1a) — żeby przy cyklicznym sprawdzaniu nie pytać modelu, gdy tekst się nie zmienił.\nlet h = 0x811c9dc5; for (let i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }\nreturn [{ json: { ok: true, title, desc, text: t.slice(0, 20000), hash: h.toString(16), length: t.length } }];\n"
+    "jsCode": "// HTML → tytuł, opis i sam tekst (Code node nie ma DOM-u, więc wyrażeniami). Wynik przycięty do 20 000 znaków.\nconst r = $json; const status = Number(r.statusCode || 0);\nconst body = typeof r.data === 'string' ? r.data : typeof r.body === 'string' ? r.body : '';\nif (status < 200 || status >= 300) return [{ json: { ok: false, error: status ? `Strona odpowiedziała kodem ${status}.` : 'Nie udało się pobrać strony.' } }];\nconst ctype = String((r.headers || {})['content-type'] || '');\nif (ctype && !/text\\/html|text\\/plain|application\\/xhtml/i.test(ctype)) return [{ json: { ok: false, error: 'To nie jest zwykła strona internetowa (' + ctype.split(';')[0] + ').' } }];\nconst ent = (s) => s.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '\"')\n  .replace(/&#39;|&apos;/g, \"'\").replace(/&#(\\d+);/g, (_, n) => String.fromCodePoint(Number(n))).replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)));\nconst title = ent(((body.match(/<title[^>]*>([\\s\\S]*?)<\\/title>/i) || [])[1] || '').replace(/\\s+/g, ' ').trim()).slice(0, 200);\nconst desc = ent(((body.match(/<meta[^>]+name=[\"']description[\"'][^>]*content=[\"']([^\"']*)/i) || [])[1] || '').trim()).slice(0, 300);\nlet t = body\n  .replace(/<(script|style|noscript|svg|template|iframe|head)[\\s\\S]*?<\\/\\1>/gi, ' ')\n  .replace(/<(nav|footer)[\\s\\S]*?<\\/\\1>/gi, ' ')\n  .replace(/<!--[\\s\\S]*?-->/g, ' ')\n  .replace(/<(br|\\/p|\\/div|\\/li|\\/h[1-6]|\\/tr|\\/section|\\/article)[^>]*>/gi, '\\n')\n  .replace(/<[^>]+>/g, ' ');\nt = ent(t).replace(/[ \\t\\f\\v]+/g, ' ').replace(/\\n\\s*\\n+/g, '\\n').trim();\n// Odcisk treści (FNV-1a) — żeby przy cyklicznym sprawdzaniu nie pytać modelu, gdy tekst się nie zmienił.\nlet h = 0x811c9dc5; for (let i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }\nreturn [{ json: { ok: true, title, desc, text: t.slice(0, 20000), hash: h.toString(16), length: t.length } }];\n"
    }
   },
   {
-   "id": "18e61888-2cb3-478d-8bd0-b87d5022fbad",
+   "id": "c4b50f5f-b989-437a-a576-0da52e3125ea",
    "name": "Tekst OK?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -518,7 +518,7 @@
      },
      "conditions": [
       {
-       "id": "5e1b7e79-5fda-4eea-bdfa-e24fa3b28ad0",
+       "id": "9d1e572b-e38b-4eb3-985f-c2bf2d8a02fd",
        "leftValue": "={{ $json.ok }}",
        "rightValue": "",
        "operator": {
@@ -534,7 +534,7 @@
    }
   },
   {
-   "id": "864ed43c-292f-4509-a82a-7efd60d2c9e8",
+   "id": "05943298-bd79-48c1-99b1-7543f0e7119a",
    "name": "Bez zmian?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -552,7 +552,7 @@
      },
      "conditions": [
       {
-       "id": "17c80a77-fdef-451e-977d-019ab7485f78",
+       "id": "0e095f20-0f28-4c3a-8de1-48f515e1a941",
        "leftValue": "={{ !!$('Wczytaj').first().json.prev && ($('Wczytaj').first().json.prev || {}).hash === $json.hash }}",
        "rightValue": "",
        "operator": {
@@ -568,7 +568,7 @@
    }
   },
   {
-   "id": "8d3bc2fd-ea0b-4c87-821b-961c74e2b9e8",
+   "id": "8e1ca11b-4766-46c1-a1dd-6af2bb7c2340",
    "name": "Zapisz: bez zmian",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -591,7 +591,7 @@
    }
   },
   {
-   "id": "558a1d4c-c073-4b04-9ba7-1f96452cfc9c",
+   "id": "b2e1a766-c6f2-4123-9ae8-ce4f0c6b89dc",
    "name": "DeepSeek: streść",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -635,7 +635,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "aa335c96-7d8f-4153-8b7a-fee1abf985f4",
+   "id": "b7f4be2d-416a-4ba3-85dd-10a50b1674bc",
    "name": "Sprawdź streszczenie",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -644,11 +644,11 @@
     60
    ],
    "parameters": {
-    "jsCode": "\nconst t = $('Wyciągnij tekst').first().json; const prev = $('Wczytaj').first().json.prev;\nlet m;\ntry { m = JSON.parse(String($json.choices?.[0]?.message?.content || '').replace(/^```(json)?|```$/g, '').trim()); }\ncatch (e) { return [{ json: { ok: false, error: 'Model nie oddał streszczenia.' } }]; }\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst summary = { headline: cut(m.headline, 160), bullets: (Array.isArray(m.bullets) ? m.bullets : []).map((b) => cut(String(b), 180)).filter(Boolean).slice(0, 5),\n  changed: !!prev && m.changed === true, changes: prev ? cut(m.changes, 240) : '', page_title: t.title, hash: t.hash, checked_at: new Date().toISOString() };\nif (!summary.headline) return [{ json: { ok: false, error: 'Puste streszczenie.' } }];\nreturn [{ json: { ok: true, summary } }];\n"
+    "jsCode": "\nconst t = $('Wyciągnij tekst').first().json; const prev = $('Wczytaj').first().json.prev;\nlet m;\ntry { m = JSON.parse(String($json.choices?.[0]?.message?.content || '').replace(/^```(json)?|```$/g, '').trim()); }\ncatch (e) { return [{ json: { ok: false, error: 'Nie udało mi się streścić tej strony.' } }]; }\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst summary = { headline: cut(m.headline, 160), bullets: (Array.isArray(m.bullets) ? m.bullets : []).map((b) => cut(String(b), 180)).filter(Boolean).slice(0, 5),\n  changed: !!prev && m.changed === true, changes: prev ? cut(m.changes, 240) : '', page_title: t.title, hash: t.hash, checked_at: new Date().toISOString() };\nif (!summary.headline) return [{ json: { ok: false, error: 'Nie udało mi się streścić tej strony.' } }];\nreturn [{ json: { ok: true, summary } }];\n"
    }
   },
   {
-   "id": "7f1d4900-66e6-4f8b-a564-c87a74ea6369",
+   "id": "758b7a51-3f7e-4ad1-a84a-107015d1f8c3",
    "name": "Streszczenie OK?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -666,7 +666,7 @@
      },
      "conditions": [
       {
-       "id": "e555a6cc-4fa7-4865-917d-68df21adf0f2",
+       "id": "e066550a-f193-402b-8a5b-2cf650dbc62f",
        "leftValue": "={{ $json.ok }}",
        "rightValue": "",
        "operator": {
@@ -682,7 +682,7 @@
    }
   },
   {
-   "id": "964cc06e-6cc8-4fbe-b717-3d40a3c9fb47",
+   "id": "234a3fc4-20f4-4c21-a567-7a1f4ddd4397",
    "name": "Zapisz streszczenie",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -705,7 +705,7 @@
    }
   },
   {
-   "id": "41687f1f-dec0-4049-8249-2e4b893bc29c",
+   "id": "a5d5fd6c-9655-4482-8168-ce1ef694c451",
    "name": "Powiadomić o zmianie?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -723,7 +723,7 @@
      },
      "conditions": [
       {
-       "id": "5905cf56-4e20-4f92-aedd-b454fbd448d2",
+       "id": "56d9c1f9-a276-44d5-aac8-9276954c51b7",
        "leftValue": "={{ $('Wejście').first().json.reason === 'scheduled' && $('Sprawdź streszczenie').first().json.summary.changed }}",
        "rightValue": "",
        "operator": {
@@ -739,7 +739,7 @@
    }
   },
   {
-   "id": "9de4c8a3-c769-4c2c-8d8e-a877ab8f5fa5",
+   "id": "b93f0cbd-5af9-4e9b-92da-174461c46759",
    "name": "Powiadomienie o zmianie",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -762,7 +762,7 @@
    }
   },
   {
-   "id": "8c154ea3-19a7-41d7-b048-8ac71eb404f6",
+   "id": "cb0895a3-94ef-4d8f-a59f-aeef643c89ad",
    "name": "Zapisz błąd",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,

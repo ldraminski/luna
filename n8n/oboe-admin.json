@@ -2,7 +2,7 @@
  "name": "Oboe: Wydaj token",
  "nodes": [
   {
-   "id": "6df9994d-a3be-4b27-bbb5-3a2b33f344d6",
+   "id": "a8e87ee7-9cc9-41ff-b677-afef560a275c",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "fe15c05b-2cad-499d-a0ae-851a0b4de7c0",
+   "id": "eb02da47-b139-4e6b-bc96-fa36c48d9524",
    "name": "POST admin/token",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -38,10 +38,10 @@
      "name": "Oboe - admin (X-Admin-Token)"
     }
    },
-   "webhookId": "ce510849-ed89-444c-a64f-f7bd67049572"
+   "webhookId": "4d6b5aef-bb67-428d-8986-429ee7d4798c"
   },
   {
-   "id": "01b692c0-32f0-46f5-abeb-6d7995eea5f2",
+   "id": "8bc3d979-4716-45e1-9539-05e0c4a54eb9",
    "name": "Wydaj token",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -64,7 +64,7 @@
    }
   },
   {
-   "id": "a929a6ae-3982-4c29-9f1c-2eb4b0ed9aae",
+   "id": "d9ca8859-920f-49be-a5f7-3a3e981c2f62",
    "name": "Wysłać mail?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -82,7 +82,7 @@
      },
      "conditions": [
       {
-       "id": "beb6679b-f2d1-42aa-8147-cdd154237309",
+       "id": "93b217a1-4b20-475e-a505-09a314bac21f",
        "leftValue": "={{ $json.result.status === 200 && $('POST admin/token').item.json.body.send_email !== false }}",
        "rightValue": "",
        "operator": {
@@ -98,7 +98,7 @@
    }
   },
   {
-   "id": "f81b21e9-cb9f-4539-aefd-0954c5098b21",
+   "id": "08e16c04-c1bc-4a9d-9757-3a9ce9326f70",
    "name": "Wyślij token mailem",
    "type": "n8n-nodes-base.emailSend",
    "typeVersion": 2.1,
@@ -111,7 +111,7 @@
     "toEmail": "={{ $json.result.email }}",
     "subject": "Cześć, tu Luna — Twój klucz",
     "emailFormat": "text",
-    "text": "={{ 'Cześć' + ($json.result.name ? ' ' + $json.result.name : '') + '!\\n\\nJestem Luna — Twoja prywatna asystentka. Zapisuję sprawy, terminy, listy i notatki, a potem pilnuję, żeby nic Ci nie umknęło.\\n\\nOto Twój klucz:\\n\\n' + $json.result.token + '\\n\\nJak zacząć:\\n1. Otwórz na telefonie: https://luna.draminski.dev\\n2. iPhone: Udostępnij → „Do ekranu początkowego”. Android: menu → „Zainstaluj aplikację”.\\n3. Uruchom Lunę Z EKRANU POCZĄTKOWEGO i dopiero tam wklej klucz. (Na iPhonie aplikacja z ekranu początkowego nie widzi tego, co wpiszesz w Safari.)\\n\\nKlucz działa bez końca. Nie przesyłaj go nikomu — kto go ma, widzi Twoje sprawy.\\nZgubisz go? Wejdź na https://luna.draminski.dev, wpisz swój e-mail, a wyślę Ci nowy.\\n\\nDo usłyszenia!\\n— Luna' }}",
+    "text": "={{ 'Cześć' + ($json.result.name ? ' ' + $json.result.name : '') + '!\\n\\nJestem Luna — Twoja prywatna asystentka w telefonie. Piszesz mi zwykłym zdaniem (albo wysyłasz zdjęcie), co masz na głowie, a ja to zapisuję i pilnuję za Ciebie:\\n• przypominam o terminach — dzień wcześniej i tuż przed wydarzeniem,\\n• pilnuję rzeczy, które się powtarzają (opłaty, przeglądy, cotygodniowe obowiązki),\\n• robię listy do odhaczania i notatki — także ze zdjęć,\\n• sprawdzam informacje w internecie i streszczam strony,\\n• co rano wysyłam krótki plan dnia, a w poniedziałki plan całego tygodnia.\\n\\nLuna działa w przeglądarce — dodajesz ją do ekranu początkowego jak zwykłą aplikację, niczego nie pobierasz ze sklepu. Twoje sprawy widzisz tylko Ty.\\n\\nOto Twój klucz:\\n\\n' + $json.result.token + '\\n\\nJak zacząć:\\n1. Otwórz na telefonie: https://luna.draminski.dev\\n2. iPhone: Udostępnij → „Do ekranu początkowego”. Android: menu → „Zainstaluj aplikację”.\\n3. Uruchom Lunę Z EKRANU POCZĄTKOWEGO i dopiero tam wklej klucz. (Na iPhonie aplikacja z ekranu początkowego nie widzi tego, co wpiszesz w Safari.)\\n\\nKlucz działa bez końca. Nie przesyłaj go nikomu — kto go ma, widzi Twoje sprawy.\\nZgubisz go? Wejdź na https://luna.draminski.dev, wpisz swój e-mail, a wyślę Ci nowy.\\n\\nDo usłyszenia!\\n— Luna' }}",
     "options": {
      "appendAttribution": false
     }
@@ -125,7 +125,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "686f2c24-0e84-4d67-9f52-8791b9245405",
+   "id": "eb66723a-1c52-4996-9935-0615efd5c29f",
    "name": "Odpowiedz: wysłano",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -140,7 +140,7 @@
    }
   },
   {
-   "id": "a933628a-d9cb-4fa8-ae73-40f1825cb11b",
+   "id": "d85af380-4d2c-469f-b38f-b4abbee7ccd4",
    "name": "Odpowiedz",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,

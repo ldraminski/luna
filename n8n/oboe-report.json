@@ -2,7 +2,7 @@
  "name": "Oboe: Raport",
  "nodes": [
   {
-   "id": "96adce84-72c9-4620-87c4-7642d5c75c3f",
+   "id": "5a6e1c66-2d9a-4860-98e5-4ac7594db129",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "9edf8680-a3ce-4983-848e-7736db8b371d",
+   "id": "3f781bbf-1736-47f7-b1ab-73bb0daa2b5b",
    "name": "Co 5 minut",
    "type": "n8n-nodes-base.scheduleTrigger",
    "typeVersion": 1.2,
@@ -37,7 +37,7 @@
    }
   },
   {
-   "id": "8a25e1b2-66d6-4474-97f9-604e19ec4cbd",
+   "id": "13a5bae6-e3a6-4fee-af9d-f011637e0b1e",
    "name": "POST admin/report",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -58,10 +58,10 @@
      "name": "Oboe - admin (X-Admin-Token)"
     }
    },
-   "webhookId": "ca0b1618-5d4f-47fa-80a8-0ff4dd3c38ea"
+   "webhookId": "b59f52e2-5e26-4b77-8ef1-1259452afc38"
   },
   {
-   "id": "f4089162-d1fd-429a-866f-aaa1a1f1fb53",
+   "id": "9ff245d2-82c5-4841-ac41-c7f05874c7d9",
    "name": "Parametry",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -74,7 +74,7 @@
    }
   },
   {
-   "id": "2807f0de-d5f8-4275-b492-98cacc1ed79f",
+   "id": "683e53a2-e7f1-484c-a716-76aa90760c3d",
    "name": "Komu raport",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -97,7 +97,7 @@
    }
   },
   {
-   "id": "43e544d0-ad2c-49a8-8521-95d72240a345",
+   "id": "a706a5ab-d8a8-460b-b48c-bbb23914d305",
    "name": "Ułóż plan",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -106,11 +106,11 @@
     100
    ],
    "parameters": {
-    "jsCode": "// Plan do raportu liczony KODEM (model dostaje gotowe fakty): dziś + jutro, a w poniedziałek cały tydzień.\n// Występowania cyklicznych jak w aplikacji; zaległe = jednorazowe z terminem w przeszłości (wciąż aktywne); niedokończone listy bez terminu.\nconst Z = 'Europe/Warsaw';\nconst DNI = ['poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela'];\nconst MIES = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];\nconst dayLabel = (d) => `${DNI[d.weekday - 1]}, ${d.day} ${MIES[d.month - 1]}`;\nconst STEP = { day: { days: 1 }, week: { weeks: 1 }, month: { months: 1 } };\nreturn $input.all().map(({ json: u }) => {\n  const now = DateTime.now().setZone(Z); const today = now.startOf('day');\n  const weekly = u.force_weekly === true || now.weekday === 1;\n  const nDays = weekly ? 7 : 2; const end = today.plus({ days: nDays });\n  const days = Array.from({ length: nDays }, (_, k) => ({ date: today.plus({ days: k }).toISODate(),\n    label: k === 0 ? 'Dziś' : k === 1 ? 'Jutro' : dayLabel(today.plus({ days: k })), items: [] }));\n  const overdue = []; const lists = [];\n  for (const it of u.items || []) {\n    const evRaw = it.spec?.event_at || it.next_at;\n    const left = (it.lists || []).reduce((a, l) => a + (l?.items || []).filter((x) => !x.done).length, 0);\n    const total = (it.lists || []).reduce((a, l) => a + (l?.items || []).length, 0);\n    if (!evRaw) { if (left) lists.push({ id: it.id, title: it.title, left, total }); continue; }\n    let ev = DateTime.fromISO(new Date(evRaw).toISOString()).setZone(Z);\n    const r = it.spec?.recurrence;\n    if (!r) {\n      if (ev < now) { overdue.push({ id: it.id, title: it.title, when: dayLabel(ev) + ', ' + ev.toFormat('HH:mm') }); continue; }\n    }\n    for (let i = 0; ev < end && i < 400; i++) {\n      if (ev >= today) {\n        const k = Math.floor(ev.diff(today, 'days').days);\n        if (days[k]) days[k].items.push({ id: it.id, title: it.title, time: ev.toFormat('HH:mm'), recurring: !!r, left, total });\n      }\n      if (!r || !STEP[r.unit]) break;\n      ev = ev.plus(Object.fromEntries(Object.entries(STEP[r.unit]).map(([k, v]) => [k, v * r.every])));\n    }\n  }\n  days.forEach((d) => d.items.sort((a, b) => a.time.localeCompare(b.time)));\n  const count = days.reduce((a, d) => a + d.items.length, 0);\n  const title = weekly ? `Twój tydzień: ${today.day} ${MIES[today.month - 1]} – ${end.minus({ days: 1 }).day} ${MIES[end.minus({ days: 1 }).month - 1]}`\n    : `Plan na dziś — ${dayLabel(today)}`;\n  const facts = [`Rodzaj: ${weekly ? 'raport tygodnia' : 'raport dnia (dziś i jutro)'}, teraz ${now.toFormat('yyyy-MM-dd HH:mm')}`,\n    ...days.map((d) => `${d.label} (${d.date}): ` + (d.items.length ? d.items.map((x) => `${x.time} ${x.title}${x.total ? ` (lista: ${x.left} z ${x.total} do zrobienia)` : ''}`).join('; ') : 'nic')),\n    `Zaległe (po terminie, nieodhaczone): ` + (overdue.length ? overdue.map((x) => `${x.title} (${x.when})`).join('; ') : 'brak'),\n    `Listy bez terminu z niezrobionymi punktami: ` + (lists.length ? lists.slice(0, 5).map((x) => `${x.title} (${x.left} z ${x.total})`).join('; ') : 'brak')].join('\\n');\n  return { json: {\n    user_id: u.user_id, kind: weekly ? 'weekly' : 'daily', for_date: today.toISODate(),\n    content: { title, kind: weekly ? 'weekly' : 'daily', days, overdue, lists: lists.slice(0, 5), count },\n    facts, push_title: weekly ? 'Twój tydzień z Luną' : 'Twój plan na dziś',\n    fallback: count ? `Masz ${count} ${count === 1 ? 'rzecz' : 'rzeczy'} w planie.` : 'Na razie nic nie masz w planie.',\n  } };\n});\n"
+    "jsCode": "// Plan do raportu liczony KODEM (model dostaje gotowe fakty): dziś + jutro, a w poniedziałek cały tydzień.\n// Występowania cyklicznych jak w aplikacji; zaległe = jednorazowe z terminem w przeszłości (wciąż aktywne); niedokończone listy bez terminu.\nconst Z = 'Europe/Warsaw';\nconst DNI = ['poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela'];\nconst MIES = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];\nconst dayLabel = (d) => `${DNI[d.weekday - 1]}, ${d.day} ${MIES[d.month - 1]}`;\nconst STEP = { day: { days: 1 }, week: { weeks: 1 }, month: { months: 1 } };\nreturn $input.all().map(({ json: u }) => {\n  const now = DateTime.now().setZone(Z); const today = now.startOf('day');\n  const weekly = u.force_weekly === true || now.weekday === 1;\n  const nDays = weekly ? 7 : 2; const end = today.plus({ days: nDays });\n  const days = Array.from({ length: nDays }, (_, k) => ({ date: today.plus({ days: k }).toISODate(),\n    label: k === 0 ? 'Dziś' : k === 1 ? 'Jutro' : dayLabel(today.plus({ days: k })), items: [] }));\n  const overdue = []; const lists = [];\n  for (const it of u.items || []) {\n    const evRaw = it.spec?.event_at || it.next_at;\n    const left = (it.lists || []).reduce((a, l) => a + (l?.items || []).filter((x) => !x.done).length, 0);\n    const total = (it.lists || []).reduce((a, l) => a + (l?.items || []).length, 0);\n    if (!evRaw) { if (left) lists.push({ id: it.id, title: it.title, left, total }); continue; }\n    let ev = DateTime.fromISO(new Date(evRaw).toISOString()).setZone(Z);\n    const r = it.spec?.recurrence;\n    if (!r) {\n      if (ev < now) { overdue.push({ id: it.id, title: it.title, when: dayLabel(ev) + ', ' + ev.toFormat('HH:mm') }); continue; }\n    }\n    for (let i = 0; ev < end && i < 400; i++) {\n      if (ev >= today) {\n        const k = Math.floor(ev.diff(today, 'days').days);\n        if (days[k]) days[k].items.push({ id: it.id, title: it.title, time: ev.toFormat('HH:mm'), recurring: !!r, left, total });\n      }\n      if (!r || !STEP[r.unit]) break;\n      ev = ev.plus(Object.fromEntries(Object.entries(STEP[r.unit]).map(([k, v]) => [k, v * r.every])));\n    }\n  }\n  days.forEach((d) => d.items.sort((a, b) => a.time.localeCompare(b.time)));\n  const count = days.reduce((a, d) => a + d.items.length, 0);\n  const title = weekly ? `Twój tydzień: ${today.day} ${MIES[today.month - 1]} – ${end.minus({ days: 1 }).day} ${MIES[end.minus({ days: 1 }).month - 1]}`\n    : `Plan na dziś — ${dayLabel(today)}`;\n  const facts = [`Rodzaj: ${weekly ? 'raport tygodnia' : 'raport dnia (dziś i jutro)'}, teraz ${now.toFormat('yyyy-MM-dd HH:mm')}`,\n    ...days.map((d) => `${d.label} (${d.date}): ` + (d.items.length ? d.items.map((x) => `${x.time} ${x.title}${x.total ? ` (lista: ${x.left} z ${x.total} do zrobienia)` : ''}`).join('; ') : 'nic')),\n    `Zaległe (po terminie, nieodhaczone): ` + (overdue.length ? overdue.map((x) => `${x.title} (${x.when})`).join('; ') : 'brak'),\n    `Listy bez terminu z niezrobionymi punktami: ` + (lists.length ? lists.slice(0, 5).map((x) => `${x.title} (${x.left} z ${x.total})`).join('; ') : 'brak')].join('\\n');\n  return { json: {\n    user_id: u.user_id, kind: weekly ? 'weekly' : 'daily', for_date: today.toISODate(),\n    content: { title, kind: weekly ? 'weekly' : 'daily', days, overdue, lists: lists.slice(0, 5), count },\n    facts, push_title: weekly ? 'Twój plan na tydzień' : 'Twój plan na dziś',\n    fallback: count ? `Masz ${count} ${count === 1 ? 'rzecz' : 'rzeczy'} w planie.` : 'Na razie nic nie masz w planie.',\n  } };\n});\n"
    }
   },
   {
-   "id": "993d5a8f-2b6e-4054-bf01-8437744da5e2",
+   "id": "a1c1dc73-85b9-457d-a499-5e7040755b01",
    "name": "DeepSeek: wstęp",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -154,7 +154,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "ffec657f-7e3e-425a-9f1a-b9d12868ca9b",
+   "id": "17c601ac-da99-46f6-ade5-51df71637804",
    "name": "Dołącz wstęp",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -167,7 +167,7 @@
    }
   },
   {
-   "id": "1b182ca4-9b4f-4ac2-a04b-992d17e99496",
+   "id": "802dc0c8-2e6e-42fe-b38b-c06ed8a9607b",
    "name": "Zapisz raport",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,

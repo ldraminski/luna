@@ -10,7 +10,7 @@ const priv4 = (ip) => {
 };
 const priv6 = (ip) => { const s = ip.toLowerCase(); return s === '::1' || s === '::' || /^(fc|fd|fe8|fe9|fea|feb)/.test(s) || s.startsWith('::ffff:'); };
 const ips = answers.filter((a) => /^[\d.]+$/.test(a) || a.includes(':'));
-if (!ips.length) return [{ json: { ok: false, url, error: 'Nie znalazłem tej domeny (DNS).' } }];
+if (!ips.length) return [{ json: { ok: false, url, error: 'Nie znalazłam takiej strony — sprawdź adres.' } }];
 const bad = ips.filter((ip) => (ip.includes(':') ? priv6(ip) : priv4(ip)));
 if (bad.length) return [{ json: { ok: false, url, error: 'Ten adres prowadzi do sieci wewnętrznej — nie pobieram go.' } }];
 return [{ json: { ok: true, url, ips } }];

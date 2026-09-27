@@ -42,7 +42,7 @@ return $input.all().map(({ json: u }) => {
   return { json: {
     user_id: u.user_id, kind: weekly ? 'weekly' : 'daily', for_date: today.toISODate(),
     content: { title, kind: weekly ? 'weekly' : 'daily', days, overdue, lists: lists.slice(0, 5), count },
-    facts, push_title: weekly ? 'Twój tydzień z Luną' : 'Twój plan na dziś',
+    facts, push_title: weekly ? 'Twój plan na tydzień' : 'Twój plan na dziś',
     fallback: count ? `Masz ${count} ${count === 1 ? 'rzecz' : 'rzeczy'} w planie.` : 'Na razie nic nie masz w planie.',
   } };
 });

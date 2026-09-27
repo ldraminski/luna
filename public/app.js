@@ -14,7 +14,7 @@ const startOfDay = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); retur
 const dayDiff = (d) => Math.round((startOfDay(d) - startOfDay(new Date())) / DAY);
 const fDay = new Intl.DateTimeFormat('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' });
 const fShort = new Intl.DateTimeFormat('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' });
-const fTime = new Intl.DateTimeFormat('pl-PL', { hour: '2-digit', minute: '2-digit' });
+const fTime = new Intl.DateTimeFormat('pl-PL', { hour: 'numeric', minute: '2-digit' });
 const fWd = new Intl.DateTimeFormat('pl-PL', { weekday: 'short' });
 const fMonth = new Intl.DateTimeFormat('pl-PL', { month: 'long' });
 const fMonShort = new Intl.DateTimeFormat('pl-PL', { month: 'short' });
@@ -104,7 +104,7 @@ async function submitToken(e) {
     state.user = me.user;
     startMain();
   } catch (err) {
-    $('#tok-err').textContent = err.status === 401 ? 'Ten klucz nie działa. Poproś Łukasza o nowy.' : err.message;
+    $('#tok-err').textContent = err.status === 401 ? 'Ten klucz nie działa. Wpisz wyżej swój e-mail, a wyślę nowy.' : err.message;
   }
 }
 
@@ -135,8 +135,8 @@ async function loadReport(auto = false) {
 }
 function reportTimes(cur) {
   const out = ['<option value="off">wyłączony</option>'];
-  for (let h = 5; h <= 12; h++) for (const m of ['00', '30']) { const t = `${String(h).padStart(2, '0')}:${m}`; out.push(`<option value="${t}">${h}:${m}</option>`); }
-  if (cur && !out.some((o) => o.includes(`"${cur}"`))) out.push(`<option value="${cur}">${cur}</option>`);
+  for (let h = 5; h <= 12; h++) for (const m of ['00', '30']) { const t = `${String(h).padStart(2, '0')}:${m}`; out.push(`<option value="${t}">o ${h}:${m}</option>`); }
+  if (cur && !out.some((o) => o.includes(`"${cur}"`))) out.push(`<option value="${cur}">o ${cur.replace(/^0/, '')}</option>`);
   return out.join('');
 }
 function openReport() {
@@ -146,7 +146,7 @@ function openReport() {
   $('#rep-time').value = set.enabled ? set.time : 'off';
   const row = (x) => `<li><button type="button" data-open="${x.id}">${x.time ? `<span class="t">${esc(x.time)}</span>` : ''}<span class="n">${esc(x.title)}${x.total ? ` <small>${x.left} z ${x.total} do zrobienia</small>` : ''}</span></button></li>`;
   $('#rep-body').innerHTML = !c ? `<div class="moon" aria-hidden="true">${svg('doc')}</div>
-      <h2 id="rep-title">Raport jeszcze przed tobą</h2>
+      <h2 id="rep-title">Pierwszy raport jeszcze przed tobą</h2>
       <p class="lead">Codziennie o ${esc(set.time)} przygotuję plan na dziś i jutro, a w poniedziałki — plan całego tygodnia.</p>`
     : `<p class="kind">${rep.kind === 'weekly' ? 'Raport tygodnia' : 'Raport dnia'}</p>
       <h2 id="rep-title">${esc(c.title)}</h2>
@@ -156,7 +156,7 @@ function openReport() {
       ${c.prep?.length ? `<div class="rep-prep"><p class="kind">Przygotuj się wcześniej</p><ul>${c.prep.map((p) => `<li>${esc(p)}</li>`).join('')}</ul></div>` : ''}
       ${(c.days || []).map((d) => `<div class="rep-day"><h3>${esc(d.label.charAt(0).toUpperCase() + d.label.slice(1))}</h3>
         ${d.items.length ? `<ul class="rep-rows">${d.items.map(row).join('')}</ul>` : '<p class="rep-none">Nic zaplanowanego</p>'}</div>`).join('')}
-      ${c.lists?.length ? `<div class="rep-day"><h3>Czeka na liście</h3><ul class="rep-rows">${c.lists.map((x) => row({ ...x, time: '' })).join('')}</ul></div>` : ''}`;
+      ${c.lists?.length ? `<div class="rep-day"><h3>Czeka na odhaczenie</h3><ul class="rep-rows">${c.lists.map((x) => row({ ...x, time: '' })).join('')}</ul></div>` : ''}`;
   $('#report').hidden = false; $('#report').scrollTop = 0;
   document.documentElement.classList.add('locked');
   if (rep && !rep.seen) { rep.seen = true; $('#report-badge').hidden = true; api.reportSeen(rep.id).catch(() => {}); }
@@ -167,7 +167,7 @@ async function saveReportTime() {
   try {
     const r = await api.settings(v === 'off' ? set.time : v, v !== 'off');
     state.report = { ...(state.report || {}), settings: r.settings };
-    toast(v === 'off' ? 'Raport wyłączony.' : `Raport będzie przychodził codziennie o ${v}.`);
+    toast(v === 'off' ? 'Wyłączyłam codzienny raport.' : `Codzienny raport przyjdzie o ${v.replace(/^0/, '')}.`);
   } catch (err) { toast(err.message); }
 }
 
@@ -195,8 +195,8 @@ async function resolveLate(e) {
     await api.done(id);
     state.items = state.items.filter((x) => x.id !== id);
     li.remove(); render();
-    toast(b.dataset.lateAct === 'done' ? 'Zrobione ✓' : 'Zamknięte.');
-    if (!state.items.some(isLate)) { if ($('#nudge').open) $('#nudge').close(); toast('Czysto — nic nie zalega ✓'); }
+    toast(b.dataset.lateAct === 'done' ? 'Zrobione ✓' : 'Zamknęłam.');
+    if (!state.items.some(isLate)) { if ($('#nudge').open) $('#nudge').close(); toast('Wszystko nadrobione ✓'); }
     else if ($('#nudge').open) $('#nudge-title').textContent = `Masz ${state.items.filter(isLate).length} ${pl(state.items.filter(isLate).length, 'przeterminowaną rzecz', 'przeterminowane rzeczy', 'przeterminowanych rzeczy')}`;
   } catch (err) { li.querySelectorAll('button').forEach((x) => { x.disabled = false; }); toast(err.message); }
 }
@@ -233,7 +233,7 @@ async function load() {
     render();
     watchGenerating();
   } catch (err) {
-    if (err.status === 401) return logout('Klucz przestał działać. Poproś Łukasza o nowy.');
+    if (err.status === 401) return logout('Klucz przestał działać — wpisz swój e-mail, a wyślę nowy.');
     if (!state.items.length) $('#list').innerHTML = `<div class="empty"><h3>Nie udało się wczytać</h3><p>${esc(err.message)}</p></div>`;
     else toast(err.message);
   }
@@ -251,7 +251,7 @@ function render() {
   renderDays(items);
   if (state.day) return renderDayList(items);
   if (!items.length) {
-    $('#list').innerHTML = `<div class="empty"><h3>Jeszcze nic mi nie powierzono</h3>
+    $('#list').innerHTML = `<div class="empty"><h3>Na razie nic tu nie ma</h3>
       <p>Napisz na dole zwykłym zdaniem, co mam zapamiętać — resztą zajmę się sama. Na przykład:</p>
       <div class="ex">${exChips()}</div></div>`;
     renderRequests();
@@ -270,11 +270,11 @@ function render() {
   let html = '';
   if (late.length) html += `<h2 class="sec sec--late">Po terminie <span>${late.length}</span></h2>` + late.map((i) => card(i)).join('');
   if (hero) html += card(hero, true);
-  if (rest.length) html += `<h2 class="sec">${hero ? 'Dalej' : 'Najbliższe'}</h2>` + rest.map((i) => card(i)).join('');
-  if (rec.length) html += '<h2 class="sec">Powtarzalne</h2>' + rec.map((i) => card(i)).join('');
+  if (rest.length) html += `<h2 class="sec">${hero ? 'Kolejne terminy' : 'Najbliższe terminy'}</h2>` + rest.map((i) => card(i)).join('');
+  if (rec.length) html += '<h2 class="sec">Cykliczne</h2>' + rec.map((i) => card(i)).join('');
   if (tracked.length) html += '<h2 class="sec">Śledzone</h2>' + tracked.map((i) => card(i)).join('');
   if (lists.length) html += '<h2 class="sec">Listy</h2>' + lists.map((i) => card(i)).join('');
-  if (saved.length) html += '<h2 class="sec">Zapisane</h2>' + saved.map((i) => card(i)).join('');
+  if (saved.length) html += '<h2 class="sec">Notatki</h2>' + saved.map((i) => card(i)).join('');
   $('#list').innerHTML = html;
   renderRequests();
   loadPhotos($('#list'));
@@ -373,7 +373,7 @@ function renderDayList(items) {
     <p class="kind">${list.length ? `${list.length} ${list.length === 1 ? 'rzecz' : 'rzeczy'}` : 'Nic zaplanowanego'}</p></div>
     <button type="button" class="ghost-txt" data-day-clear>Pokaż wszystko</button></div>`;
   $('#list').innerHTML = head + (list.length ? list.map((x) => card(x.it)).join('')
-    : `<div class="empty"><h3>Na ten dzień nic nie masz</h3><p>Napisz na dole, co zaplanować — np. „${esc(fWd.format(new Date(state.day)).replace('.', ''))} o 10 dentysta”.</p></div>`);
+    : `<div class="empty"><h3>Na ten dzień nic nie masz</h3><p>Napisz na dole, co zaplanować — np. „${esc(new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'long' }).format(new Date(state.day)))} o 10 dentysta”.</p></div>`);
   loadPhotos($('#list'));
 }
 
@@ -386,7 +386,7 @@ function remindLine(it) {
 
 const PERIOD = { day: 1, week: 7, month: 30 };
 function recLabel(r) {
-  if (!r) return 'Powtarzalne';
+  if (!r) return 'Cykliczne';
   const n = r.every;
   const u = { day: ['dzień', 'dni', 'dni'], week: ['tydzień', 'tygodnie', 'tygodni'], month: ['miesiąc', 'miesiące', 'miesięcy'] }[r.unit];
   if (n === 1) return 'Co ' + u[0];
@@ -411,7 +411,7 @@ function kindLabel(it) {
   const r = it.spec?.recurrence; const ev = eventOf(it);
   if (r) return recLabel(r);
   if (ev && isLate(it)) return lateLabel(ev);
-  if (ev) return (it.kind === 'reminder-once' ? 'Jednorazowe · ' : '') + rel(ev) + ', ' + fTime.format(ev);
+  if (ev) { const w = rel(ev); return w.charAt(0).toUpperCase() + w.slice(1) + ', ' + fTime.format(ev); }
   if (it.data?.widget && it.data.widget.status !== 'rejected') return 'Śledzenie';
   if (listOf(it).length) return 'Lista';
   if (it.spec?.url) return it.spec?.summarize ? 'Streszczenie strony' : 'Strona';
@@ -427,7 +427,7 @@ function partCycle(it) {
   const done = Math.max(0, Math.min(segs - 1, Math.round((1 - left / days) * segs)));
   const bars = Array.from({ length: segs }, (_, k) => `<i class="${k < done ? 'on' : k === done ? 'rem' : ''}"></i>`).join('');
   return `<div class="cycle" aria-hidden="true" style="grid-template-columns:repeat(${segs},1fr)">${bars}</div>
-    <div class="cyc-l"><span>${ev ? 'następny ' + esc(rel(ev)) : ''}</span><span>${ev ? esc(fShort.format(ev)) : ''}</span></div>`;
+    <div class="cyc-l"><span>${ev ? 'następny raz: ' + esc(rel(ev)) : ''}</span><span>${ev ? esc(fShort.format(ev)) : ''}</span></div>`;
 }
 function partList(it, heads = true) {
   const ls = (Array.isArray(it.data?.lists) ? it.data.lists : []);
@@ -496,7 +496,7 @@ function partWidget(it) {
   if (w.status === 'generating') return `<p class="gen-state">${svg('spark', 'width:15px;height:15px')} Robię widget do tej rzeczy…</p>`;
   if (w.status === 'rejected') return `<p class="gen-state bad">Widget nie przeszedł kontroli bezpieczeństwa, więc zostawiam zwykłą kartę.</p>`;
   if (w.status !== 'ready' || !/^[a-z0-9-]+$/.test(w.slug || '') || !Number.isInteger(w.version)) return '';
-  const note = w.pending ? `<p class="gen-state">${svg('spark', 'width:15px;height:15px')} Przebudowuję widget — ten działa do czasu podmiany…</p>`
+  const note = w.pending ? `<p class="gen-state">${svg('spark', 'width:15px;height:15px')} Przebudowuję widget — do tego czasu działa obecny…</p>`
     : w.revision_error ? `<p class="gen-state bad">Nowa wersja nie przeszła kontroli, więc zostawiam tę. ${esc(String(w.revision_error).replace(/^ODRZUCONY( po poprawce)?: /, '').slice(0, 160))}</p>` : '';
   return note + `<iframe class="wframe" data-wid="${it.id}" src="/widgets/${w.slug}.v${w.version}.html" sandbox="allow-scripts"
     title="Widget: ${esc(it.title)}" loading="lazy" referrerpolicy="no-referrer" style="height:120px"></iframe>`;
@@ -518,7 +518,7 @@ function card(it, hero = false) {
   const noteText = !listOf(it).length && !it.spec?.url && !ev && !it.spec?.recurrence && !it.data?.research && !it.data?.photo ? `<p class="sum">${esc(it.source_text)}</p>` : '';
   if (hero) {
     return `<article class="w w--hero" data-id="${it.id}" data-widget="${esc(it.kind)}" tabindex="0" role="button">
-      <p class="kind">${svg('clock', 'width:16px;height:16px')} ${esc(kindLabel(it).replace(/^Jednorazowe · /, 'Jednorazowe · ') )}</p>
+      <p class="kind">${svg('clock', 'width:16px;height:16px')} Najbliższy termin · ${esc(fTime.format(ev))}</p>
       <p class="big">${esc(rel(ev))}</p>
       <h3>${esc(it.title)}</h3>
       <div class="blob" aria-hidden="true">${it.has_photo ? `<img class="blob-photo" data-photo="${it.id}" alt="">` : `<svg class="i" viewBox="0 0 24 24" style="width:64px;height:64px;stroke-width:1.4;margin:-10px 18px 0 0">${I[icon]}</svg>`}</div>
@@ -534,7 +534,7 @@ function card(it, hero = false) {
 }
 
 // ---------- szczegół ----------
-const KIND = { 'reminder-once': 'Jednorazowe', 'reminder-recurring': 'Powtarzalne', checklist: 'Lista', 'page-summary': 'Strona', note: 'Notatka' };
+const KIND = { 'reminder-once': 'Termin', 'reminder-recurring': 'Cykliczne', checklist: 'Lista', 'page-summary': 'Strona', note: 'Notatka' };
 const TOP = { 'reminder-once': '--tint-lavender', 'reminder-recurring': '--tint-mint', checklist: '--tint-pink', 'page-summary': '--tint-blue', note: '--tint-pink' };
 
 function openDetail(id) {
@@ -545,7 +545,7 @@ function openDetail(id) {
   const ev = eventOf(it);
   const rows = [];
   const late = isLate(it);
-  if (ev) rows.push([it.spec?.recurrence ? 'Następny raz' : late ? 'Termin był' : 'Kiedy', fDay.format(ev) + ', ' + fTime.format(ev)]);
+  if (ev) rows.push([it.spec?.recurrence ? 'Następny raz' : late ? 'Termin minął' : 'Kiedy', fDay.format(ev) + ', ' + fTime.format(ev)]);
   if (it.spec?.recurrence) rows.push(['Powtarzanie', recLabel(it.spec.recurrence)]);
   if ((it.notify_at || []).length) rows.push(['Przypomnienia', it.notify_at.map((d) => whenRel(dt(d))).join(' · ')]);
   for (const f of it.data?.fields || []) rows.push([f.label, f.value]);
@@ -564,7 +564,7 @@ function openDetail(id) {
     </div>
     <div class="d-body">
       ${it.has_photo ? `<img class="d-photo" data-photo="${it.id}" alt="Zdjęcie dodane do tej rzeczy">` : ''}
-      <div class="quote">Wpisane ${esc(rel(dt(it.created_at)))}, ${esc(fTime.format(dt(it.created_at)))}:<q>${esc(it.source_text)}</q></div>
+      <div class="quote">Twoja wiadomość · ${esc(rel(dt(it.created_at)))}, ${esc(fTime.format(dt(it.created_at)))}<q>${esc(it.source_text)}</q></div>
       ${it.data?.photo ? `<div class="w" style="margin-top:12px;cursor:default">${partPhoto(it, true)}</div>` : ''}
       ${it.data?.research ? `<div class="w" style="margin-top:12px;cursor:default">${partResearch(it, true)}</div>` : ''}
       ${it.data?.widget ? `<div class="w" style="margin-top:12px;cursor:default">${partWidget(it)}</div>` : ''}
@@ -615,7 +615,7 @@ async function detailAction(act) {
   const id = state.openId;
   if (act === 'close') return closeDetail();
   if (act === 'chat') return openChat(id);
-  if (act === 'delete' && !confirm('Usunąć na dobre?')) return;
+  if (act === 'delete' && !confirm('Usunąć tę rzecz? Tego nie da się cofnąć.')) return;
   try {
     await (act === 'done' ? api.done(id) : api.remove(id));
     state.items = state.items.filter((x) => x.id !== id);
@@ -630,14 +630,14 @@ async function add(e) {
   const q = $('#q'); const text = q.value.trim(); const image = state.photo || '';
   if (!text && !image) { q.focus(); return; }
   const form = $('#wpisz'); form.classList.add('busy');
-  const slow = setTimeout(() => toast(image ? 'Chwilkę — oglądam zdjęcie…' : 'Chwilkę — sprawdzam w sieci…'), 3500);   // zdjęcie / sieć trwają kilka–kilkanaście sekund
+  const slow = setTimeout(() => toast(image ? 'Chwilkę — oglądam zdjęcie…' : 'Chwilkę — zbieram informacje…'), 3500);   // zdjęcie / sieć trwają kilka–kilkanaście sekund
   try {
     const r = await api.add(text, image, image ? state.thumb || '' : '');
     q.value = ''; fitQ(); q.blur(); setPhoto(null);
     toast(r.item?.spec?.understood || 'Zapisałam.');
     await load();
   } catch (err) {
-    if (err.status === 401) return logout('Klucz przestał działać. Poproś Łukasza o nowy.');
+    if (err.status === 401) return logout('Klucz przestał działać — wpisz swój e-mail, a wyślę nowy.');
     toast(err.message);
   } finally { clearTimeout(slow); form.classList.remove('busy'); }
 }
@@ -850,7 +850,7 @@ function bind() {
   window.visualViewport?.addEventListener('resize', keepDock);
   window.visualViewport?.addEventListener('scroll', keepDock);
   $('#plus').addEventListener('click', () => $('#q').focus());
-  $('#mic').addEventListener('click', () => { $('#q').focus(); toast('Na razie podyktuj mi to mikrofonem z klawiatury telefonu — własne słuchanie dostanę później.'); });
+  $('#mic').addEventListener('click', () => { $('#q').focus(); toast('Dyktowanie w Lunie dopiero się szykuje — na razie użyj mikrofonu na klawiaturze telefonu.'); });
   $('#bell').addEventListener('click', bell);
   $('#luna').addEventListener('click', openIntro);
   $('#report-btn').addEventListener('click', async () => { if (!state.report) await loadReport(); openReport(); });
@@ -934,7 +934,7 @@ async function boot() {
     startMain();
     if (openId) { await load(); openDetail(openId); }
   } catch (err) {
-    if (err instanceof ApiError && err.status === 401) return logout('Klucz przestał działać. Poproś Łukasza o nowy.');
+    if (err instanceof ApiError && err.status === 401) return logout('Klucz przestał działać — wpisz swój e-mail, a wyślę nowy.');
     showHello(err.message);
   }
 }

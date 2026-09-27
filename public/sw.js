@@ -55,7 +55,7 @@ async function handlePush() {
     body: n.body || '', icon: '/icons/icon-192.png', tag: 'oboe-' + n.id, data: { item: n.item_id },
   })));
   if (items.length > 3) {
-    await self.registration.showNotification('Luna', { body: `…i jeszcze ${items.length - 3}`, tag: 'oboe-more', icon: '/icons/icon-192.png', data: {} });
+    await self.registration.showNotification('Luna', { body: `…i jeszcze ${items.length - 3} ${items.length - 3 === 1 ? 'przypomnienie' : (items.length - 3) % 10 >= 2 && (items.length - 3) % 10 <= 4 && ((items.length - 3) % 100 < 10 || (items.length - 3) % 100 >= 20) ? 'przypomnienia' : 'przypomnień'}`, tag: 'oboe-more', icon: '/icons/icon-192.png', data: {} });
   }
 }
 self.addEventListener('push', (event) => event.waitUntil(handlePush()));

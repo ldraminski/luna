@@ -59,8 +59,8 @@ RETURNING id, user_id, title, spec->>'url' AS url, data->'summary' AS prev""", "
 def fetch_pass(sfx, x0, y, url_expr):
     a = code("Adres do pobrania" + sfx, [x0, y], "const url = " + url_expr + ";\n"
       "const m = /^https?:\\/\\/([a-z0-9.-]+\\.[a-z]{2,})(:\\d+)?(\\/|$|\\?)/i.exec(url || '');\n"
-      "if (!m) return [{ json: { ok: false, url, host: '', error: 'Niepoprawny adres strony.' } }];\n"
-      "if (m[2] && ![':80', ':443'].includes(m[2])) return [{ json: { ok: false, url, host: m[1], error: 'Niestandardowy port — nie pobieram.' } }];\n"
+      "if (!m) return [{ json: { ok: false, url, host: '', error: 'To nie wygląda na adres strony.' } }];\n"
+      "if (m[2] && ![':80', ':443'].includes(m[2])) return [{ json: { ok: false, url, host: m[1], error: 'Tego adresu nie otworzę — nietypowy port.' } }];\n"
       "return [{ json: { ok: true, url, host: m[1].toLowerCase() } }];")
     d4 = http_get("DNS A" + sfx, [x0 + 220, y], "=https://cloudflare-dns.com/dns-query?type=A&name={{ encodeURIComponent($json.host) }}", [("accept", "application/dns-json")])
     d6 = http_get("DNS AAAA" + sfx, [x0 + 440, y], "=https://cloudflare-dns.com/dns-query?type=AAAA&name={{ encodeURIComponent($('Adres do pobrania" + sfx + "').first().json.host) }}", [("accept", "application/dns-json")])
@@ -106,11 +106,11 @@ parse = code("Sprawdź streszczenie", [4520, 60], r"""
 const t = $('Wyciągnij tekst').first().json; const prev = $('Wczytaj').first().json.prev;
 let m;
 try { m = JSON.parse(String($json.choices?.[0]?.message?.content || '').replace(/^```(json)?|```$/g, '').trim()); }
-catch (e) { return [{ json: { ok: false, error: 'Model nie oddał streszczenia.' } }]; }
+catch (e) { return [{ json: { ok: false, error: 'Nie udało mi się streścić tej strony.' } }]; }
 const cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');
 const summary = { headline: cut(m.headline, 160), bullets: (Array.isArray(m.bullets) ? m.bullets : []).map((b) => cut(String(b), 180)).filter(Boolean).slice(0, 5),
   changed: !!prev && m.changed === true, changes: prev ? cut(m.changes, 240) : '', page_title: t.title, hash: t.hash, checked_at: new Date().toISOString() };
-if (!summary.headline) return [{ json: { ok: false, error: 'Puste streszczenie.' } }];
+if (!summary.headline) return [{ json: { ok: false, error: 'Nie udało mi się streścić tej strony.' } }];
 return [{ json: { ok: true, summary } }];
 """)
 pok = iff("Streszczenie OK?", [4740, 60], "={{ $json.ok }}")

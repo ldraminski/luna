@@ -3,7 +3,7 @@ const r = $json; const status = Number(r.statusCode || 0);
 const body = typeof r.data === 'string' ? r.data : typeof r.body === 'string' ? r.body : '';
 if (status < 200 || status >= 300) return [{ json: { ok: false, error: status ? `Strona odpowiedziała kodem ${status}.` : 'Nie udało się pobrać strony.' } }];
 const ctype = String((r.headers || {})['content-type'] || '');
-if (ctype && !/text\/html|text\/plain|application\/xhtml/i.test(ctype)) return [{ json: { ok: false, error: 'To nie jest strona HTML (' + ctype.split(';')[0] + ').' } }];
+if (ctype && !/text\/html|text\/plain|application\/xhtml/i.test(ctype)) return [{ json: { ok: false, error: 'To nie jest zwykła strona internetowa (' + ctype.split(';')[0] + ').' } }];
 const ent = (s) => s.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
   .replace(/&#39;|&apos;/g, "'").replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n))).replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)));
 const title = ent(((body.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [])[1] || '').replace(/\s+/g, ' ').trim()).slice(0, 200);
