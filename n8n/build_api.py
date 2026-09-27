@@ -48,6 +48,33 @@ SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
   ELSE (SELECT json_build_object('status', 200, 'user', json_build_object('email', u.email, 'name', u.name))
         FROM users u WHERE u.id = (SELECT user_id FROM me)) END AS result""",
    "={{ [ " + TOKEN + " ] }}"),
+
+  ("GET", "items", "Lista rzeczy", f"""
+WITH {ME}
+SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
+  ELSE json_build_object('status', 200, 'items', coalesce((SELECT json_agg(t ORDER BY t.next_at NULLS LAST, t.created_at DESC) FROM (
+    SELECT i.id, i.kind, i.title, i.source_text, i.spec, i.data, i.widget_slug, i.status, i.created_at,
+      (SELECT min(n.due_at) FROM notifications n WHERE n.item_id = i.id AND n.sent_at IS NULL) AS next_at
+    FROM items i WHERE i.user_id = (SELECT user_id FROM me) AND i.status = 'active') t), '[]'::json)) END AS result""",
+   "={{ [ " + TOKEN + " ] }}"),
+
+  ("POST", "items/done", "Odhacz", f"""
+WITH {ME},
+upd AS (UPDATE items SET status = 'done', updated_at = now()
+        WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) RETURNING id),
+cancel AS (DELETE FROM notifications WHERE item_id IN (SELECT id FROM upd) AND sent_at IS NULL RETURNING 1)
+SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
+  WHEN NOT EXISTS (SELECT 1 FROM upd) THEN json_build_object('status', 404, 'error', 'Nie ma takiej rzeczy')
+  ELSE json_build_object('status', 200, 'ok', true) END AS result""",
+   "={{ [ " + TOKEN + ", /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000' ] }}"),
+
+  ("POST", "items/delete", "Usuń", f"""
+WITH {ME},
+d AS (DELETE FROM items WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) RETURNING id)
+SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
+  WHEN NOT EXISTS (SELECT 1 FROM d) THEN json_build_object('status', 404, 'error', 'Nie ma takiej rzeczy')
+  ELSE json_build_object('status', 200, 'ok', true) END AS result""",
+   "={{ [ " + TOKEN + ", /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000' ] }}"),
 ]
 
 nodes, conns = [], {}
@@ -75,6 +102,72 @@ for i, (method, path, name, sql, params) in enumerate(ROUTES):
     ]
     conns[wh] = {"main": [[{"node": q, "type": "main", "index": 0}]]}
     conns[q] = {"main": [[{"node": r, "type": "main", "index": 0}]]}
+
+
+# ---- POST items: zdanie użytkownika → DeepSeek → rzecz + zaplanowane powiadomienia ----
+SYSTEM = open("prompt-rozumienie.txt").read()
+MODEL = "deepseek/deepseek-v4.1-flash"
+USER_MSG = ("'Teraz jest: ' + $json.teraz + '\\n\\nKalendarz (używaj WYŁĄCZNIE tych dat):\\n' + $json.kalendarz"
+            " + '\\n\\nZdanie użytkownika:\\n' + String($('POST items').item.json.body.text).trim().slice(0, 1000)")
+JSON_BODY = ("={{ JSON.stringify({ model: '" + MODEL + "', temperature: 0.2, max_tokens: 1200, reasoning: { enabled: false }, "
+             "response_format: { type: 'json_object' }, messages: [ { role: 'system', content: " + json.dumps(SYSTEM, ensure_ascii=False)
+             + " }, { role: 'user', content: " + USER_MSG + " } ] }) }}")
+assert "{{" not in SYSTEM and "}}" not in SYSTEM, "n8n: {{ }} w prompcie psuje wyrażenie"
+def node(name, typ, ver, pos, params, **kw):
+    n = {"id": str(uuid.uuid4()), "name": name, "type": typ, "typeVersion": ver, "position": pos, "parameters": params}
+    n.update(kw); nodes.append(n); return name
+def link(a, b, out=0):
+    conns.setdefault(a, {"main": []})
+    while len(conns[a]["main"]) <= out: conns[a]["main"].append([])
+    conns[a]["main"][out].append({"node": b, "type": "main", "index": 0})
+
+y = len(ROUTES) * 200 + 100
+w = node("POST items", "n8n-nodes-base.webhook", 2, [0, y],
+  {"httpMethod": "POST", "path": "oboe/items", "responseMode": "responseNode", "options": {}}, webhookId=str(uuid.uuid4()))
+sess = node("Sesja", "n8n-nodes-base.postgres", 2.6, [220, y],
+  {"operation": "executeQuery", "query": f"WITH {ME}\nSELECT (SELECT user_id FROM me) AS user_id",
+   "options": {"queryReplacement": "={{ [ " + TOKEN + " ] }}"}}, credentials=PG)
+iff = node("Zalogowany i jest tekst?", "n8n-nodes-base.if", 2.2, [440, y], {
+  "conditions": {"options": {"caseSensitive": True, "leftValue": "", "typeValidation": "loose", "version": 2},
+    "conditions": [
+      {"id": str(uuid.uuid4()), "leftValue": "={{ $json.user_id }}", "rightValue": "",
+       "operator": {"type": "string", "operation": "notEmpty", "singleValue": True}},
+      {"id": str(uuid.uuid4()), "leftValue": "={{ String($('POST items').item.json.body.text || '').trim() }}", "rightValue": "",
+       "operator": {"type": "string", "operation": "notEmpty", "singleValue": True}}],
+    "combinator": "and"}, "options": {}})
+deny = node("Odmów", "n8n-nodes-base.respondToWebhook", 1.1, [660, y + 180],
+  {"respondWith": "json", "options": {"responseCode": "={{ $json.user_id ? 400 : 401 }}"},
+   "responseBody": "={{ $json.user_id ? { status: 400, error: 'Napisz, co zapamiętać' } : { status: 401, error: 'Zaloguj się ponownie' } }}"})
+cal = node("Kalendarz", "n8n-nodes-base.code", 2, [660, y], {"jsCode": open("kalendarz.js").read()})
+llm = node("DeepSeek: zrozum", "n8n-nodes-base.httpRequest", 4.2, [880, y], {
+  "method": "POST", "url": "https://openrouter.ai/api/v1/chat/completions",
+  "authentication": "predefinedCredentialType", "nodeCredentialType": "openRouterApi",
+  "sendHeaders": True, "headerParameters": {"parameters": [
+    {"name": "HTTP-Referer", "value": "https://draminski.dev"}, {"name": "X-Title", "value": "Oboe (n8n)"}]},
+  "sendBody": True, "specifyBody": "json",
+  "jsonBody": JSON_BODY,
+  "options": {"timeout": 60000}},
+  credentials={"openRouterApi": {"id": "kv8oGsmY1JN14X0m", "name": "OpenRouter account"}},
+  retryOnFail=True, maxTries=2, onError="continueRegularOutput")
+code = node("Sprawdź odpowiedź", "n8n-nodes-base.code", 2, [1100, y], {"jsCode": open("walidacja.js").read().replace("__MODEL__", MODEL)})
+save = node("Zapisz", "n8n-nodes-base.postgres", 2.6, [1320, y], {"operation": "executeQuery", "query": """
+WITH it AS (
+  INSERT INTO items (user_id, kind, source_text, title, spec, widget_slug, data)
+  SELECT $1::uuid, $2, $3, $4, $5::jsonb, $6, $7::jsonb WHERE $8::boolean
+  RETURNING *),
+nt AS (
+  INSERT INTO notifications (item_id, user_id, due_at, channels, title, body)
+  SELECT it.id, it.user_id, x.at, coalesce(x.channels, '{push}'), x.title, x.body
+  FROM it, jsonb_to_recordset($9::jsonb) AS x(at timestamptz, title text, body text, channels text[])
+  RETURNING due_at)
+SELECT CASE WHEN NOT $8::boolean THEN json_build_object('status', 422, 'error', $10::text)
+  ELSE json_build_object('status', 200, 'item', (SELECT row_to_json(it) FROM it),
+       'notifications', coalesce((SELECT json_agg(due_at ORDER BY due_at) FROM nt), '[]'::json)) END AS result""".strip(),
+  "options": {"queryReplacement": "={{ [ $('Sesja').item.json.user_id, $json.kind, $json.source_text, $json.title, JSON.stringify($json.spec), $json.widget_slug, JSON.stringify($json.data), $json.ok, JSON.stringify($json.notify), $json.error || '' ] }}"}},
+  credentials=PG)
+resp = node("Odpowiedz: dodano", "n8n-nodes-base.respondToWebhook", 1.1, [1540, y],
+  {"respondWith": "json", "responseBody": "={{ $json.result }}", "options": {"responseCode": "={{ $json.result.status || 200 }}"}})
+link(w, sess); link(sess, iff); link(iff, cal, 0); link(cal, llm); link(iff, deny, 1); link(llm, code); link(code, save); link(save, resp)
 
 wf = {"name": "Oboe: API", "nodes": nodes, "connections": conns,
       "settings": {"executionOrder": "v1", "timezone": "Europe/Warsaw"}}
