@@ -130,11 +130,13 @@ async function openIntro() {
   let on = false;
   try { on = push.permission() === 'granted' && !!(await push.current()); } catch {}
   $('#intro-push').hidden = on || !push.supported();
-  if (!$('#intro').open) $('#intro').showModal();
+  $('#intro').hidden = false; $('#intro').scrollTop = 0;
+  document.documentElement.classList.add('locked');   // tło aplikacji nie przewija się pod kartą
 }
 function closeIntro() {
   try { localStorage.setItem(introKey(), '1'); } catch {}
-  if ($('#intro').open) $('#intro').close();
+  $('#intro').hidden = true;
+  document.documentElement.classList.remove('locked');
 }
 function useExample(text) {
   closeIntro();
@@ -603,7 +605,6 @@ function bind() {
     if (b.dataset.intro === 'close') return closeIntro();
     if (b.dataset.intro === 'push') { await bell(); openIntro(); }
   });
-  $('#intro').addEventListener('cancel', () => { try { localStorage.setItem(introKey(), '1'); } catch {} });
   $('#list').addEventListener('click', (e) => { const ex = e.target.closest('.empty [data-ex]'); if (ex) { const q = $('#q'); q.value = ex.dataset.ex; q.focus(); } });
 
   const onCheck = async (e) => {
@@ -647,7 +648,7 @@ function bind() {
   $('#chat').addEventListener('click', (e) => { const b = e.target.closest('[data-chat]'); if (b) chatAction(b.dataset.chat); });
   $('#detail').addEventListener('click', onSum, true);
   addEventListener('popstate', () => closeDetail(true));
-  addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDetail(); });
+  addEventListener('keydown', (e) => { if (e.key !== 'Escape') return; if (!$('#intro').hidden) closeIntro(); else closeDetail(); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden && state.user) { load(); refreshBell(); } });
   navigator.serviceWorker?.addEventListener('message', (e) => { if (e.data?.type === 'open') { load().then(() => e.data.id && openDetail(e.data.id)); } });
 }

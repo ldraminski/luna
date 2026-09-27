@@ -3,7 +3,7 @@
 // po „szturchańcu” pobieramy treść z /api/pending tokenem z IndexedDB.
 // iOS wymaga, żeby KAŻDY push skończył się widocznym powiadomieniem — inaczej Apple cofa subskrypcję.
 
-const SHELL = 'oboe-shell-v11';
+const SHELL = 'oboe-shell-v12';
 const SHELL_FILES = ['/', '/index.html', '/app.css', '/app.js', '/api.js', '/manifest.webmanifest', '/icons/icon-192.png'];
 
 self.addEventListener('install', (event) => {

@@ -272,21 +272,26 @@ button.chev:disabled{opacity:.4;cursor:default}
 .d-top--late .ring{border-color:rgba(255,255,255,.45)}
 .d-top--late .pill{color:var(--late);display:inline-flex;gap:6px;align-items:center}
 
-/* karta powitalna „Jestem Luna” (Hikari, 27.09) — arkusz jak czat widgetu */
-.intro{gap:14px}
-.intro-scroll{outline:none;flex:1;overflow:auto;padding:10px 4px 4px}
+/* karta powitalna „Jestem Luna” — osobny pełny ekran (Hikari, 27.09; wcześniej arkusz nad aplikacją ucinał się na iPhonie) */
+html.locked,html.locked body{overflow:hidden;height:100%}
+.intro{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.intro-in{box-sizing:border-box;width:100%;max-width:430px;min-height:100%;margin:0 auto;display:flex;flex-direction:column;
+  padding:calc(28px + env(safe-area-inset-top)) 20px 0}
+.intro-body{flex:1;min-width:0}
+.intro-foot{position:sticky;bottom:0;padding:16px 0 calc(16px + env(safe-area-inset-bottom));background:linear-gradient(rgba(230,240,242,0),var(--bg) 40%)}
+.intro-foot .cta{margin-top:0}
 .moon{width:72px;height:72px;border-radius:24px;background:var(--tint-lavender);display:grid;place-items:center;color:var(--navy)}
 .moon .i{width:36px;height:36px;stroke-width:1.6}
 .intro h2{font-size:26px;line-height:1.15;margin-top:18px}
 .intro .lead{color:var(--ink-2);margin-top:8px;font-size:15px}
 .can{list-style:none;margin-top:20px;display:grid;gap:10px}
-.can li{display:flex;gap:12px;align-items:center;background:var(--surface);border-radius:var(--r-tile);padding:10px 14px 10px 10px;box-shadow:var(--shadow)}
+.can li{display:flex;gap:12px;align-items:center;min-width:0;background:var(--surface);border-radius:var(--r-tile);padding:10px 14px 10px 10px;box-shadow:var(--shadow)}
 .can .ico{width:44px;height:44px;border-radius:14px}
 .can .ico .i{width:22px;height:22px}
-.can p{font-size:13px;color:var(--ink-2);line-height:1.35}
+.can p{min-width:0;font-size:13px;color:var(--ink-2);line-height:1.35}
 .can b{display:block;font-size:15px;color:var(--ink);font-weight:500}
 .ex{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.ex button{border:0;background:var(--surface);box-shadow:var(--shadow);border-radius:18px;padding:10px 14px;font-size:14px;text-align:left;cursor:pointer;color:var(--ink);line-height:1.35}
+.ex button{max-width:100%;border:0;background:var(--surface);box-shadow:var(--shadow);border-radius:18px;padding:10px 14px;font-size:14px;text-align:left;cursor:pointer;color:var(--ink);line-height:1.35}
 .empty .ex button{background:var(--surface-2);box-shadow:none}
 #intro-push{margin-top:18px}
 #intro-push .cta{margin-top:10px}

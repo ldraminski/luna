@@ -114,9 +114,9 @@
 </dialog>
 
 <!-- KARTA POWITALNA · kim jest Luna (po pierwszym logowaniu i z przycisku z księżycem) -->
-<dialog class="chat" id="intro" aria-labelledby="intro-title">
-  <div class="chat-in intro">
-    <div class="intro-scroll">
+<section class="intro" id="intro" role="dialog" aria-modal="true" aria-labelledby="intro-title" hidden>
+  <div class="intro-in">
+    <div class="intro-body">
       <div class="moon" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></div>
       <h2 id="intro-title">Cześć! Jestem Luna.</h2>
       <p class="lead">Twoja prywatna asystentka. Mów mi, co masz na głowie — zapiszę to, poukładam i odezwę się, kiedy trzeba.</p>
@@ -131,9 +131,9 @@
       <div class="note" id="intro-push" hidden><b>Żebym mogła się odezwać,</b> włącz powiadomienia.
         <button class="cta alt wide" type="button" data-intro="push">Włącz powiadomienia</button></div>
     </div>
-    <button class="cta wide" type="button" data-intro="close">Zaczynamy</button>
+    <div class="intro-foot"><button class="cta wide" type="button" data-intro="close">Zaczynamy</button></div>
   </div>
-</dialog>
+</section>
 
 <!-- EKRAN 2 · szczegół -->
 <section class="detail" id="detail" aria-label="Szczegóły" aria-modal="true" role="dialog"></section>
