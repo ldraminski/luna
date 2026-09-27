@@ -322,6 +322,14 @@ function partPage(it, full = false) {
         <a class="chev" href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="Otwórz stronę">${svg('ext')}</a></span></div>
     ${checked ? `<p class="dom" style="margin-top:6px">${esc(checked)}${d.summary_status === 'error' && sm ? ' · ostatnia próba: ' + esc(d.summary_error || 'błąd') : ''}</p>` : ''}`;
 }
+// Sprawdzone w sieci: odpowiedź Luny + źródła (host jako link). Na karcie skrót, w szczególe całość.
+function partResearch(it, full = false) {
+  const r = it.data?.research; if (!r || (!r.answer && !(r.sources || []).length)) return '';
+  const src = (r.sources || []).slice(0, full ? 5 : 2);
+  return `<div class="res${full ? ' res--full' : ''}"><p class="kind">${svg('globe', 'width:15px;height:15px')} Sprawdziłam w sieci</p>
+    ${r.answer ? `<p class="res-a">${esc(r.answer)}</p>` : ''}
+    ${src.length ? `<p class="res-s">${src.map((x) => `<a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.host)}</a>`).join('')}</p>` : ''}</div>`;
+}
 // Widget wygenerowany przez AI: iframe sandbox (bez allow-same-origin) + CSP sandbox z nginx = osobny, pusty origin,
 // bez sieci i bez dostępu do aplikacji. Rozmowa tylko przez postMessage (oboe:data / ready / resize / save).
 function partWidget(it) {
@@ -348,21 +356,21 @@ function partFoot(it) {
 function card(it, hero = false) {
   const { tint, icon } = lookOf(it);
   const ev = eventOf(it);
-  const noteText = !listOf(it).length && !it.spec?.url && !ev && !it.spec?.recurrence ? `<p class="sum">${esc(it.source_text)}</p>` : '';
+  const noteText = !listOf(it).length && !it.spec?.url && !ev && !it.spec?.recurrence && !it.data?.research ? `<p class="sum">${esc(it.source_text)}</p>` : '';
   if (hero) {
     return `<article class="w w--hero" data-id="${it.id}" data-widget="${esc(it.kind)}" tabindex="0" role="button">
       <p class="kind">${svg('clock', 'width:16px;height:16px')} ${esc(kindLabel(it).replace(/^Jednorazowe · /, 'Jednorazowe · ') )}</p>
       <p class="big">${esc(rel(ev))}</p>
       <h3>${esc(it.title)}</h3>
       <div class="blob" aria-hidden="true"><svg class="i" viewBox="0 0 24 24" style="width:64px;height:64px;stroke-width:1.4;margin:-10px 18px 0 0">${I[icon]}</svg></div>
-      ${partFields(it)}${partWidget(it)}${partList(it)}${partFoot(it)}
+      ${partFields(it)}${partResearch(it)}${partWidget(it)}${partList(it)}${partFoot(it)}
     </article>`;
   }
   const late = isLate(it);
   return `<article class="w${late ? ' w--late' : ''}" data-id="${it.id}" data-widget="${esc(it.kind)}" tabindex="0" role="button">
     <div class="w-h"><div class="ico" style="background:var(${late ? '--late-bg' : TINT[tint]})" aria-hidden="true">${svg(icon)}</div>
       <div style="min-width:0"><p class="kind">${esc(kindLabel(it))}</p><h3>${esc(it.title)}</h3></div></div>
-    ${partCycle(it)}${partFields(it)}${partPage(it)}${partWidget(it)}${partList(it)}${it.data?.widget ? '' : noteText}${partFoot(it)}
+    ${partCycle(it)}${partFields(it)}${partResearch(it)}${partPage(it)}${partWidget(it)}${partList(it)}${it.data?.widget ? '' : noteText}${partFoot(it)}
   </article>`;
 }
 
@@ -397,6 +405,7 @@ function openDetail(id) {
     </div>
     <div class="d-body">
       <div class="quote">Wpisane ${esc(rel(dt(it.created_at)))}, ${esc(fTime.format(dt(it.created_at)))}:<q>${esc(it.source_text)}</q></div>
+      ${it.data?.research ? `<div class="w" style="margin-top:12px;cursor:default">${partResearch(it, true)}</div>` : ''}
       ${it.data?.widget ? `<div class="w" style="margin-top:12px;cursor:default">${partWidget(it)}</div>` : ''}
       ${list.length ? `<div class="w" data-id="${it.id}" style="margin-top:12px;cursor:default">
           <div class="w-h" style="justify-content:space-between"><h3>Do odhaczenia</h3>
@@ -458,6 +467,7 @@ async function add(e) {
   const q = $('#q'); const text = q.value.trim();
   if (!text) { q.focus(); return; }
   const form = $('#wpisz'); form.classList.add('busy');
+  const slow = setTimeout(() => toast('Chwilkę — sprawdzam w sieci…'), 3500);   // sprawdzanie w sieci trwa kilka–kilkanaście sekund
   try {
     const r = await api.add(text);
     q.value = ''; q.blur();
@@ -466,7 +476,7 @@ async function add(e) {
   } catch (err) {
     if (err.status === 401) return logout('Klucz przestał działać. Poproś Łukasza o nowy.');
     toast(err.message);
-  } finally { form.classList.remove('busy'); }
+  } finally { clearTimeout(slow); form.classList.remove('busy'); }
 }
 
 // ---------- powiadomienia ----------

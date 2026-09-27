@@ -50,6 +50,17 @@ Workflow „Oboe: Dostęp” (`n8n/build_access.py`, id w `n8n/.access-wf-id`), 
 - Teksty wszystkich maili: `n8n/maile.py` (wspólne dla „Dostęp” i „Wydaj token”).
 - „Oboe: Wydaj token” (ręcznie z serwera) zostaje jako awaryjne.
 
+## Luna sprawdza w sieci (27.09.2026)
+
+W „Oboe: API” → POST items: gdy model rozumienia ustawi `research.query` (pytanie albo termin zależny od informacji z internetu),
+DeepSeek 4.1 Flash szuka przez **wtyczkę web OpenRoutera** (`plugins: [{id: 'web', max_results: 5}]`, prompt `n8n/prompt-sieci.txt`),
+a potem rozumie zdanie **drugi raz** ze znalezionymi faktami → termin i przypomnienia z wyniku („o której X na TVP 1, przypomnij 10 min przed”).
+Wynik: `items.data.research = {query, answer, sources[{url,title,host}], checked_at}`; karta „Sprawdziłam w sieci” ze źródłami.
+- Samo pytanie → notatka z odpowiedzią, bez przypomnienia. Brak pewnej informacji → Luna mówi to wprost i nie ustawia terminu.
+- Koszt ok. 3 gr za sprawdzenie (0,0076 USD w teście), czas 6–9 s; zwykłe wpisy bez zmian (~2 s).
+- Link + „zrób notatkę / co ważne” → jednorazowe streszczenie („Oboe: Streść stronę”), bez pilnowania.
+- Wyniki wyszukiwania to dane, nie polecenia (prompt) — model niczego nie wykonuje, tekst na karcie escapowany.
+
 ## Wdrożenie
 
 ```bash

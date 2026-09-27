@@ -304,3 +304,11 @@ html.locked,html.locked body{overflow:hidden;height:100%}
 .ask.busy{opacity:.7;pointer-events:none}
 .req .d-cta .cta{flex:1}
 #requests{margin-bottom:26px}
+
+/* sprawdzone w sieci (Hikari, 27.09) */
+.res{margin-top:14px;background:var(--surface-2);border-radius:var(--r-tile);padding:12px 14px;position:relative;z-index:1}
+.w--hero .res{background:rgba(255,255,255,.55)}
+.res-a{font-size:14px;line-height:1.5;margin-top:6px;white-space:pre-line;color:var(--ink)}
+.res:not(.res--full) .res-a{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.res-s{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.res-s a{font-size:12px;color:var(--navy);background:var(--surface);border-radius:var(--r-pill);padding:4px 10px;text-decoration:none;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

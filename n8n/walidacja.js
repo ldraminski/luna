@@ -52,4 +52,5 @@ return [{ json: {
     checklist_reset: checklist.length && recurrence ? m.checklist_reset !== false : undefined,
   },
   notify,
+  research: cut(m.research?.query, 200) || null,   // tylko sterowanie przepływem — nie trafia do bazy
 } }];
