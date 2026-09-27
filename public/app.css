@@ -1,4 +1,4 @@
-/* Oboe — style 1:1 z makiety Sekkei (wariant A, ~/Work/agents/hikari/sekkei/oboe/wariant-a.html) + elementy aplikacji na dole. */
+/* Luna (wewn. oboe) — style 1:1 z makiety Sekkei (wariant A, ~/Work/agents/hikari/sekkei/oboe/wariant-a.html) + elementy aplikacji na dole. */
 /* ============================================================
    OBOE · wariant A · tokeny
    Każdy widget (także wygenerowany przez AI) składa się WYŁĄCZNIE
@@ -271,3 +271,22 @@ button.chev:disabled{opacity:.4;cursor:default}
 .late-done:disabled{opacity:.5}
 .d-top--late .ring{border-color:rgba(255,255,255,.45)}
 .d-top--late .pill{color:var(--late);display:inline-flex;gap:6px;align-items:center}
+
+/* karta powitalna „Jestem Luna” (Hikari, 27.09) — arkusz jak czat widgetu */
+.intro{gap:14px}
+.intro-scroll{outline:none;flex:1;overflow:auto;padding:10px 4px 4px}
+.moon{width:72px;height:72px;border-radius:24px;background:var(--tint-lavender);display:grid;place-items:center;color:var(--navy)}
+.moon .i{width:36px;height:36px;stroke-width:1.6}
+.intro h2{font-size:26px;line-height:1.15;margin-top:18px}
+.intro .lead{color:var(--ink-2);margin-top:8px;font-size:15px}
+.can{list-style:none;margin-top:20px;display:grid;gap:10px}
+.can li{display:flex;gap:12px;align-items:center;background:var(--surface);border-radius:var(--r-tile);padding:10px 14px 10px 10px;box-shadow:var(--shadow)}
+.can .ico{width:44px;height:44px;border-radius:14px}
+.can .ico .i{width:22px;height:22px}
+.can p{font-size:13px;color:var(--ink-2);line-height:1.35}
+.can b{display:block;font-size:15px;color:var(--ink);font-weight:500}
+.ex{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.ex button{border:0;background:var(--surface);box-shadow:var(--shadow);border-radius:18px;padding:10px 14px;font-size:14px;text-align:left;cursor:pointer;color:var(--ink);line-height:1.35}
+.empty .ex button{background:var(--surface-2);box-shadow:none}
+#intro-push{margin-top:18px}
+#intro-push .cta{margin-top:10px}

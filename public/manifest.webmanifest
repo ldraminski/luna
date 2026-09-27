@@ -1,7 +1,7 @@
 {
-  "name": "Oboe",
-  "short_name": "Oboe",
-  "description": "Przypomnienia i zadania z jednego zdania.",
+  "name": "Luna",
+  "short_name": "Luna",
+  "description": "Twoja prywatna asystentka — zapisuje sprawy, terminy, listy i notatki.",
   "lang": "pl",
   "start_url": "/",
   "scope": "/",

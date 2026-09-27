@@ -1,4 +1,4 @@
-// Oboe — aplikacja. Wygląd i anatomia kart 1:1 z makiety A (Sekkei); tu tylko dane i zachowanie.
+// Luna (wewn. oboe) — aplikacja. Wygląd i anatomia kart 1:1 z makiety A (Sekkei); tu tylko dane i zachowanie.
 import { api, push, getToken, setToken, ApiError } from './api.js';
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -96,6 +96,30 @@ function startMain() {
   $('#today').textContent = fDay.format(new Date());
   refreshBell();
   load();
+  if (!introSeen()) openIntro();
+}
+
+// ---------- karta powitalna: kim jest Luna ----------
+const EXAMPLES = ['za 3 dni rano jadę do urzędu złożyć wniosek', 'co 2 tygodnie sprawdzaj klimatyzację, przypomnij dzień wcześniej',
+  'kup mleko, chleb i baterie', 'zaglądaj co tydzień na draminskiweb.pl i daj znać, co się zmieniło'];
+const exChips = () => EXAMPLES.map((t) => `<button type="button" data-ex="${esc(t)}">${esc(t)}</button>`).join('');
+const introKey = () => 'luna-intro-' + (state.user?.id || state.user?.email || '');
+function introSeen() { try { return localStorage.getItem(introKey()) === '1'; } catch { return true; } }
+async function openIntro() {
+  $('#intro-ex').innerHTML = exChips();
+  let on = false;
+  try { on = push.permission() === 'granted' && !!(await push.current()); } catch {}
+  $('#intro-push').hidden = on || !push.supported();
+  if (!$('#intro').open) $('#intro').showModal();
+}
+function closeIntro() {
+  try { localStorage.setItem(introKey(), '1'); } catch {}
+  if ($('#intro').open) $('#intro').close();
+}
+function useExample(text) {
+  closeIntro();
+  const q = $('#q'); q.value = text; q.focus();
+  toast('Wyślij, a zapiszę — albo zmień po swojemu.');
 }
 
 async function load() {
@@ -121,10 +145,9 @@ function render() {
   const items = state.items;
   renderDays(items);
   if (!items.length) {
-    $('#list').innerHTML = `<div class="empty"><h3>Tu jeszcze pusto</h3>
-      <p>Napisz na dole zwykłym zdaniem, co mam zapamiętać. Na przykład:</p>
-      <ul><li>za 3 dni rano jadę do urzędu złożyć wniosek</li><li>co 2 tygodnie sprawdzaj klimatyzację, przypomnij dzień wcześniej</li>
-      <li>kup mleko, chleb i baterie</li></ul></div>`;
+    $('#list').innerHTML = `<div class="empty"><h3>Jeszcze nic mi nie powierzono</h3>
+      <p>Napisz na dole zwykłym zdaniem, co mam zapamiętać — resztą zajmę się sama. Na przykład:</p>
+      <div class="ex">${exChips()}</div></div>`;
     return;
   }
   const byTime = (a, b) => (eventOf(a) || Infinity) - (eventOf(b) || Infinity);
@@ -242,14 +265,14 @@ function partPage(it, full = false) {
     ${checked ? `<p class="dom" style="margin-top:6px">${esc(checked)}${d.summary_status === 'error' && sm ? ' · ostatnia próba: ' + esc(d.summary_error || 'błąd') : ''}</p>` : ''}`;
 }
 // Widget wygenerowany przez AI: iframe sandbox (bez allow-same-origin) + CSP sandbox z nginx = osobny, pusty origin,
-// bez sieci i bez dostępu do Oboe. Rozmowa tylko przez postMessage (oboe:data / ready / resize / save).
+// bez sieci i bez dostępu do aplikacji. Rozmowa tylko przez postMessage (oboe:data / ready / resize / save).
 function partWidget(it) {
   const w = it.data?.widget; if (!w) return '';
-  if (w.status === 'generating') return `<p class="gen-state">${svg('spark', 'width:15px;height:15px')} AI buduje widget do tej rzeczy…</p>`;
-  if (w.status === 'rejected') return `<p class="gen-state bad">Widget nie przeszedł kontroli bezpieczeństwa — zostaje zwykła karta.</p>`;
+  if (w.status === 'generating') return `<p class="gen-state">${svg('spark', 'width:15px;height:15px')} Robię widget do tej rzeczy…</p>`;
+  if (w.status === 'rejected') return `<p class="gen-state bad">Widget nie przeszedł kontroli bezpieczeństwa, więc zostawiam zwykłą kartę.</p>`;
   if (w.status !== 'ready' || !/^[a-z0-9-]+$/.test(w.slug || '') || !Number.isInteger(w.version)) return '';
-  const note = w.pending ? `<p class="gen-state">${svg('spark', 'width:15px;height:15px')} AI przebudowuje widget — ten działa do czasu podmiany…</p>`
-    : w.revision_error ? `<p class="gen-state bad">Nowa wersja nie przeszła kontroli — zostaje ta. ${esc(String(w.revision_error).replace(/^ODRZUCONY( po poprawce)?: /, '').slice(0, 160))}</p>` : '';
+  const note = w.pending ? `<p class="gen-state">${svg('spark', 'width:15px;height:15px')} Przebudowuję widget — ten działa do czasu podmiany…</p>`
+    : w.revision_error ? `<p class="gen-state bad">Nowa wersja nie przeszła kontroli, więc zostawiam tę. ${esc(String(w.revision_error).replace(/^ODRZUCONY( po poprawce)?: /, '').slice(0, 160))}</p>` : '';
   return note + `<iframe class="wframe" data-wid="${it.id}" src="/widgets/${w.slug}.v${w.version}.html" sandbox="allow-scripts"
     title="Widget: ${esc(it.title)}" loading="lazy" referrerpolicy="no-referrer" style="height:120px"></iframe>`;
 }
@@ -302,7 +325,7 @@ function openDetail(id) {
   if ((it.notify_at || []).length) rows.push(['Przypomnienia', it.notify_at.map((d) => whenRel(dt(d))).join(' · ')]);
   for (const f of it.data?.fields || []) rows.push([f.label, f.value]);
   if (it.data?.tip) rows.push(['Podpowiedź', it.data.tip]);
-  if (it.spec?.understood) rows.push(['Jak Oboe to rozumie', it.spec.understood]);
+  if (it.spec?.understood) rows.push(['Jak to zrozumiałam', it.spec.understood]);
   const url = it.spec?.url;
   const list = listOf(it);
   const [first, ...more] = it.title.split(/\s+[—–-]\s+/);
@@ -367,7 +390,7 @@ async function detailAction(act) {
     await (act === 'done' ? api.done(id) : api.remove(id));
     state.items = state.items.filter((x) => x.id !== id);
     closeDetail(); render();
-    toast(act === 'done' ? 'Zrobione ✓' : 'Usunięte');
+    toast(act === 'done' ? 'Zrobione ✓' : 'Usunęłam.');
   } catch (err) { toast(err.message); }
 }
 
@@ -380,7 +403,7 @@ async function add(e) {
   try {
     const r = await api.add(text);
     q.value = ''; q.blur();
-    toast(r.item?.spec?.understood || 'Zapisane');
+    toast(r.item?.spec?.understood || 'Zapisałam.');
     await load();
   } catch (err) {
     if (err.status === 401) return logout('Klucz przestał działać. Poproś Łukasza o nowy.');
@@ -398,12 +421,12 @@ async function refreshBell() {
 }
 
 async function bell() {
-  if (IOS && !STANDALONE) return toast('Najpierw dodaj Oboe do ekranu początkowego (Udostępnij → „Do ekranu początkowego”) i otwórz stamtąd.');
-  if (!push.supported()) return toast('Ta przeglądarka nie obsługuje powiadomień.');
+  if (IOS && !STANDALONE) return toast('Najpierw dodaj mnie do ekranu początkowego (Udostępnij → „Do ekranu początkowego”) i otwórz stamtąd.');
+  if (!push.supported()) return toast('W tej przeglądarce nie mogę wysyłać ci powiadomień.');
   try {
-    if (push.permission() === 'granted' && (await push.current())) { await push.resync(); return toast('Powiadomienia są włączone.'); }
+    if (push.permission() === 'granted' && (await push.current())) { await push.resync(); return toast('Powiadomienia są włączone — odezwę się, kiedy trzeba.'); }
     await push.enable();
-    toast('Powiadomienia włączone ✓');
+    toast('Gotowe — odezwę się, kiedy trzeba ✓');
   } catch (err) { toast(err.message); }
   refreshBell();
 }
@@ -512,8 +535,17 @@ function bind() {
   });
   $('#wpisz').addEventListener('submit', add);
   $('#plus').addEventListener('click', () => $('#q').focus());
-  $('#mic').addEventListener('click', () => { $('#q').focus(); toast('Użyj mikrofonu na klawiaturze telefonu — dyktowanie w aplikacji dojdzie później.'); });
+  $('#mic').addEventListener('click', () => { $('#q').focus(); toast('Na razie podyktuj mi to mikrofonem z klawiatury telefonu — własne słuchanie dostanę później.'); });
   $('#bell').addEventListener('click', bell);
+  $('#luna').addEventListener('click', openIntro);
+  $('#intro').addEventListener('click', async (e) => {
+    const ex = e.target.closest('[data-ex]'); if (ex) return useExample(ex.dataset.ex);
+    const b = e.target.closest('[data-intro]'); if (!b) return;
+    if (b.dataset.intro === 'close') return closeIntro();
+    if (b.dataset.intro === 'push') { await bell(); openIntro(); }
+  });
+  $('#intro').addEventListener('cancel', () => { try { localStorage.setItem(introKey(), '1'); } catch {} });
+  $('#list').addEventListener('click', (e) => { const ex = e.target.closest('.empty [data-ex]'); if (ex) { const q = $('#q'); q.value = ex.dataset.ex; q.focus(); } });
 
   const onCheck = async (e) => {
     const cb = e.target.closest('[data-check]'); if (!cb) return;

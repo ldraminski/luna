@@ -1,6 +1,23 @@
-# Oboe (覚え)
+# Luna — prywatna asystentka (wewnętrznie: `oboe`)
 
-Przypomnienia i akcje z języka naturalnego, ekran złożony z widgetów (część generuje AI).
+Zapisuje sprawy, terminy, listy i notatki z języka naturalnego i odzywa się, kiedy trzeba; ekran złożony z widgetów (część generuje AI).
+
+## Nazwy: Luna na zewnątrz, `oboe` w środku (decyzja Łukasza 27.09.2026)
+
+Produkt nazywał się roboczo Oboe (覚え). Od 27.09.2026 **dla użytkownika to wyłącznie „Luna”**, a `oboe` zostaje
+**tylko jako identyfikator techniczny** — zmiana nazw w środku to ryzyko bez żadnego zysku.
+
+| Widzi użytkownik → **Luna** | Techniczne → zostaje **oboe** (nie zmieniać) |
+|---|---|
+| tytuł, manifest PWA, ikona, teksty w aplikacji | repo `~/Work/oboe`, katalog `/opt/oboe`, obraz `oboe:latest` |
+| głos modeli: `understood`, powiadomienia, czat widgetu | kontenery `oboe`, `oboe-db`, baza i użytkownik `oboe` |
+| nadawca i treść maili („Luna <n8n@renlab.ovh>”) | workflow n8n „Oboe: …”, webhooki `/webhook/oboe/…`, credentiale „Oboe - …” |
+| adres `luna.draminski.dev` (`oboe.draminski.dev` działa dalej) | protokół widgetów `oboe:data/ready/resize/save` (zmiana zepsuje gotowe widgety) |
+| | `localStorage` `oboe-token`, IndexedDB `oboe`, cache SW `oboe-shell-*` (zmiana wyloguje ludzi) |
+
+Zasady: nowy tekst dla ludzi → „Luna”, w 1. osobie, forma żeńska, na „ty” („Zapisałam. Przypomnę ci…”).
+Nowy identyfikator w kodzie → dalej `oboe`. W komentarzach wolno „Luna (wewn. oboe)”.
+**Przed każdym wdrożeniem:** `tools/sprawdz-nazwy.sh` — wyłapuje „Oboe” w tekstach widocznych dla użytkownika.
 Założenia: `~/Work/agents/hikari/memory/project-app-powiadomienia.md`.
 Design system: wariant A (pastel) — `~/Work/agents/hikari/sekkei/oboe/wariant-a.html`.
 
@@ -22,6 +39,7 @@ Widgety są niezmienne: każda wersja to nowy plik `<slug>.v<N>.html` (płasko �
 ## Wdrożenie
 
 ```bash
+tools/sprawdz-nazwy.sh || exit 1
 rsync -av --delete --exclude .git ~/Work/oboe/ vps.draminski.dev:/opt/oboe/app/
 ssh vps.draminski.dev "cd /opt/oboe/app && docker build -t oboe:latest . && cd /opt/infra && docker compose up -d oboe"
 ```

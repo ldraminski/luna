@@ -1,9 +1,9 @@
-// Service worker Oboe — wzorowany na Alertach.
+// Service worker Luny (wewn. oboe) — wzorowany na Alertach.
 // Pushe przychodzą BEZ treści (n8n nie ma w sandboksie modułu crypto, więc nie szyfruje payloadu),
 // po „szturchańcu” pobieramy treść z /api/pending tokenem z IndexedDB.
 // iOS wymaga, żeby KAŻDY push skończył się widocznym powiadomieniem — inaczej Apple cofa subskrypcję.
 
-const SHELL = 'oboe-shell-v9';
+const SHELL = 'oboe-shell-v10';
 const SHELL_FILES = ['/', '/index.html', '/app.css', '/app.js', '/api.js', '/manifest.webmanifest', '/icons/icon-192.png'];
 
 self.addEventListener('install', (event) => {
@@ -46,14 +46,14 @@ async function handlePush() {
     if (r.ok) items = (await r.json()).items || [];
   } catch {}
   if (!items.length) {
-    return self.registration.showNotification('Oboe', { body: 'Masz przypomnienie — otwórz aplikację.', icon: '/icons/icon-192.png', tag: 'oboe-fallback', data: {} });
+    return self.registration.showNotification('Luna', { body: 'Mam dla ciebie przypomnienie — zajrzyj.', icon: '/icons/icon-192.png', tag: 'oboe-fallback', data: {} });
   }
   const shown = items.slice(0, 3);
   await Promise.all(shown.map((n) => self.registration.showNotification(n.title, {
     body: n.body || '', icon: '/icons/icon-192.png', tag: 'oboe-' + n.id, data: { item: n.item_id },
   })));
   if (items.length > 3) {
-    await self.registration.showNotification('Oboe', { body: `…i ${items.length - 3} więcej`, tag: 'oboe-more', icon: '/icons/icon-192.png', data: {} });
+    await self.registration.showNotification('Luna', { body: `…i jeszcze ${items.length - 3}`, tag: 'oboe-more', icon: '/icons/icon-192.png', data: {} });
   }
 }
 self.addEventListener('push', (event) => event.waitUntil(handlePush()));

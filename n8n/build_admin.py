@@ -7,7 +7,7 @@ Wołany tylko z serwera (nginx blokuje /api/admin/):
 """
 import json, uuid
 
-APP_URL = "https://oboe.draminski.dev"
+APP_URL = "https://luna.draminski.dev"
 PG = {"postgres": {"id": "IAfnl61Lb7KbTeZi", "name": "Oboe - Postgres (oboe-db)"}}
 SMTP = {"smtp": {"id": "DY5t4HkHVBfxB2gY", "name": "SMTP n8n renlab"}}
 ADMIN = {"httpHeaderAuth": {"id": "9Rd7Zl7NxIcEvPtL", "name": "Oboe - admin (X-Admin-Token)"}}
@@ -53,17 +53,17 @@ iff = node("Wysłać mail?", "n8n-nodes-base.if", 2.2, [440, 0], {
     "combinator": "and"}, "options": {}})
 
 TEXT = ("={{ 'Cześć' + ($json.result.name ? ' ' + $json.result.name : '') + '!\\n\\n"
-  "Oto Twój klucz do Oboe — aplikacji, która pamięta za Ciebie:\\n\\n' + $json.result.token + '\\n\\n"
+  "Jestem Luna — Twoja prywatna asystentka. Zapisuję sprawy, terminy, listy i notatki, a potem pilnuję, żeby nic Ci nie umknęło.\\n\\nOto Twój klucz:\\n\\n' + $json.result.token + '\\n\\n"
   "Jak zacząć:\\n"
   "1. Otwórz na telefonie: " + APP_URL + "\\n"
   "2. iPhone: Udostępnij → „Do ekranu początkowego”. Android: menu → „Zainstaluj aplikację”.\\n"
-  "3. Uruchom Oboe Z EKRANU POCZĄTKOWEGO i dopiero tam wklej klucz. "
+  "3. Uruchom Lunę Z EKRANU POCZĄTKOWEGO i dopiero tam wklej klucz. "
   "(Na iPhonie aplikacja z ekranu początkowego nie widzi tego, co wpiszesz w Safari.)\\n\\n"
   "Klucz działa bez końca. Nie przesyłaj go nikomu — kto go ma, widzi Twoje przypomnienia.\\n"
-  "Zgubisz go? Napisz do Łukasza, dostaniesz nowy, a ten przestanie działać.\\n\\n— Oboe' }}")
+  "Zgubisz go? Napisz do Łukasza, dostaniesz nowy, a ten przestanie działać.\\n\\nDo usłyszenia!\\n— Luna' }}")
 mail = node("Wyślij token mailem", "n8n-nodes-base.emailSend", 2.1, [660, -100], {
-  "fromEmail": "Oboe <n8n@renlab.ovh>", "toEmail": "={{ $json.result.email }}",
-  "subject": "Twój klucz do Oboe", "emailFormat": "text", "text": TEXT, "options": {"appendAttribution": False}},
+  "fromEmail": "Luna <n8n@renlab.ovh>", "toEmail": "={{ $json.result.email }}",
+  "subject": "Cześć, tu Luna — Twój klucz", "emailFormat": "text", "text": TEXT, "options": {"appendAttribution": False}},
   credentials=SMTP, onError="continueRegularOutput")
 r_mail = node("Odpowiedz: wysłano", "n8n-nodes-base.respondToWebhook", 1.1, [880, -100], {
   "respondWith": "json", "options": {},
