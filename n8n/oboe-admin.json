@@ -2,7 +2,7 @@
  "name": "Oboe: Wydaj token",
  "nodes": [
   {
-   "id": "66890366-2bde-4d16-bbd0-28aa9bcc893e",
+   "id": "1b65fea8-6953-4d6c-9000-f239a1344916",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "f23546a1-55c8-4b18-b396-06c7f8ae19d0",
+   "id": "d00eb7fd-a936-4058-bded-8f1c5c58b378",
    "name": "POST admin/token",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -38,10 +38,10 @@
      "name": "Oboe - admin (X-Admin-Token)"
     }
    },
-   "webhookId": "a6aca990-54bd-4a9a-a52c-fc2b2f8784cc"
+   "webhookId": "e2a28fe7-062b-4bfc-99a6-c8131d9de9d5"
   },
   {
-   "id": "fde2c0a8-04d2-4fc0-a6c3-66129915db2d",
+   "id": "2ae041cb-1f9e-4e52-899d-d32507be6e70",
    "name": "Wydaj token",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -64,7 +64,7 @@
    }
   },
   {
-   "id": "30a121ee-610b-4b67-b833-4d0a1c054bc2",
+   "id": "f642f3db-adb1-43bc-a5e9-7dd782cda0a2",
    "name": "Wysłać mail?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -82,7 +82,7 @@
      },
      "conditions": [
       {
-       "id": "77ec6e06-ba51-49ba-acd1-12604ad1cd72",
+       "id": "1a745142-f7ed-4b97-a4bc-3806e542a9bd",
        "leftValue": "={{ $json.result.status === 200 && $('POST admin/token').item.json.body.send_email !== false }}",
        "rightValue": "",
        "operator": {
@@ -98,7 +98,7 @@
    }
   },
   {
-   "id": "e3695d0e-c87d-4f1d-a75c-dbcb78339cad",
+   "id": "2e27b39e-9279-4984-a489-e758a734b390",
    "name": "Wyślij token mailem",
    "type": "n8n-nodes-base.emailSend",
    "typeVersion": 2.1,
@@ -111,7 +111,7 @@
     "toEmail": "={{ $json.result.email }}",
     "subject": "Twój klucz do Oboe",
     "emailFormat": "text",
-    "text": "={{ 'Cześć' + ($json.result.name ? ' ' + $json.result.name : '') + '!\\n\\nOto Twój klucz do Oboe — aplikacji, która pamięta za Ciebie:\\n\\n' + $json.result.token + '\\n\\nJak zacząć:\\n1. Otwórz na telefonie: https://fusion-thomson-arrow-coordinated.trycloudflare.com\\n2. iPhone: Udostępnij → „Do ekranu początkowego”. Android: menu → „Zainstaluj aplikację”.\\n3. Uruchom Oboe Z EKRANU POCZĄTKOWEGO i dopiero tam wklej klucz. (Na iPhonie aplikacja z ekranu początkowego nie widzi tego, co wpiszesz w Safari.)\\n\\nKlucz działa bez końca. Nie przesyłaj go nikomu — kto go ma, widzi Twoje przypomnienia.\\nZgubisz go? Napisz do Łukasza, dostaniesz nowy, a ten przestanie działać.\\n\\n— Oboe' }}",
+    "text": "={{ 'Cześć' + ($json.result.name ? ' ' + $json.result.name : '') + '!\\n\\nOto Twój klucz do Oboe — aplikacji, która pamięta za Ciebie:\\n\\n' + $json.result.token + '\\n\\nJak zacząć:\\n1. Otwórz na telefonie: https://oboe.draminski.dev\\n2. iPhone: Udostępnij → „Do ekranu początkowego”. Android: menu → „Zainstaluj aplikację”.\\n3. Uruchom Oboe Z EKRANU POCZĄTKOWEGO i dopiero tam wklej klucz. (Na iPhonie aplikacja z ekranu początkowego nie widzi tego, co wpiszesz w Safari.)\\n\\nKlucz działa bez końca. Nie przesyłaj go nikomu — kto go ma, widzi Twoje przypomnienia.\\nZgubisz go? Napisz do Łukasza, dostaniesz nowy, a ten przestanie działać.\\n\\n— Oboe' }}",
     "options": {
      "appendAttribution": false
     }
@@ -125,7 +125,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "5b5db3e4-a6d5-4961-acf3-fa2ce17c6357",
+   "id": "23a6c453-cf44-4e2e-a780-f278c48fbdbd",
    "name": "Odpowiedz: wysłano",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -140,7 +140,7 @@
    }
   },
   {
-   "id": "b6db9ea8-c6bb-46e7-a593-4db7a47ad038",
+   "id": "913761dc-44e1-40e4-9ec7-a08cb92a05f8",
    "name": "Odpowiedz",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,

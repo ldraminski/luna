@@ -7,7 +7,7 @@ Wołany tylko z serwera (nginx blokuje /api/admin/):
 """
 import json, uuid
 
-APP_URL = "https://fusion-thomson-arrow-coordinated.trycloudflare.com"  # TYMCZASOWO — po trasie tunelu: https://oboe.draminski.dev
+APP_URL = "https://oboe.draminski.dev"
 PG = {"postgres": {"id": "IAfnl61Lb7KbTeZi", "name": "Oboe - Postgres (oboe-db)"}}
 SMTP = {"smtp": {"id": "DY5t4HkHVBfxB2gY", "name": "SMTP n8n renlab"}}
 ADMIN = {"httpHeaderAuth": {"id": "9Rd7Zl7NxIcEvPtL", "name": "Oboe - admin (X-Admin-Token)"}}
