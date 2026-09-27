@@ -1,0 +1,171 @@
+{
+ "name": "Oboe: Limit klucza",
+ "nodes": [
+  {
+   "id": "5667d863-c72d-41a9-ab71-767634e18e9d",
+   "name": "Opis",
+   "type": "n8n-nodes-base.stickyNote",
+   "typeVersion": 1,
+   "position": [
+    -420,
+    -260
+   ],
+   "parameters": {
+    "width": 560,
+    "height": 220,
+    "content": "## Oboe: Limit klucza (Luna)\nCo godzinę: `GET openrouter.ai/api/v1/key` kluczem Luny (credential „OpenRouter - Luna”, limit ustawia Łukasz).\nProgi 80/95/100% → powiadomienie push + mail dla `users.is_admin`, każdy raz (static data). <50% → reset.\nKwoty w zł wg kursu NBP. Źródło: `~/Work/oboe/n8n/build_limit.py`."
+   }
+  },
+  {
+   "id": "6220fe0c-6ee4-4ec8-b70c-11b90ba1d2c5",
+   "name": "Co godzinę",
+   "type": "n8n-nodes-base.scheduleTrigger",
+   "typeVersion": 1.2,
+   "position": [
+    0,
+    0
+   ],
+   "parameters": {
+    "rule": {
+     "interval": [
+      {
+       "field": "hours",
+       "hoursInterval": 1
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "a71df004-3d80-4644-ae13-2c36d02fcbd0",
+   "name": "Zużycie klucza",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    220,
+    0
+   ],
+   "parameters": {
+    "method": "GET",
+    "url": "https://openrouter.ai/api/v1/key",
+    "authentication": "predefinedCredentialType",
+    "nodeCredentialType": "openRouterApi",
+    "options": {
+     "timeout": 30000
+    }
+   },
+   "credentials": {
+    "openRouterApi": {
+     "id": "ZGSl0yv59gDWZKJG",
+     "name": "OpenRouter - Luna"
+    }
+   },
+   "retryOnFail": true,
+   "maxTries": 3
+  },
+  {
+   "id": "1e7098c4-f082-47af-8083-be0b0c2b75f0",
+   "name": "Kurs USD (NBP)",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    440,
+    0
+   ],
+   "parameters": {
+    "method": "GET",
+    "url": "https://api.nbp.pl/api/exchangerates/rates/a/usd/?format=json",
+    "options": {
+     "timeout": 15000
+    }
+   },
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "11952313-e867-45fc-ad64-02904b3e8268",
+   "name": "Próg?",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    660,
+    0
+   ],
+   "parameters": {
+    "jsCode": "const k = $('Zużycie klucza').first().json.data || {};\nconst usd = Number($json.rates?.[0]?.mid) || 3.7;          // NBP; awaryjnie ~3,70\nconst limit = Number(k.limit); const used = Number(k.usage) || 0;\nif (!(limit > 0)) return [];                              // klucz bez limitu — nie ma czego pilnować\nconst pct = used / limit * 100;\nconst st = $getWorkflowStaticData('global');\nif (pct < 50) { st.level = 0; return []; }\nconst level = pct >= 100 ? 100 : pct >= 95 ? 95 : pct >= 80 ? 80 : 0;\nif (!level || level <= (st.level || 0)) return [];\nst.level = level;\nconst zl = (x) => (x * usd).toFixed(2).replace('.', ',') + ' zł';\nconst title = level >= 100 ? 'Luna: limit klucza wyczerpany' : `Luna: wykorzystano ${Math.floor(pct)}% limitu`;\nconst body = `Zużyto ${zl(used)} z ${zl(limit)} (${used.toFixed(2)} z ${limit.toFixed(2)} USD). `\n  + (level >= 100 ? 'Luna nie odpowiada, dopóki nie podniesiesz limitu w panelu OpenRouter.' : 'Podnieś limit w panelu OpenRouter, zanim Luna przestanie odpowiadać.');\nreturn [{ json: { title, body, level } }];"
+   }
+  },
+  {
+   "id": "5c3cd3d8-ccce-488d-b75c-f1dc668eb772",
+   "name": "Powiadom adminów",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    880,
+    0
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "INSERT INTO notifications (item_id, user_id, due_at, channels, title, body)\nSELECT NULL, id, now(), '{push,email}', $1, $2 FROM users WHERE is_admin\nRETURNING user_id",
+    "options": {
+     "queryReplacement": "={{ [ $json.title, $json.body ] }}"
+    }
+   },
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   }
+  }
+ ],
+ "connections": {
+  "Co godzinę": {
+   "main": [
+    [
+     {
+      "node": "Zużycie klucza",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Zużycie klucza": {
+   "main": [
+    [
+     {
+      "node": "Kurs USD (NBP)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Kurs USD (NBP)": {
+   "main": [
+    [
+     {
+      "node": "Próg?",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Próg?": {
+   "main": [
+    [
+     {
+      "node": "Powiadom adminów",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1",
+  "timezone": "Europe/Warsaw"
+ }
+}

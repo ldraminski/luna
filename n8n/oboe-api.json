@@ -2,7 +2,7 @@
  "name": "Oboe: API",
  "nodes": [
   {
-   "id": "863ccadf-2ec9-4d29-b94f-7b0d97b1cc6d",
+   "id": "b8742727-aefe-4d53-80c4-ab2cf5998169",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "e5843df5-6024-4e29-bf2e-a910513ed0d6",
+   "id": "8e92f382-acdf-4278-8cac-42b8cbb8ab0b",
    "name": "GET me",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -25,7 +25,7 @@
     0,
     0
    ],
-   "webhookId": "66a49ce0-fc0c-4f0c-9aec-791edf99be7a",
+   "webhookId": "8ceec61c-0df8-42f8-bd36-93aee9a6e6e9",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/me",
@@ -34,7 +34,7 @@
    }
   },
   {
-   "id": "5b29a8ea-a82e-43c5-bdf8-9c82f0339dbd",
+   "id": "8eeee117-a1f9-4e98-a1b6-242eceadbcad",
    "name": "Kim jestem",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -58,7 +58,7 @@
    }
   },
   {
-   "id": "93779ff8-0108-4e5c-a2db-4dbb09184b22",
+   "id": "32c3a46f-ed62-4a19-a339-dda400b20c73",
    "name": "Odpowiedz: Kim jestem",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -75,7 +75,7 @@
    }
   },
   {
-   "id": "c0962ba5-fad2-4af2-aa36-3669164b2375",
+   "id": "169c37c1-d8e5-4fa7-bbb9-8fae2a34d8e5",
    "name": "GET items",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -83,7 +83,7 @@
     0,
     200
    ],
-   "webhookId": "dd898c4a-e697-4791-8197-8e6293936fb3",
+   "webhookId": "2349b5d8-43b9-4f0a-a89b-67326ebeb491",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/items",
@@ -92,7 +92,7 @@
    }
   },
   {
-   "id": "4f6e411e-239d-4368-a139-8b3132472cbc",
+   "id": "beb50b1f-82bf-4150-93a7-94b79c9987ca",
    "name": "Lista rzeczy",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -116,7 +116,7 @@
    }
   },
   {
-   "id": "58c4b4df-e498-45ab-9d37-627b98ad77b9",
+   "id": "a9be1b30-c1dd-4c86-823f-fb6230a8c2df",
    "name": "Odpowiedz: Lista rzeczy",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -133,7 +133,7 @@
    }
   },
   {
-   "id": "4f854b36-bff8-4d7d-8640-9faab85f296b",
+   "id": "4813a3bb-1a2b-400f-8963-e1dfb21e8a75",
    "name": "GET items/photo",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -141,7 +141,7 @@
     0,
     400
    ],
-   "webhookId": "0747f8d5-f11d-4027-a7de-c0e8457fbdc1",
+   "webhookId": "c809ec87-6c85-41c5-8433-e46915bafb71",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/items/photo",
@@ -150,7 +150,7 @@
    }
   },
   {
-   "id": "bb766e7f-a72a-4614-9660-d5311f0a2283",
+   "id": "8cdc9b13-fd3a-4ddc-bfb9-cf1d74fe2acf",
    "name": "Zdjęcie rzeczy",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -174,7 +174,7 @@
    }
   },
   {
-   "id": "55d60950-d15b-45dd-91b8-5f0dec5666bd",
+   "id": "cc9be695-e1fc-4e09-b092-f1755c85e5ab",
    "name": "Odpowiedz: Zdjęcie rzeczy",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -191,7 +191,7 @@
    }
   },
   {
-   "id": "d54c3922-dd42-4746-b38b-e4f75b4fdb6a",
+   "id": "90a218d6-0218-4f9d-baf7-b3266a3f3498",
    "name": "GET report",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -199,7 +199,7 @@
     0,
     600
    ],
-   "webhookId": "01378d8f-15c2-430c-9e3e-4419c723ead0",
+   "webhookId": "ef699e60-ecbe-4fcb-b33a-5ab14267e94f",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/report",
@@ -208,7 +208,7 @@
    }
   },
   {
-   "id": "d3d187c0-d1f9-451c-8a9c-0c0a66e4c84f",
+   "id": "d46f1439-e3e7-4e65-ad6f-5166d83d144e",
    "name": "Raport",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -232,7 +232,7 @@
    }
   },
   {
-   "id": "f83f93ba-e480-476f-9326-4e8935097690",
+   "id": "5bcd1ea6-7b95-4495-8101-ec067539c2ad",
    "name": "Odpowiedz: Raport",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -249,7 +249,7 @@
    }
   },
   {
-   "id": "1095cd28-2707-4922-aeb5-ebd74e718795",
+   "id": "05b8e6b6-a1a5-4a4a-b120-33b375a17646",
    "name": "POST report/seen",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -257,7 +257,7 @@
     0,
     800
    ],
-   "webhookId": "e5fc5ad7-0482-4da2-8281-cd11fcd6e144",
+   "webhookId": "f472d0d2-450e-4be9-bb2e-81a0dce281da",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/report/seen",
@@ -266,7 +266,7 @@
    }
   },
   {
-   "id": "6115ddbb-a1a7-4fbe-a0a1-ec8b803926e4",
+   "id": "9ae5e443-12e5-479a-b25a-b6276ebe3391",
    "name": "Raport obejrzany",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -290,7 +290,7 @@
    }
   },
   {
-   "id": "204580e6-5c6b-407c-9968-108f9cc291f5",
+   "id": "6bf6b933-6d20-415c-bba4-bbdcd477d900",
    "name": "Odpowiedz: Raport obejrzany",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -307,7 +307,7 @@
    }
   },
   {
-   "id": "dcf9b263-8dba-4c8b-ba42-fae9bd2805c6",
+   "id": "6b8f4770-e5d6-4ea5-88bc-afba82b13758",
    "name": "POST settings",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -315,7 +315,7 @@
     0,
     1000
    ],
-   "webhookId": "ccaeb5e9-6a18-45c3-becc-801dba2d8c83",
+   "webhookId": "40e05383-c0ef-4a63-b9b6-b0eec113e567",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/settings",
@@ -324,7 +324,7 @@
    }
   },
   {
-   "id": "3a0a34ae-d05e-4496-9d7f-36380f13d793",
+   "id": "1151aa38-45dc-488f-84f2-d67ad92df542",
    "name": "Ustawienia raportu",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -348,7 +348,7 @@
    }
   },
   {
-   "id": "050cd8df-64ed-4ff4-a2d1-becad3c49685",
+   "id": "bf3216c0-fefc-437a-9d78-4c6c1de6349f",
    "name": "Odpowiedz: Ustawienia raportu",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -365,7 +365,7 @@
    }
   },
   {
-   "id": "372e5140-e332-4230-81f3-199cbc78e81a",
+   "id": "aec6e440-c30c-4e60-92c7-031979d03065",
    "name": "GET pending",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -373,7 +373,7 @@
     0,
     1200
    ],
-   "webhookId": "49d6acbc-cb49-4719-b27b-5d98c590e5c4",
+   "webhookId": "19e29603-c2d8-4785-8ec8-1960b25d7957",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/pending",
@@ -382,7 +382,7 @@
    }
   },
   {
-   "id": "24b08268-b754-4f0a-b88c-7ff51f32491f",
+   "id": "ee611e2d-8da4-4d37-b7e9-9425bb2551b6",
    "name": "Do pokazania",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -406,7 +406,7 @@
    }
   },
   {
-   "id": "ce79e03b-95ec-470d-bcbc-8027ea425544",
+   "id": "1a42e45a-09de-410e-a3c4-4786be92c9a6",
    "name": "Odpowiedz: Do pokazania",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -423,7 +423,7 @@
    }
   },
   {
-   "id": "2c03ec1a-4472-4cbc-b3e0-4630e7907cc6",
+   "id": "c12b1222-ed37-4c7e-b06d-3a8cb4a6722f",
    "name": "POST push/subscribe",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -431,7 +431,7 @@
     0,
     1400
    ],
-   "webhookId": "a12f200d-c2d3-487b-aa75-88079ce5b922",
+   "webhookId": "3a67487c-1c23-49b7-b37b-958de355b13b",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/push/subscribe",
@@ -440,7 +440,7 @@
    }
   },
   {
-   "id": "f3c4d99a-b07a-4114-a461-9822aad247d9",
+   "id": "dd7f59bb-f6bb-4798-aee3-164e60dff815",
    "name": "Zapisz urządzenie",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -464,7 +464,7 @@
    }
   },
   {
-   "id": "c5aa0490-1b92-4086-bc81-561c1164db31",
+   "id": "4ca86186-66a3-426a-821a-f9ffab5f3804",
    "name": "Odpowiedz: Zapisz urządzenie",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -481,7 +481,7 @@
    }
   },
   {
-   "id": "eebcb953-9f96-4292-a92e-137569e4a857",
+   "id": "692e2631-a80b-4f32-be27-735b837b41ed",
    "name": "POST push/unsubscribe",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -489,7 +489,7 @@
     0,
     1600
    ],
-   "webhookId": "4335fce2-cc0c-4596-983a-b2cabf7ddf2a",
+   "webhookId": "9c51967e-936f-49b2-a204-b1dfd34f07bd",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/push/unsubscribe",
@@ -498,7 +498,7 @@
    }
   },
   {
-   "id": "0a93ceb5-4eae-45a8-88c0-f9381869bb5b",
+   "id": "cc37ac50-9d22-4b9c-9b9e-11727d12fcf7",
    "name": "Usuń urządzenie",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -522,7 +522,7 @@
    }
   },
   {
-   "id": "9b40269f-3a44-478e-86b4-e0084ed75b11",
+   "id": "e442c038-cb31-4184-a3b2-e5cdc899a4f3",
    "name": "Odpowiedz: Usuń urządzenie",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -539,7 +539,7 @@
    }
   },
   {
-   "id": "31946436-98c6-46c3-8bd1-9c50f835d2ff",
+   "id": "91136d5f-3a40-4ac2-93f9-fa59452b0b7c",
    "name": "POST items/done",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -547,7 +547,7 @@
     0,
     1800
    ],
-   "webhookId": "c37c1c5a-a5e2-4159-806a-df49ecd328a8",
+   "webhookId": "67be7420-f686-4f4e-b729-e0aac291fd11",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/done",
@@ -556,7 +556,7 @@
    }
   },
   {
-   "id": "a7b70265-d16c-49b6-a1d8-07e3d30bf1aa",
+   "id": "939d7a0c-957c-429a-a243-ba117987c3ed",
    "name": "Odhacz",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -580,7 +580,7 @@
    }
   },
   {
-   "id": "0477f242-5b73-42ad-929d-ca3f74daa0ac",
+   "id": "6653c1e1-e781-4bb4-b219-e5882d4e38dc",
    "name": "Odpowiedz: Odhacz",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -597,7 +597,7 @@
    }
   },
   {
-   "id": "f4ac247d-2dfb-48cb-8a59-73f5daa91120",
+   "id": "b40ad1fd-66c5-4c5b-9376-b68ace3a4cf3",
    "name": "POST items/check",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -605,7 +605,7 @@
     0,
     2000
    ],
-   "webhookId": "8b71a865-f102-41f5-ad2a-9884b154b044",
+   "webhookId": "aebfaf72-86a6-4710-b2d4-da4b1cc66631",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/check",
@@ -614,7 +614,7 @@
    }
   },
   {
-   "id": "d41dc8da-3523-40a8-89d8-cb2f0838363e",
+   "id": "c7500bbb-c95f-4003-a39d-74dd3eb777b5",
    "name": "Odhacz pozycję",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -638,7 +638,7 @@
    }
   },
   {
-   "id": "001256e5-32b7-426a-ad17-f86a9ed88ab3",
+   "id": "107285a6-757e-44d3-b69c-c2e5e09d0778",
    "name": "Odpowiedz: Odhacz pozycję",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -655,7 +655,7 @@
    }
   },
   {
-   "id": "b5d4fa2a-25d9-4a91-acf7-81665e16713a",
+   "id": "bbea4bcc-de44-4c87-8bb6-719326a0a978",
    "name": "POST items/widget-state",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -663,7 +663,7 @@
     0,
     2200
    ],
-   "webhookId": "374ea1e1-80dd-44ba-acf7-f006e79e8ec2",
+   "webhookId": "ef5ba3cc-dd85-4dfc-aa76-7d8783f6def9",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/widget-state",
@@ -672,7 +672,7 @@
    }
   },
   {
-   "id": "a1c6a906-a398-4f29-8cfa-3347bb1beec2",
+   "id": "34a08564-9797-4935-b604-5c21cace4a81",
    "name": "Stan widgetu",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -696,7 +696,7 @@
    }
   },
   {
-   "id": "7f92b907-8875-4a6a-87af-7fc8b8356fde",
+   "id": "dccc506c-4fa4-4f6b-831e-74055e9b6fd9",
    "name": "Odpowiedz: Stan widgetu",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -713,7 +713,7 @@
    }
   },
   {
-   "id": "331441c3-73f9-4596-964c-6d296efe6f8c",
+   "id": "00cfeea3-e270-4a29-9159-2d2c78de1033",
    "name": "POST items/widget-chat/close",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -721,7 +721,7 @@
     0,
     2400
    ],
-   "webhookId": "f5586b35-4bc4-44dc-9d43-ea649b20810e",
+   "webhookId": "6b1c0424-75e9-4056-81c2-1f791e2b4147",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/widget-chat/close",
@@ -730,7 +730,7 @@
    }
   },
   {
-   "id": "3eae27c0-c413-48ca-b3db-ca5a36c7e1e7",
+   "id": "e7953b79-5cb8-4c66-a9b1-3180805a649c",
    "name": "Zamknij czat",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -754,7 +754,7 @@
    }
   },
   {
-   "id": "b77c8bf1-b982-4c2c-bea0-66b697a2aebc",
+   "id": "74afe9eb-1483-4c06-852d-ff0e5162f49e",
    "name": "Odpowiedz: Zamknij czat",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -771,7 +771,7 @@
    }
   },
   {
-   "id": "c72a6dd3-f880-499b-89da-84f61c65ed9a",
+   "id": "e81a1966-1c0a-4090-b57f-8348552ae832",
    "name": "POST items/delete",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -779,7 +779,7 @@
     0,
     2600
    ],
-   "webhookId": "fd510406-67c3-4067-acad-112b6e42ed5f",
+   "webhookId": "1272bb90-01f5-488d-841a-48fa662774d0",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/delete",
@@ -788,7 +788,7 @@
    }
   },
   {
-   "id": "cd7ae0f9-53cc-477f-b250-a5406e9003ff",
+   "id": "de4ac33a-155d-418c-a0f3-4a8766327158",
    "name": "Usuń",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -812,7 +812,7 @@
    }
   },
   {
-   "id": "cfe7ca94-0fc3-49a2-a6cf-11a0b568603f",
+   "id": "404209db-a215-47f9-a8f6-3109e40fce8e",
    "name": "Odpowiedz: Usuń",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -829,7 +829,7 @@
    }
   },
   {
-   "id": "f8563257-620d-45d6-98aa-b11857340655",
+   "id": "383d4420-a40c-4fb3-a3b7-69699cb9af92",
    "name": "POST items",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -843,10 +843,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "f822597b-b0b2-458e-82c0-863dd851a73a"
+   "webhookId": "5fa2664f-f78a-4e49-9dee-8459c4e92292"
   },
   {
-   "id": "7a06ea58-23d9-471b-8a20-ce75e2337c2f",
+   "id": "85ffbaa8-16cb-404c-9338-5b6fcf8f1586",
    "name": "Sesja",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -869,7 +869,7 @@
    }
   },
   {
-   "id": "e7df8916-ef95-4e77-9361-ab4485682a94",
+   "id": "028c97fc-10ee-424f-bd13-e1547198dc73",
    "name": "Zalogowany i jest tekst?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -887,7 +887,7 @@
      },
      "conditions": [
       {
-       "id": "556e2343-9d59-44c0-bb5c-257099ee7c61",
+       "id": "e9d15253-2f1b-4d14-b776-eec84b8ec34d",
        "leftValue": "={{ $json.user_id }}",
        "rightValue": "",
        "operator": {
@@ -897,7 +897,7 @@
        }
       },
       {
-       "id": "a2303607-abba-477c-9b8c-f019272b2ad3",
+       "id": "855a5b16-1dbc-465c-ba98-bc33026cd454",
        "leftValue": "={{ String($('POST items').item.json.body.text || '').trim() || (/^data:image\\//.test(String($('POST items').item.json.body.image || '')) ? 'zdjęcie' : '') }}",
        "rightValue": "",
        "operator": {
@@ -913,7 +913,7 @@
    }
   },
   {
-   "id": "611e4e54-b8b2-4e66-830a-399d8620a019",
+   "id": "f1bed792-48f4-4761-ba9c-002cb6325de9",
    "name": "Odmów",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -930,7 +930,7 @@
    }
   },
   {
-   "id": "453a6529-8637-48fc-9168-f4a419ca63a9",
+   "id": "d5662f43-b474-4cdd-8f2a-65c30b1428ca",
    "name": "Kalendarz",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -943,7 +943,7 @@
    }
   },
   {
-   "id": "f44c1c5a-0c32-47a8-8b73-50736e44b264",
+   "id": "b3ba8155-ce7a-48bd-8601-744e6141ddea",
    "name": "DeepSeek: zrozum",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -987,7 +987,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "fa97c23b-2320-4da5-a373-6027640c1b69",
+   "id": "45fd3a09-4100-4a7f-bf3a-4a8d6eda7833",
    "name": "Sprawdź odpowiedź",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -996,11 +996,11 @@
     2900
    ],
    "parameters": {
-    "jsCode": "// Sprawdza odpowiedź modelu; niczego nie zgaduje — przy błędzie zwraca ok:false z komunikatem.\n// Rzecz składa się z części (termin, lista, strona, szczegóły); `kind` to tylko część główna — do sortowania i sekcji.\nconst src = String($('POST items').first().json.body.text || '').trim().slice(0, 1000) || '📷 Zdjęcie';\nconst fail = (error) => [{ json: { ok: false, error, notify: [], spec: {}, data: {}, source_text: src } }];\n\nconst raw = $json.choices?.[0]?.message?.content;\nif (!raw) return fail('Nie udało mi się odpowiedzieć — spróbuj jeszcze raz.');\nlet m;\ntry { m = JSON.parse(raw.replace(/^```(json)?|```$/g, '').trim()); } catch (e) { return fail('Nie zrozumiałam. Spróbuj napisać to inaczej.'); }\n\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst now = Date.now();\nconst iso = (v) => { const t = Date.parse(v); return Number.isFinite(t) ? new Date(t).toISOString() : null; };\n\nconst notify = (Array.isArray(m.notify) ? m.notify : [])\n  .map((n) => ({ at: iso(n.at), title: cut(n.title, 50) || cut(m.title, 50), body: cut(n.body, 120) }))\n  .filter((n) => n.at && Date.parse(n.at) > now - 60000 && Date.parse(n.at) < now + 400 * 864e5)\n  .slice(0, 10);\n\nconst r = m.recurrence;\nconst recurrence = r && Number(r.every) > 0 && ['day', 'week', 'month'].includes(r.unit)\n  ? { every: Math.min(Math.round(Number(r.every)), 365), unit: r.unit } : null;\n\n// Code node nie ma URL — prosta walidacja wyrażeniem.\nconst u = String(m.url || '').trim();\nconst url = /^https?:\\/\\/[a-z0-9.-]+\\.[a-z]{2,}(:\\d+)?(\\/\\S*)?$/i.test(u) ? u.slice(0, 500) : null;\n\nconst checklist = (Array.isArray(m.checklist) ? m.checklist : [])\n  .map((x) => ({ text: cut(String(x), 80), done: false })).filter((x) => x.text).slice(0, 30);\nconst fields = (Array.isArray(m.fields) ? m.fields : [])\n  .map((f) => ({ label: cut(f?.label, 20), value: cut(String(f?.value ?? ''), 60) })).filter((f) => f.label && f.value).slice(0, 4);\n\nconst TINTS = ['lavender', 'mint', 'blue', 'pink', 'sky'];\nconst ICONS = ['clock', 'cycle', 'list', 'globe', 'note', 'building', 'tv', 'health', 'car', 'home', 'cart', 'work', 'money', 'sport', 'people', 'doc', 'food', 'travel'];\nconst event_at = iso(m.event_at);\n\nconst kind = recurrence ? 'reminder-recurring' : event_at || notify.length ? 'reminder-once'\n  : checklist.length ? 'checklist' : url ? 'page-summary' : 'note';\nconst look = {\n  tint: TINTS.includes(m.look?.tint) ? m.look.tint : { 'reminder-recurring': 'mint', checklist: 'pink', 'page-summary': 'blue' }[kind] || 'lavender',\n  icon: ICONS.includes(m.look?.icon) ? m.look.icon : { 'reminder-recurring': 'cycle', checklist: 'list', 'page-summary': 'globe', note: 'note' }[kind] || 'clock',\n};\n\nreturn [{ json: {\n  ok: true, kind, title: cut(m.title, 40) || src.slice(0, 40), source_text: src, widget_slug: kind,\n  spec: { understood: cut(m.understood, 300), event_at, recurrence, url, summarize: m.summarize === true && !!url, model: 'deepseek/deepseek-v4.1-flash',\n    widget_brief: cut(m.widget?.brief, 300) || undefined },\n  data: {\n    tip: cut(m.tip, 80) || null, look, fields,\n    widget: m.widget?.brief ? { status: 'generating' } : undefined,\n    // listy z nazwami (Popraw może dołożyć kolejne); z jednego zdania powstaje najwyżej jedna, bez nazwy\n    photo: (() => { try { return $('Wejście do modelu').first().json.photo || undefined; } catch (e) { return undefined; } })(),   // opis zdjęcia, jeśli było\n    lists: checklist.length ? [{ name: null, items: checklist, reset: !!(recurrence && m.checklist_reset !== false) }] : undefined,\n  },\n  notify,\n  research: cut(m.research?.query, 200) || null,   // tylko sterowanie przepływem — nie trafia do bazy\n} }];\n"
+    "jsCode": "// Sprawdza odpowiedź modelu; niczego nie zgaduje — przy błędzie zwraca ok:false z komunikatem.\n// Rzecz składa się z części (termin, lista, strona, szczegóły); `kind` to tylko część główna — do sortowania i sekcji.\nconst src = String($('POST items').first().json.body.text || '').trim().slice(0, 1000) || '📷 Zdjęcie';\nconst fail = (error) => [{ json: { ok: false, error, notify: [], spec: {}, data: {}, source_text: src } }];\n\nconst raw = $json.choices?.[0]?.message?.content;\n// 402 z OpenRoutera = wyczerpany limit klucza Luny (alarm dostaje Łukasz z „Oboe: Limit klucza”)\nif (!raw && /\\b402\\b|insufficient|credits|limit/i.test(JSON.stringify($json.error || $json))) return fail('Mam chwilową przerwę — skończył się limit, z którego korzystam. Łukasz już o tym wie.');\nif (!raw) return fail('Nie udało mi się odpowiedzieć — spróbuj jeszcze raz.');\nlet m;\ntry { m = JSON.parse(raw.replace(/^```(json)?|```$/g, '').trim()); } catch (e) { return fail('Nie zrozumiałam. Spróbuj napisać to inaczej.'); }\n\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst now = Date.now();\nconst iso = (v) => { const t = Date.parse(v); return Number.isFinite(t) ? new Date(t).toISOString() : null; };\n\nconst notify = (Array.isArray(m.notify) ? m.notify : [])\n  .map((n) => ({ at: iso(n.at), title: cut(n.title, 50) || cut(m.title, 50), body: cut(n.body, 120) }))\n  .filter((n) => n.at && Date.parse(n.at) > now - 60000 && Date.parse(n.at) < now + 400 * 864e5)\n  .slice(0, 10);\n\nconst r = m.recurrence;\nconst recurrence = r && Number(r.every) > 0 && ['day', 'week', 'month'].includes(r.unit)\n  ? { every: Math.min(Math.round(Number(r.every)), 365), unit: r.unit } : null;\n\n// Code node nie ma URL — prosta walidacja wyrażeniem.\nconst u = String(m.url || '').trim();\nconst url = /^https?:\\/\\/[a-z0-9.-]+\\.[a-z]{2,}(:\\d+)?(\\/\\S*)?$/i.test(u) ? u.slice(0, 500) : null;\n\nconst checklist = (Array.isArray(m.checklist) ? m.checklist : [])\n  .map((x) => ({ text: cut(String(x), 80), done: false })).filter((x) => x.text).slice(0, 30);\nconst fields = (Array.isArray(m.fields) ? m.fields : [])\n  .map((f) => ({ label: cut(f?.label, 20), value: cut(String(f?.value ?? ''), 60) })).filter((f) => f.label && f.value).slice(0, 4);\n\nconst TINTS = ['lavender', 'mint', 'blue', 'pink', 'sky'];\nconst ICONS = ['clock', 'cycle', 'list', 'globe', 'note', 'building', 'tv', 'health', 'car', 'home', 'cart', 'work', 'money', 'sport', 'people', 'doc', 'food', 'travel'];\nconst event_at = iso(m.event_at);\n\nconst kind = recurrence ? 'reminder-recurring' : event_at || notify.length ? 'reminder-once'\n  : checklist.length ? 'checklist' : url ? 'page-summary' : 'note';\nconst look = {\n  tint: TINTS.includes(m.look?.tint) ? m.look.tint : { 'reminder-recurring': 'mint', checklist: 'pink', 'page-summary': 'blue' }[kind] || 'lavender',\n  icon: ICONS.includes(m.look?.icon) ? m.look.icon : { 'reminder-recurring': 'cycle', checklist: 'list', 'page-summary': 'globe', note: 'note' }[kind] || 'clock',\n};\n\nreturn [{ json: {\n  ok: true, kind, title: cut(m.title, 40) || src.slice(0, 40), source_text: src, widget_slug: kind,\n  spec: { understood: cut(m.understood, 300), event_at, recurrence, url, summarize: m.summarize === true && !!url, model: 'deepseek/deepseek-v4.1-flash',\n    widget_brief: cut(m.widget?.brief, 300) || undefined },\n  data: {\n    tip: cut(m.tip, 80) || null, look, fields,\n    widget: m.widget?.brief ? { status: 'generating' } : undefined,\n    // listy z nazwami (Popraw może dołożyć kolejne); z jednego zdania powstaje najwyżej jedna, bez nazwy\n    photo: (() => { try { return $('Wejście do modelu').first().json.photo || undefined; } catch (e) { return undefined; } })(),   // opis zdjęcia, jeśli było\n    lists: checklist.length ? [{ name: null, items: checklist, reset: !!(recurrence && m.checklist_reset !== false) }] : undefined,\n  },\n  notify,\n  research: cut(m.research?.query, 200) || null,   // tylko sterowanie przepływem — nie trafia do bazy\n} }];\n"
    }
   },
   {
-   "id": "6f02393c-99e5-4d2b-bb43-f20570af810c",
+   "id": "ab4ff81d-3ba8-4925-8ce2-2092ebcfa2a1",
    "name": "Zapisz",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -1023,7 +1023,7 @@
    }
   },
   {
-   "id": "cca4e472-9d1a-48f9-8157-b5ddff572bf0",
+   "id": "b075d441-015f-4afb-a8bf-2c0e9cb92b5d",
    "name": "Odpowiedz: dodano",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -1040,7 +1040,7 @@
    }
   },
   {
-   "id": "eaa4f886-ffd1-48ce-85f0-a6f220b5643e",
+   "id": "6169787f-1f15-4eab-824f-f3d8db6346cf",
    "name": "Potrzebny widget?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -1058,7 +1058,7 @@
      },
      "conditions": [
       {
-       "id": "a25940d1-4cb7-4779-849f-3928c6db79ea",
+       "id": "8d748f4b-3de7-4c95-98cb-66f9148daa82",
        "leftValue": "={{ $json.result.status === 200 && !!(($json.result.item || {}).data || {}).widget }}",
        "rightValue": "",
        "operator": {
@@ -1074,7 +1074,7 @@
    }
   },
   {
-   "id": "d9126485-26ed-4a54-b16c-237e9bf291c5",
+   "id": "5272377e-a914-46f0-9950-b6a36174ce91",
    "name": "Generuj widget (w tle)",
    "type": "n8n-nodes-base.executeWorkflow",
    "typeVersion": 1.2,
@@ -1095,7 +1095,7 @@
    }
   },
   {
-   "id": "10fd1964-a16b-459e-b29d-dc228ff30eed",
+   "id": "13f988bc-ee22-48a1-adff-b9763cc820df",
    "name": "Id rzeczy",
    "type": "n8n-nodes-base.set",
    "typeVersion": 3.4,
@@ -1109,7 +1109,7 @@
     "assignments": {
      "assignments": [
       {
-       "id": "c8626db1-58d9-487f-9650-d16f38a5a76c",
+       "id": "06083efb-e23a-442b-ba95-77f61863d7b9",
        "name": "item_id",
        "type": "string",
        "value": "={{ $json.result.item.id }}"
@@ -1120,7 +1120,7 @@
    }
   },
   {
-   "id": "88cda751-b60c-4204-a2af-acb481d03e2f",
+   "id": "7e7031c7-cdeb-4b4f-ad2a-1ea07c54f0ed",
    "name": "Streścić stronę?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -1138,7 +1138,7 @@
      },
      "conditions": [
       {
-       "id": "ef1ff9b4-4a27-4f7e-9e20-24e59c5cc620",
+       "id": "7f406bf1-7033-4986-b858-336a8e8b142f",
        "leftValue": "={{ $json.result.status === 200 && !!(($json.result.item || {}).spec || {}).summarize }}",
        "rightValue": "",
        "operator": {
@@ -1154,7 +1154,7 @@
    }
   },
   {
-   "id": "801a855f-3d85-4d74-8960-45773ecfb036",
+   "id": "d7ea6ae6-3713-466b-8681-c0e91b6f3af2",
    "name": "Id do streszczenia",
    "type": "n8n-nodes-base.set",
    "typeVersion": 3.4,
@@ -1168,13 +1168,13 @@
     "assignments": {
      "assignments": [
       {
-       "id": "d39c27b4-0e5a-4d6d-9946-b44d842e3d26",
+       "id": "d8cd5a3a-7ab9-4c7d-8baa-67cbd1a23da5",
        "name": "item_id",
        "type": "string",
        "value": "={{ $json.result.item.id }}"
       },
       {
-       "id": "74a1cf46-68f4-423a-bd81-dbc2c9642986",
+       "id": "a38bfdf9-7fdd-4bb1-9479-f123eb5b8134",
        "name": "reason",
        "type": "string",
        "value": "created"
@@ -1185,7 +1185,7 @@
    }
   },
   {
-   "id": "14f52992-a540-4a83-85eb-48b21a497a17",
+   "id": "6a25c48b-6578-4e68-b832-33d6b1a55013",
    "name": "Streść (w tle)",
    "type": "n8n-nodes-base.executeWorkflow",
    "typeVersion": 1.2,
@@ -1206,7 +1206,7 @@
    }
   },
   {
-   "id": "9ab69564-c9d1-4ab7-8089-2270be96c048",
+   "id": "cce2f1c2-8daf-4b0d-9c08-1c26d92c99df",
    "name": "POST items/summarize",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -1220,10 +1220,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "e60d13af-dbf8-4804-a328-619dc9ca557c"
+   "webhookId": "1af6c8cc-5c9d-4b9d-9b20-de986313d9de"
   },
   {
-   "id": "154e3511-46e0-4c14-baf6-4210bf23cf84",
+   "id": "ed35ecd8-8ce1-480d-b5d6-dfb4e2863ab1",
    "name": "Sprawdź teraz",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -1246,7 +1246,7 @@
    }
   },
   {
-   "id": "d7b2a80c-d3ae-43f6-a7a9-84b2844b6f38",
+   "id": "3a33cfa8-b986-454c-9b72-142f200d3e01",
    "name": "Odpowiedz: sprawdzam",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -1263,7 +1263,7 @@
    }
   },
   {
-   "id": "35aaf934-310f-4911-a739-e8accd61acd7",
+   "id": "f86b0756-0fab-44e2-9766-4c42ddc71b3e",
    "name": "Ruszać?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -1281,7 +1281,7 @@
      },
      "conditions": [
       {
-       "id": "a5f5f2c8-c848-4d53-ad68-f4717656fbd1",
+       "id": "bb0e1ecc-b0ab-4240-a794-5e52fbb59786",
        "leftValue": "={{ $json.result.status === 202 }}",
        "rightValue": "",
        "operator": {
@@ -1297,7 +1297,7 @@
    }
   },
   {
-   "id": "24f5d982-8db8-4fa2-ad85-80bbf8b41046",
+   "id": "6350df7e-c8a6-4e3c-9aaf-7b95e9e7770f",
    "name": "Id (sprawdź teraz)",
    "type": "n8n-nodes-base.set",
    "typeVersion": 3.4,
@@ -1311,13 +1311,13 @@
     "assignments": {
      "assignments": [
       {
-       "id": "2868ce3f-83f3-45db-95e2-c2982be87d52",
+       "id": "2971eafb-0815-4096-9536-1117a8474f6e",
        "name": "item_id",
        "type": "string",
        "value": "={{ $json.result.id }}"
       },
       {
-       "id": "2c3e33de-ee33-4ccc-a89d-62716ccca0b3",
+       "id": "79bebf15-ad6d-44d2-92f1-66ea5dd095dc",
        "name": "reason",
        "type": "string",
        "value": "manual"
@@ -1328,7 +1328,7 @@
    }
   },
   {
-   "id": "9e93ebf2-4485-437c-ba89-f1152f0e761e",
+   "id": "329a6967-74b8-41ac-b8ee-5b6794e9d6f2",
    "name": "Streść teraz (w tle)",
    "type": "n8n-nodes-base.executeWorkflow",
    "typeVersion": 1.2,
@@ -1349,7 +1349,7 @@
    }
   },
   {
-   "id": "f4fa5812-e400-4cb0-83fc-dbd4086734ca",
+   "id": "4b36e1ea-eecc-4852-94a8-12af2028fac1",
    "name": "Jest zdjęcie?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -1367,7 +1367,7 @@
      },
      "conditions": [
       {
-       "id": "5cbea1a8-4c12-497a-a35a-ac56a36e195c",
+       "id": "00563e68-e210-4880-b04e-4fc86c683fda",
        "leftValue": "={{ /^data:image\\/(jpeg|png|webp);base64,[A-Za-z0-9+\\/=]+$/.test(String($('POST items').item.json.body.image || '')) && String($('POST items').item.json.body.image).length < 4000000 }}",
        "rightValue": "",
        "operator": {
@@ -1383,7 +1383,7 @@
    }
   },
   {
-   "id": "7b2b21ef-1f07-47a2-88e1-2d2ed9a836c0",
+   "id": "09098231-ef56-4f5f-8e2b-3494b03d7009",
    "name": "Zdjęcie: analiza",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -1427,7 +1427,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "70947734-e1af-456d-a5d6-7e6efd63cbdc",
+   "id": "ad71a8e9-22fb-4c5f-a593-e5e463d57075",
    "name": "Zdjęcie: wynik",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -1440,7 +1440,7 @@
    }
   },
   {
-   "id": "6d917c8e-0602-4315-85ef-1aa7386430aa",
+   "id": "993afe07-80d8-43b0-bdad-5bbe57185a1c",
    "name": "Zdjęcie odczytane?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -1458,7 +1458,7 @@
      },
      "conditions": [
       {
-       "id": "6fae7fd7-8863-42a4-9b50-88cb4d445e2c",
+       "id": "57e50fce-0200-4fdf-bbac-0edc3e37ab50",
        "leftValue": "={{ !!$json.photo }}",
        "rightValue": "",
        "operator": {
@@ -1474,7 +1474,7 @@
    }
   },
   {
-   "id": "70aba576-8de8-4db1-b9fd-f75574cfd64d",
+   "id": "3fd4dcb8-bcaf-44fe-95d6-bfa334573b9b",
    "name": "Zdjęcie: analiza (2. próba)",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -1518,7 +1518,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "cb666b08-af7b-4f05-a7a4-b60b4f12b200",
+   "id": "493d432b-5661-4199-bf98-0885c6b448b6",
    "name": "Zdjęcie: wynik (2. próba)",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -1531,7 +1531,7 @@
    }
   },
   {
-   "id": "489516c4-66c1-402a-802c-ada2b511c870",
+   "id": "cddbb147-eb36-45a3-85f0-1330fe40bd49",
    "name": "Zdjęcie nieczytelne?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -1549,7 +1549,7 @@
      },
      "conditions": [
       {
-       "id": "9aeca58f-c8e1-474c-9d47-84c6e08e2bb4",
+       "id": "1934de20-b7f2-4006-9eb7-a6741cab1419",
        "leftValue": "={{ !$json.photo && !String($('POST items').item.json.body.text || '').trim() }}",
        "rightValue": "",
        "operator": {
@@ -1565,7 +1565,7 @@
    }
   },
   {
-   "id": "eed85363-d786-457d-94ba-3fb2a3836f86",
+   "id": "e05825fd-6ed0-4e22-b26d-c7ec8af763b4",
    "name": "Odpowiedz: zdjęcie nieczytelne",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -1582,7 +1582,7 @@
    }
   },
   {
-   "id": "bcc24fca-e7df-4bd8-84f2-b61b64df1a1b",
+   "id": "bfe2959e-7037-437d-afd9-8d65d8124e43",
    "name": "Wejście do modelu",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -1595,7 +1595,7 @@
    }
   },
   {
-   "id": "ea6d697b-a209-4625-bdf8-b3f4fa1cd56f",
+   "id": "70e77718-0f71-41b3-94da-78a00189e30f",
    "name": "Szukać w sieci?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -1613,7 +1613,7 @@
      },
      "conditions": [
       {
-       "id": "6fd2196a-1bc7-4b79-92f7-878760985b07",
+       "id": "52e2bf4c-eeec-4e96-a918-93dfe21b7900",
        "leftValue": "={{ $json.ok === true && !!$json.research }}",
        "rightValue": "",
        "operator": {
@@ -1629,7 +1629,7 @@
    }
   },
   {
-   "id": "b5d83c86-4c29-4640-b920-997a4be264e0",
+   "id": "705a2754-62ff-49ea-a35e-62a7691cbd2d",
    "name": "Szukaj w sieci",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -1673,7 +1673,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "7d045579-c1c4-4338-b203-142851cae030",
+   "id": "3c834db4-2c59-4351-8536-ccc3ae91d2d5",
    "name": "Wynik z sieci",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -1686,7 +1686,7 @@
    }
   },
   {
-   "id": "1ab60b98-52d5-48f5-a4c7-28ea05702322",
+   "id": "176d35d6-fe7e-4ff4-acb2-4a75b8e66350",
    "name": "DeepSeek: zrozum z faktami",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -1730,7 +1730,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "29da4a05-6132-4f49-92c0-2d8a392333ff",
+   "id": "896ef342-6a74-4c8b-9032-d1c7d5615e93",
    "name": "Sprawdź odpowiedź 2",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -1739,11 +1739,11 @@
     2500
    ],
    "parameters": {
-    "jsCode": "// Sprawdza odpowiedź modelu; niczego nie zgaduje — przy błędzie zwraca ok:false z komunikatem.\n// Rzecz składa się z części (termin, lista, strona, szczegóły); `kind` to tylko część główna — do sortowania i sekcji.\nconst src = String($('POST items').first().json.body.text || '').trim().slice(0, 1000) || '📷 Zdjęcie';\nconst fail = (error) => [{ json: { ok: false, error, notify: [], spec: {}, data: {}, source_text: src } }];\n\nconst raw = $json.choices?.[0]?.message?.content;\nif (!raw) return fail('Nie udało mi się odpowiedzieć — spróbuj jeszcze raz.');\nlet m;\ntry { m = JSON.parse(raw.replace(/^```(json)?|```$/g, '').trim()); } catch (e) { return fail('Nie zrozumiałam. Spróbuj napisać to inaczej.'); }\n\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst now = Date.now();\nconst iso = (v) => { const t = Date.parse(v); return Number.isFinite(t) ? new Date(t).toISOString() : null; };\n\nconst notify = (Array.isArray(m.notify) ? m.notify : [])\n  .map((n) => ({ at: iso(n.at), title: cut(n.title, 50) || cut(m.title, 50), body: cut(n.body, 120) }))\n  .filter((n) => n.at && Date.parse(n.at) > now - 60000 && Date.parse(n.at) < now + 400 * 864e5)\n  .slice(0, 10);\n\nconst r = m.recurrence;\nconst recurrence = r && Number(r.every) > 0 && ['day', 'week', 'month'].includes(r.unit)\n  ? { every: Math.min(Math.round(Number(r.every)), 365), unit: r.unit } : null;\n\n// Code node nie ma URL — prosta walidacja wyrażeniem.\nconst u = String(m.url || '').trim();\nconst url = /^https?:\\/\\/[a-z0-9.-]+\\.[a-z]{2,}(:\\d+)?(\\/\\S*)?$/i.test(u) ? u.slice(0, 500) : null;\n\nconst checklist = (Array.isArray(m.checklist) ? m.checklist : [])\n  .map((x) => ({ text: cut(String(x), 80), done: false })).filter((x) => x.text).slice(0, 30);\nconst fields = (Array.isArray(m.fields) ? m.fields : [])\n  .map((f) => ({ label: cut(f?.label, 20), value: cut(String(f?.value ?? ''), 60) })).filter((f) => f.label && f.value).slice(0, 4);\n\nconst TINTS = ['lavender', 'mint', 'blue', 'pink', 'sky'];\nconst ICONS = ['clock', 'cycle', 'list', 'globe', 'note', 'building', 'tv', 'health', 'car', 'home', 'cart', 'work', 'money', 'sport', 'people', 'doc', 'food', 'travel'];\nconst event_at = iso(m.event_at);\n\nconst kind = recurrence ? 'reminder-recurring' : event_at || notify.length ? 'reminder-once'\n  : checklist.length ? 'checklist' : url ? 'page-summary' : 'note';\nconst look = {\n  tint: TINTS.includes(m.look?.tint) ? m.look.tint : { 'reminder-recurring': 'mint', checklist: 'pink', 'page-summary': 'blue' }[kind] || 'lavender',\n  icon: ICONS.includes(m.look?.icon) ? m.look.icon : { 'reminder-recurring': 'cycle', checklist: 'list', 'page-summary': 'globe', note: 'note' }[kind] || 'clock',\n};\n\nreturn [{ json: {\n  ok: true, kind, title: cut(m.title, 40) || src.slice(0, 40), source_text: src, widget_slug: kind,\n  spec: { understood: cut(m.understood, 300), event_at, recurrence, url, summarize: m.summarize === true && !!url, model: 'deepseek/deepseek-v4.1-flash',\n    widget_brief: cut(m.widget?.brief, 300) || undefined },\n  data: {\n    tip: cut(m.tip, 80) || null, look, fields,\n    widget: m.widget?.brief ? { status: 'generating' } : undefined,\n    // listy z nazwami (Popraw może dołożyć kolejne); z jednego zdania powstaje najwyżej jedna, bez nazwy\n    photo: (() => { try { return $('Wejście do modelu').first().json.photo || undefined; } catch (e) { return undefined; } })(),   // opis zdjęcia, jeśli było\n    lists: checklist.length ? [{ name: null, items: checklist, reset: !!(recurrence && m.checklist_reset !== false) }] : undefined,\n  },\n  notify,\n  research: cut(m.research?.query, 200) || null,   // tylko sterowanie przepływem — nie trafia do bazy\n} }];\n"
+    "jsCode": "// Sprawdza odpowiedź modelu; niczego nie zgaduje — przy błędzie zwraca ok:false z komunikatem.\n// Rzecz składa się z części (termin, lista, strona, szczegóły); `kind` to tylko część główna — do sortowania i sekcji.\nconst src = String($('POST items').first().json.body.text || '').trim().slice(0, 1000) || '📷 Zdjęcie';\nconst fail = (error) => [{ json: { ok: false, error, notify: [], spec: {}, data: {}, source_text: src } }];\n\nconst raw = $json.choices?.[0]?.message?.content;\n// 402 z OpenRoutera = wyczerpany limit klucza Luny (alarm dostaje Łukasz z „Oboe: Limit klucza”)\nif (!raw && /\\b402\\b|insufficient|credits|limit/i.test(JSON.stringify($json.error || $json))) return fail('Mam chwilową przerwę — skończył się limit, z którego korzystam. Łukasz już o tym wie.');\nif (!raw) return fail('Nie udało mi się odpowiedzieć — spróbuj jeszcze raz.');\nlet m;\ntry { m = JSON.parse(raw.replace(/^```(json)?|```$/g, '').trim()); } catch (e) { return fail('Nie zrozumiałam. Spróbuj napisać to inaczej.'); }\n\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst now = Date.now();\nconst iso = (v) => { const t = Date.parse(v); return Number.isFinite(t) ? new Date(t).toISOString() : null; };\n\nconst notify = (Array.isArray(m.notify) ? m.notify : [])\n  .map((n) => ({ at: iso(n.at), title: cut(n.title, 50) || cut(m.title, 50), body: cut(n.body, 120) }))\n  .filter((n) => n.at && Date.parse(n.at) > now - 60000 && Date.parse(n.at) < now + 400 * 864e5)\n  .slice(0, 10);\n\nconst r = m.recurrence;\nconst recurrence = r && Number(r.every) > 0 && ['day', 'week', 'month'].includes(r.unit)\n  ? { every: Math.min(Math.round(Number(r.every)), 365), unit: r.unit } : null;\n\n// Code node nie ma URL — prosta walidacja wyrażeniem.\nconst u = String(m.url || '').trim();\nconst url = /^https?:\\/\\/[a-z0-9.-]+\\.[a-z]{2,}(:\\d+)?(\\/\\S*)?$/i.test(u) ? u.slice(0, 500) : null;\n\nconst checklist = (Array.isArray(m.checklist) ? m.checklist : [])\n  .map((x) => ({ text: cut(String(x), 80), done: false })).filter((x) => x.text).slice(0, 30);\nconst fields = (Array.isArray(m.fields) ? m.fields : [])\n  .map((f) => ({ label: cut(f?.label, 20), value: cut(String(f?.value ?? ''), 60) })).filter((f) => f.label && f.value).slice(0, 4);\n\nconst TINTS = ['lavender', 'mint', 'blue', 'pink', 'sky'];\nconst ICONS = ['clock', 'cycle', 'list', 'globe', 'note', 'building', 'tv', 'health', 'car', 'home', 'cart', 'work', 'money', 'sport', 'people', 'doc', 'food', 'travel'];\nconst event_at = iso(m.event_at);\n\nconst kind = recurrence ? 'reminder-recurring' : event_at || notify.length ? 'reminder-once'\n  : checklist.length ? 'checklist' : url ? 'page-summary' : 'note';\nconst look = {\n  tint: TINTS.includes(m.look?.tint) ? m.look.tint : { 'reminder-recurring': 'mint', checklist: 'pink', 'page-summary': 'blue' }[kind] || 'lavender',\n  icon: ICONS.includes(m.look?.icon) ? m.look.icon : { 'reminder-recurring': 'cycle', checklist: 'list', 'page-summary': 'globe', note: 'note' }[kind] || 'clock',\n};\n\nreturn [{ json: {\n  ok: true, kind, title: cut(m.title, 40) || src.slice(0, 40), source_text: src, widget_slug: kind,\n  spec: { understood: cut(m.understood, 300), event_at, recurrence, url, summarize: m.summarize === true && !!url, model: 'deepseek/deepseek-v4.1-flash',\n    widget_brief: cut(m.widget?.brief, 300) || undefined },\n  data: {\n    tip: cut(m.tip, 80) || null, look, fields,\n    widget: m.widget?.brief ? { status: 'generating' } : undefined,\n    // listy z nazwami (Popraw może dołożyć kolejne); z jednego zdania powstaje najwyżej jedna, bez nazwy\n    photo: (() => { try { return $('Wejście do modelu').first().json.photo || undefined; } catch (e) { return undefined; } })(),   // opis zdjęcia, jeśli było\n    lists: checklist.length ? [{ name: null, items: checklist, reset: !!(recurrence && m.checklist_reset !== false) }] : undefined,\n  },\n  notify,\n  research: cut(m.research?.query, 200) || null,   // tylko sterowanie przepływem — nie trafia do bazy\n} }];\n"
    }
   },
   {
-   "id": "42fc1e9f-c0cf-454e-941a-701c47adf784",
+   "id": "ed29ade2-79b3-4d33-a8c0-dbfd402d16bd",
    "name": "Dołącz źródła",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -1756,7 +1756,7 @@
    }
   },
   {
-   "id": "80b0da93-e074-44d2-bc61-78f45fab4c39",
+   "id": "5ef3791f-15b4-4dbe-ad67-abb539195eaa",
    "name": "POST items/widget-chat",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -1770,10 +1770,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "dec445c6-cfbf-4091-90f9-b57ae7496e26"
+   "webhookId": "6f81b4e2-c2fd-4eac-85a6-91065afdc263"
   },
   {
-   "id": "3e96e26a-7ded-4960-a706-1f3f7d959ff4",
+   "id": "26e1ffea-55e5-4982-b42b-9db5c2e5cf26",
    "name": "Czat: jest zdjęcie?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -1791,7 +1791,7 @@
      },
      "conditions": [
       {
-       "id": "86f97dd5-ee2e-4a12-8eee-21fe43e95519",
+       "id": "294fb093-6ecc-456c-b29e-3a095e90c14a",
        "leftValue": "={{ /^data:image\\/(jpeg|png|webp);base64,[A-Za-z0-9+\\/=]+$/.test(String($json.body.image || '')) && String($json.body.image).length < 4000000 }}",
        "rightValue": "",
        "operator": {
@@ -1807,7 +1807,7 @@
    }
   },
   {
-   "id": "41aa8d84-73b9-4d12-8cd8-decbed00bb95",
+   "id": "a589c1b3-f443-4fff-89e1-fac877545647",
    "name": "Czat: odczytaj zdjęcie",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -1851,7 +1851,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "dc72b33a-1394-4c71-a081-85234c802d47",
+   "id": "8c3c1ca0-4440-4bb5-8a6e-4de2466a196f",
    "name": "Czat: wiadomość",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -1864,7 +1864,7 @@
    }
   },
   {
-   "id": "4ce59897-591e-4ad1-8792-90901e48618a",
+   "id": "e088fe6d-0d13-44be-ad2a-d0b068a939ed",
    "name": "Czat: dopisz wiadomość",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -1887,7 +1887,7 @@
    }
   },
   {
-   "id": "c974c499-d361-4769-b3ce-8119679e3b4e",
+   "id": "fd53ec9e-5bf2-44d8-a68b-98e800515c0e",
    "name": "Czat: pytać AI?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -1905,7 +1905,7 @@
      },
      "conditions": [
       {
-       "id": "c3144378-d05e-4390-a64c-8fc5d1736b96",
+       "id": "f4cf53d5-558a-418d-99ad-34137a1b75a7",
        "leftValue": "={{ $json.result.status === 200 && $json.result.ask === true }}",
        "rightValue": "",
        "operator": {
@@ -1921,7 +1921,7 @@
    }
   },
   {
-   "id": "98963eec-7e6b-42fb-ac49-73cf45924eb3",
+   "id": "39fc9634-c94d-4f87-9fa9-cfb1762c9233",
    "name": "Czat: odpowiedz od razu",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -1938,7 +1938,7 @@
    }
   },
   {
-   "id": "de6cc8c7-aee2-43bc-90ff-6ab025d4c58a",
+   "id": "87153459-0fe0-4f76-917b-feb46746fd51",
    "name": "Czat: kalendarz",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -1951,7 +1951,7 @@
    }
   },
   {
-   "id": "c428e219-1ced-4782-8aa2-d8471a58e435",
+   "id": "a2d3fbe2-c5d9-4ffe-b797-3451bb368028",
    "name": "Czat: AI",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -1995,7 +1995,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "481b90d7-c73e-4c5a-a774-aedd36ec219a",
+   "id": "4688c6f7-14d2-4579-8ff7-ca5afcd89c28",
    "name": "Czat: sprawdź odpowiedź",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -2008,7 +2008,7 @@
    }
   },
   {
-   "id": "476e3ba9-8f1d-4ed6-ba53-8c2d5b39e066",
+   "id": "99ffab6d-047e-4eee-95bb-d9191100d37e",
    "name": "Czat: zapisz odpowiedź",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -2031,7 +2031,7 @@
    }
   },
   {
-   "id": "3123c820-d807-43a7-aba1-1034c1750cec",
+   "id": "6527c6ea-cfca-4e53-94f2-3edf1d0dfe6c",
    "name": "Czat: odpowiedz",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -2046,7 +2046,7 @@
    }
   },
   {
-   "id": "24940a38-f0f8-47b6-86e1-909ea0c06cad",
+   "id": "1a9b4a42-67e9-4728-9ffd-ac7fa36de384",
    "name": "POST items/widget-regenerate",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -2060,10 +2060,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "515bda95-a310-4bdf-a6c7-c584d269554a"
+   "webhookId": "5341f3e4-77b9-4583-8ac7-68c5a52ba2f5"
   },
   {
-   "id": "f75666ac-66d9-4160-91ea-48adc10f4eff",
+   "id": "f20da208-1f6d-4fd1-a8b4-06cb0c19b389",
    "name": "Weź plan",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -2086,7 +2086,7 @@
    }
   },
   {
-   "id": "f49d8ca4-2da9-4578-b4dd-718aad973b5d",
+   "id": "237665a5-4591-4c17-8d82-b7e131546a71",
    "name": "Jest plan?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -2104,7 +2104,7 @@
      },
      "conditions": [
       {
-       "id": "9a054a5e-1379-4404-8f5a-ce406800c925",
+       "id": "4d65b2e9-3907-4fc0-938f-cdfe3e5f140b",
        "leftValue": "={{ $json.result.status === 200 }}",
        "rightValue": "",
        "operator": {
@@ -2120,7 +2120,7 @@
    }
   },
   {
-   "id": "519cc9f9-6d3c-4901-ba62-10d0cd800c82",
+   "id": "68536889-c6ca-4a08-a0bb-f540c78b85ea",
    "name": "Odpowiedz: brak planu",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -2137,7 +2137,7 @@
    }
   },
   {
-   "id": "9eddc3ef-a5a1-478f-96cb-b1a31aac9fe3",
+   "id": "0f6ceba2-f759-4709-9377-6909afe9f1df",
    "name": "Zastosuj zmiany",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -2150,7 +2150,7 @@
    }
   },
   {
-   "id": "7deb5fca-313b-4351-bad5-6279b9fc4585",
+   "id": "511899f7-ff3c-4fc8-b78f-8e4d954da267",
    "name": "Zapisz zmiany",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -2173,7 +2173,7 @@
    }
   },
   {
-   "id": "e4abcdd2-7cb9-46b1-b5ac-35880630ea1d",
+   "id": "8d734ef6-9db3-416a-a1e8-f7d6bf8cd38f",
    "name": "Odpowiedz: zrobione",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -2188,7 +2188,7 @@
    }
   },
   {
-   "id": "f2cab003-ed6d-4f6b-818f-5eefe36edb97",
+   "id": "e7e24953-6527-440d-864f-984315967bcb",
    "name": "Przebudować widget?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -2206,7 +2206,7 @@
      },
      "conditions": [
       {
-       "id": "07075710-94eb-49cf-918e-64e64c2fc49f",
+       "id": "b892e767-ec86-43af-a4ee-2dc2cbb06272",
        "leftValue": "={{ $json.result.widget === true }}",
        "rightValue": "",
        "operator": {
@@ -2222,7 +2222,7 @@
    }
   },
   {
-   "id": "0754e83b-490d-4a63-bdbb-2f3cae3fc7ef",
+   "id": "1819a4ab-f1f9-4d1b-bf46-ba5a2d6967e7",
    "name": "Dane przebudowy",
    "type": "n8n-nodes-base.set",
    "typeVersion": 3.4,
@@ -2236,19 +2236,19 @@
     "assignments": {
      "assignments": [
       {
-       "id": "d468105f-9cf5-4545-aa9d-36c48c6cf130",
+       "id": "c6161898-9206-4728-9b0e-57d16d525599",
        "name": "item_id",
        "type": "string",
        "value": "={{ $json.result.item_id }}"
       },
       {
-       "id": "80940c02-bf76-41f9-8394-285d4fdc3c99",
+       "id": "f6d07daa-1b2f-433f-b644-d5a2975660d4",
        "name": "mode",
        "type": "string",
        "value": "revise"
       },
       {
-       "id": "172a1780-1772-4ecd-a26f-2275e0e2528e",
+       "id": "2508ad90-173b-47a9-9e1e-125ab60c35e7",
        "name": "chat_id",
        "type": "number",
        "value": "={{ $json.result.chat_id }}"
@@ -2259,7 +2259,7 @@
    }
   },
   {
-   "id": "39374c3e-63a6-4baa-a196-966a6cbf75a4",
+   "id": "ddab2202-f4ad-4011-aa20-f18a8b471fa0",
    "name": "Przebuduj widget (w tle)",
    "type": "n8n-nodes-base.executeWorkflow",
    "typeVersion": 1.2,

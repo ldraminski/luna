@@ -96,6 +96,29 @@ Workflow „Oboe: Raport” (`n8n/build_report.py`, id w `n8n/.report-wf-id`), m
   **Zaległe:** karta od dołu przy otwarciu / powrocie do aplikacji (najwyżej co 3 h, localStorage) z „Zrobione” / „Nieaktualne — zamknij”.
 - Ręcznie (test): `POST /webhook/oboe/admin/report {email, weekly}` z X-Admin-Token, tylko z serwera.
 
+## Kopia zapasowa i pilnowanie limitu (28.09.2026)
+
+**Kopia — „Oboe: Kopia zapasowa”** (`n8n/build_backup.py`, id w `n8n/.backup-wf-id`): codziennie 3:30 eksport WSZYSTKICH tabel oboe-db
++ pliki widgetów (`/data/oboe-widgets/*.html`) → JSON → gzip → **prywatny** bucket R2 `luna-kopie`, klucz `oboe/RRRR-MM-DD.json.gz` (~180 KB).
+Nic nie zostaje na serwerze (n8n nie ma trwałego katalogu na pliki). Błąd wysyłki → push + mail dla adminów.
+**Stan 28.09: eksport działa, wysyłka CZEKA** na bucket + credential od Łukasza (credential analyzera ma dostęp tylko do publicznego
+`analyzer-images` — tam kopii NIE wrzucamy). Po założeniu: `n8n/.backup-r2.json` = `{"id": "...", "name": "..."}` credentialu,
+`python3 build_backup.py`, PUT, aktywacja, test `POST 127.0.0.1:5678/webhook/oboe/admin/backup` (X-Admin-Token). Retencja: reguła cyklu życia w R2 (30 dni).
+
+Odtworzenie (na pustej bazie po `db/schema.sql` + migracjach, w tej kolejności tabel):
+```bash
+gunzip -c 2026-09-28.json.gz > kopia.json
+for t in users widgets widget_versions items sessions notifications push_subscriptions widget_chats access_requests access_log item_photos reports; do
+  python3 -c "import json,sys; print(json.dumps(json.load(open('kopia.json'))['tables']['$t']))" > /tmp/t.json
+  docker exec -i oboe-db psql -U oboe -d oboe -v j="$(cat /tmp/t.json)" -c "INSERT INTO $t SELECT * FROM json_populate_recordset(NULL::$t, :'j'::json)"
+done
+# pliki widgetów: klucz widget_files w kopii → /opt/oboe/widgets/<nazwa> (+ git commit)
+```
+
+**Limit — „Oboe: Limit klucza”** (`n8n/build_limit.py`, id w `n8n/.limit-wf-id`): co godzinę `GET /api/v1/key` kluczem Luny;
+progi 80/95/100% → push + mail dla adminów, każdy raz (static data), <50% zeruje. Kwoty w zł wg kursu NBP.
+W aplikacji przy wyczerpanym limicie (402): „Mam chwilową przerwę — skończył się limit… Łukasz już o tym wie.”
+
 ## Wdrożenie
 
 **Pamięć podręczna (27.09):** Cloudflare dokleja `max-age=14400` do CSS/JS mimo `no-cache` z nginx — telefon brał nowy HTML ze starym CSS.

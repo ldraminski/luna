@@ -1,0 +1,324 @@
+{
+ "name": "Oboe: Kopia zapasowa",
+ "nodes": [
+  {
+   "id": "5e376df1-e5ea-4ba0-8d76-14c6f5566bbc",
+   "name": "Opis",
+   "type": "n8n-nodes-base.stickyNote",
+   "typeVersion": 1,
+   "position": [
+    -420,
+    -300
+   ],
+   "parameters": {
+    "width": 600,
+    "height": 250,
+    "content": "## Oboe: Kopia zapasowa (Luna)\nCodziennie 3:30: eksport WSZYSTKICH tabel oboe-db + plików widgetów → JSON → gzip → prywatny bucket R2 `luna-kopie`,\nklucz `oboe/RRRR-MM-DD.json.gz`. Nic nie zostaje na serwerze. Retencja: reguła cyklu życia w R2 (30 dni).\nBłąd wysyłki → powiadomienie push + mail dla adminów. Ręcznie: `POST /webhook/oboe/admin/backup` (X-Admin-Token).\nŹródło: `~/Work/oboe/n8n/build_backup.py`; odtworzenie: README repo."
+   }
+  },
+  {
+   "id": "dc490933-2948-47cc-affb-bd94a44f5c50",
+   "name": "Codziennie 3:30",
+   "type": "n8n-nodes-base.scheduleTrigger",
+   "typeVersion": 1.2,
+   "position": [
+    0,
+    0
+   ],
+   "parameters": {
+    "rule": {
+     "interval": [
+      {
+       "field": "cronExpression",
+       "expression": "30 3 * * *"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "72fb4d27-65a4-41b5-bc22-517771fd7f20",
+   "name": "POST admin/backup",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    200
+   ],
+   "parameters": {
+    "httpMethod": "POST",
+    "path": "oboe/admin/backup",
+    "authentication": "headerAuth",
+    "responseMode": "lastNode",
+    "options": {}
+   },
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "9Rd7Zl7NxIcEvPtL",
+     "name": "Oboe - admin (X-Admin-Token)"
+    }
+   },
+   "webhookId": "79915434-5e93-40b4-ae5a-889524ff6515"
+  },
+  {
+   "id": "c2851133-3c8a-41bc-b71b-cc7771cf22ab",
+   "name": "Eksport tabel",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    220,
+    100
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "SELECT json_build_object('app', 'luna (oboe)', 'version', 1, 'created_at', now(), 'tables', json_build_object(\n  'users', (SELECT coalesce(json_agg(x), '[]'::json) FROM users x),\n  'sessions', (SELECT coalesce(json_agg(x), '[]'::json) FROM sessions x),\n  'items', (SELECT coalesce(json_agg(x), '[]'::json) FROM items x),\n  'notifications', (SELECT coalesce(json_agg(x), '[]'::json) FROM notifications x),\n  'push_subscriptions', (SELECT coalesce(json_agg(x), '[]'::json) FROM push_subscriptions x),\n  'widget_chats', (SELECT coalesce(json_agg(x), '[]'::json) FROM widget_chats x),\n  'widgets', (SELECT coalesce(json_agg(x), '[]'::json) FROM widgets x),\n  'widget_versions', (SELECT coalesce(json_agg(x), '[]'::json) FROM widget_versions x),\n  'access_requests', (SELECT coalesce(json_agg(x), '[]'::json) FROM access_requests x),\n  'access_log', (SELECT coalesce(json_agg(x), '[]'::json) FROM access_log x),\n  'item_photos', (SELECT coalesce(json_agg(x), '[]'::json) FROM item_photos x),\n  'reports', (SELECT coalesce(json_agg(x), '[]'::json) FROM reports x))) AS dump",
+    "options": {}
+   },
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   }
+  },
+  {
+   "id": "54838467-09b8-46fe-8ebe-4ce34917de6d",
+   "name": "Pliki widgetów",
+   "type": "n8n-nodes-base.readWriteFile",
+   "typeVersion": 1,
+   "position": [
+    440,
+    100
+   ],
+   "parameters": {
+    "operation": "read",
+    "fileSelector": "/data/oboe-widgets/*.html",
+    "options": {}
+   },
+   "alwaysOutputData": true,
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "07fbdcd2-aa77-4205-9230-d593cb0ca1ad",
+   "name": "Złóż kopię",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    660,
+    100
+   ],
+   "parameters": {
+    "jsCode": "// Jedna kopia: tabele + pliki widgetów (tekst HTML) → JSON → plik do spakowania.\nconst dump = $('Eksport tabel').first().json.dump;\nconst widgets = {};\nfor (let i = 0; i < $input.all().length; i++) {\n  const it = $input.all()[i]; if (!it.binary?.data) continue;\n  const buf = await this.helpers.getBinaryDataBuffer(i, 'data');\n  widgets[it.binary.data.fileName] = buf.toString('utf8');\n}\ndump.widget_files = widgets;\nconst day = DateTime.now().setZone('Europe/Warsaw').toISODate();\nconst body = Buffer.from(JSON.stringify(dump));\nconst counts = Object.fromEntries(Object.entries(dump.tables).map(([k, v]) => [k, v.length]));\nreturn [{ json: { file: `oboe/${day}.json`, bytes_raw: body.length, counts, widgets: Object.keys(widgets).length },\n          binary: { data: await this.helpers.prepareBinaryData(body, `${day}.json`, 'application/json') } }];"
+   }
+  },
+  {
+   "id": "e4793e30-ac7f-4fbb-932b-b738cb970210",
+   "name": "Gzip",
+   "type": "n8n-nodes-base.compression",
+   "typeVersion": 1.1,
+   "position": [
+    880,
+    100
+   ],
+   "parameters": {
+    "operation": "compress",
+    "binaryPropertyName": "data",
+    "outputFormat": "gzip",
+    "binaryPropertyOutput": "data"
+   }
+  },
+  {
+   "id": "87d268b8-b0ed-4fc4-b22b-80755edd6ff3",
+   "name": "Wyślij do R2",
+   "type": "n8n-nodes-base.s3",
+   "typeVersion": 1,
+   "position": [
+    1100,
+    100
+   ],
+   "parameters": {
+    "operation": "upload",
+    "bucketName": "luna-kopie",
+    "fileName": "={{ $('Złóż kopię').first().json.file }}.gz",
+    "additionalFields": {}
+   },
+   "onError": "continueRegularOutput",
+   "disabled": true
+  },
+  {
+   "id": "1f4e55d8-826a-46f6-8d7d-278accb859e0",
+   "name": "Wynik",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1320,
+    100
+   ],
+   "parameters": {
+    "jsCode": "const k = $('Złóż kopię').first().json;\nconst gz = $('Gzip').first().binary?.data;\nconst sent = false && !$json.error && !$('Wyślij do R2').first()?.json?.error;   // bez credentialu R2 węzeł jest wyłączony i tylko przepuszcza dane\nreturn [{ json: { ok: sent, file: k.file + '.gz', bytes_gz: gz?.fileSize || null, bytes_raw: k.bytes_raw, tables: k.counts, widgets: k.widgets,\n  error: sent ? null : String($json.error?.message || $json.error || 'wysyłka wyłączona (brak credentialu R2)') } }];"
+   }
+  },
+  {
+   "id": "31f339ab-9da1-4957-82fb-e43cd9552d7b",
+   "name": "Błąd?",
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2.2,
+   "position": [
+    1540,
+    100
+   ],
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "loose",
+      "version": 2
+     },
+     "conditions": [
+      {
+       "id": "8d9628a6-69b9-4674-9162-714c83679128",
+       "leftValue": "={{ $json.ok === false }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "481d6e21-63b3-4645-973a-cbbeaff754d0",
+   "name": "Powiadom adminów",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    1760,
+    40
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "INSERT INTO notifications (item_id, user_id, due_at, channels, title, body)\nSELECT NULL, id, now(), '{push,email}', 'Luna: kopia zapasowa się nie udała', $1 FROM users WHERE is_admin\nRETURNING user_id",
+    "options": {
+     "queryReplacement": "={{ [ 'Dzisiejsza kopia danych Luny nie trafiła do R2: ' + String($json.error).slice(0, 150) + '. Dane są bezpieczne w bazie, ale sprawdź to.' ] }}"
+    }
+   },
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   }
+  }
+ ],
+ "connections": {
+  "Codziennie 3:30": {
+   "main": [
+    [
+     {
+      "node": "Eksport tabel",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "POST admin/backup": {
+   "main": [
+    [
+     {
+      "node": "Eksport tabel",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Eksport tabel": {
+   "main": [
+    [
+     {
+      "node": "Pliki widgetów",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Pliki widgetów": {
+   "main": [
+    [
+     {
+      "node": "Złóż kopię",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Złóż kopię": {
+   "main": [
+    [
+     {
+      "node": "Gzip",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Gzip": {
+   "main": [
+    [
+     {
+      "node": "Wyślij do R2",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Wyślij do R2": {
+   "main": [
+    [
+     {
+      "node": "Wynik",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Wynik": {
+   "main": [
+    [
+     {
+      "node": "Błąd?",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Błąd?": {
+   "main": [
+    [
+     {
+      "node": "Powiadom adminów",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1",
+  "timezone": "Europe/Warsaw"
+ }
+}
