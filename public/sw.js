@@ -3,8 +3,8 @@
 // po „szturchańcu” pobieramy treść z /api/pending tokenem z IndexedDB.
 // iOS wymaga, żeby KAŻDY push skończył się widocznym powiadomieniem — inaczej Apple cofa subskrypcję.
 
-const SHELL = 'oboe-shell-v14';
-const SHELL_FILES = ['/', '/index.html', '/app.css', '/app.js', '/api.js', '/manifest.webmanifest', '/icons/icon-192.png'];
+const SHELL = 'oboe-shell-__V__';   // __V__ = skrót treści plików, podmieniany przy budowie obrazu (Dockerfile)
+const SHELL_FILES = ['/', '/index.html', '/app.css?v=__V__', '/app.js?v=__V__', '/api.js?v=__V__', '/manifest.webmanifest', '/icons/icon-192.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(SHELL).then((c) => c.addAll(SHELL_FILES).catch(() => {})).then(() => self.skipWaiting()));
@@ -18,7 +18,9 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   if (event.request.method !== 'GET' || url.origin !== location.origin || url.pathname.startsWith('/api/')) return;
-  event.respondWith(fetch(event.request).then((res) => {
+  // Cloudflare dokleja max-age=14400 do CSS/JS — cache: 'no-cache' wymusza sprawdzenie u serwera (ETag), żeby telefon nie wziął starej wersji.
+  const net = event.request.mode === 'navigate' ? fetch(event.request) : fetch(event.request, { cache: 'no-cache' });
+  event.respondWith(net.then((res) => {
     if (res.ok) { const copy = res.clone(); caches.open(SHELL).then((c) => c.put(event.request, copy)); }
     return res;
   }).catch(() => caches.match(event.request).then((r) => r || caches.match('/'))));

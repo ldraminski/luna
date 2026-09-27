@@ -65,6 +65,10 @@ Wynik: `items.data.research = {query, answer, sources[{url,title,host}], checked
 
 ## Wdrożenie
 
+**Pamięć podręczna (27.09):** Cloudflare dokleja `max-age=14400` do CSS/JS mimo `no-cache` z nginx — telefon brał nowy HTML ze starym CSS.
+Dlatego adresy mają `?v=__V__` (index.html, import w app.js, lista w sw.js), a Dockerfile podmienia `__V__` na skrót treści plików.
+**Nie usuwać `__V__`** i nie dodawać nowych plików JS/CSS bez tego znacznika. Service worker pobiera zasoby z `cache: 'no-cache'`.
+
 ```bash
 tools/sprawdz-nazwy.sh || exit 1
 rsync -av --delete --exclude .git ~/Work/oboe/ vps.draminski.dev:/opt/oboe/app/

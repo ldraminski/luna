@@ -1,5 +1,5 @@
 // Luna (wewn. oboe) — aplikacja. Wygląd i anatomia kart 1:1 z makiety A (Sekkei); tu tylko dane i zachowanie.
-import { api, push, getToken, setToken, ApiError } from './api.js';
+import { api, push, getToken, setToken, ApiError } from './api.js?v=__V__';
 
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
