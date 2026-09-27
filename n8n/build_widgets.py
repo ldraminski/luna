@@ -8,7 +8,7 @@ Ręcznie z serwera: POST http://127.0.0.1:5678/webhook/oboe/admin/widget {"item_
 import json, uuid
 
 PG = {"postgres": {"id": "IAfnl61Lb7KbTeZi", "name": "Oboe - Postgres (oboe-db)"}}
-OR = {"openRouterApi": {"id": "kv8oGsmY1JN14X0m", "name": "OpenRouter account"}}
+OR = {"openRouterApi": {"id": "ZGSl0yv59gDWZKJG", "name": "OpenRouter - Luna"}}
 ADMIN = {"httpHeaderAuth": {"id": "9Rd7Zl7NxIcEvPtL", "name": "Oboe - admin (X-Admin-Token)"}}
 TEXT_MODEL = "deepseek/deepseek-v4.1-flash"
 # Decyzja Łukasza 27.09: na razie GLM 5.3 Flash (tańszy output, mocny w Image-to-WebDev). DO PRZETESTOWANIA na większej

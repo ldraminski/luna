@@ -7,7 +7,7 @@ ręcznie z serwera: POST http://127.0.0.1:5678/webhook/oboe/admin/summarize {"it
 import json, uuid
 
 PG = {"postgres": {"id": "IAfnl61Lb7KbTeZi", "name": "Oboe - Postgres (oboe-db)"}}
-OR = {"openRouterApi": {"id": "kv8oGsmY1JN14X0m", "name": "OpenRouter account"}}
+OR = {"openRouterApi": {"id": "ZGSl0yv59gDWZKJG", "name": "OpenRouter - Luna"}}
 ADMIN = {"httpHeaderAuth": {"id": "9Rd7Zl7NxIcEvPtL", "name": "Oboe - admin (X-Admin-Token)"}}
 TEXT_MODEL = "deepseek/deepseek-v4.1-flash"
 UA = "Mozilla/5.0 (compatible; OboeBot/1.0; +https://draminski.dev)"

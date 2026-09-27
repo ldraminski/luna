@@ -52,6 +52,8 @@ Workflow „Oboe: Dostęp” (`n8n/build_access.py`, id w `n8n/.access-wf-id`), 
 
 ## Luna sprawdza w sieci (27.09.2026)
 
+**Klucz:** Luna ma własny klucz OpenRoutera z limitem ustawionym przez Łukasza (27.09: 2 USD) — credential n8n „OpenRouter - Luna” (ZGSl0yv59gDWZKJG), używany w „Oboe: API”, „Streść stronę”, „Generuj widget”. Po wyczerpaniu limitu OpenRouter odpowiada 402 → Luna pokazuje „Model nie odpowiedział”.
+
 W „Oboe: API” → POST items: gdy model rozumienia ustawi `research.query` (pytanie albo termin zależny od informacji z internetu),
 DeepSeek 4.1 Flash szuka przez **wtyczkę web OpenRoutera** (`plugins: [{id: 'web', max_results: 5}]`, prompt `n8n/prompt-sieci.txt`),
 a potem rozumie zdanie **drugi raz** ze znalezionymi faktami → termin i przypomnienia z wyniku („o której X na TVP 1, przypomnij 10 min przed”).
