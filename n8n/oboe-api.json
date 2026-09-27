@@ -2,7 +2,7 @@
  "name": "Oboe: API",
  "nodes": [
   {
-   "id": "c431f76d-f682-4823-97a2-cff25016d600",
+   "id": "150dd7a3-605a-4406-b2a9-7e215cd6d06c",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "267716fd-2777-4a77-962c-9637ae285972",
+   "id": "c71bded6-c6a7-4384-a73a-fa88885bf049",
    "name": "GET me",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -25,7 +25,7 @@
     0,
     0
    ],
-   "webhookId": "70c1fdde-9420-4c46-9aef-ed41fbe145a7",
+   "webhookId": "f7e7c5f0-0591-44b9-8d30-fd411612fe90",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/me",
@@ -34,7 +34,7 @@
    }
   },
   {
-   "id": "0e5ee8f2-9b68-4429-9958-9c28edc0d466",
+   "id": "b50a1839-2e34-4584-b6d1-9fd37a6c86e9",
    "name": "Kim jestem",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -58,7 +58,7 @@
    }
   },
   {
-   "id": "eb71333a-b152-4776-b5d5-b29a6065e46b",
+   "id": "4b0dd608-9456-4dc9-ba4e-7f8320571788",
    "name": "Odpowiedz: Kim jestem",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -75,7 +75,7 @@
    }
   },
   {
-   "id": "412d0dc5-0794-4cf2-bdb4-e016582f6099",
+   "id": "1d1a43ce-fbb7-4f2d-ab24-d25a9da24b09",
    "name": "GET items",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -83,7 +83,7 @@
     0,
     200
    ],
-   "webhookId": "10ddf61a-7db5-4ecd-b60a-2c41c49324c1",
+   "webhookId": "26fd37a6-609d-40a3-8dfd-40c71da1c1e1",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/items",
@@ -92,7 +92,7 @@
    }
   },
   {
-   "id": "4fe30718-fc7c-45ab-ab17-214d8a46e361",
+   "id": "7621be01-e677-4d92-bc79-70cb2dc52311",
    "name": "Lista rzeczy",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -116,7 +116,7 @@
    }
   },
   {
-   "id": "39df3f7f-56c1-4371-86c7-6dc498a5bbc3",
+   "id": "4a21927c-8f83-49f0-96de-d1261a0a120a",
    "name": "Odpowiedz: Lista rzeczy",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -133,7 +133,7 @@
    }
   },
   {
-   "id": "186c8472-f304-4324-a4ba-0de73506f946",
+   "id": "771b692b-7ad7-4fe5-b210-a50bdaecb36c",
    "name": "GET pending",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -141,7 +141,7 @@
     0,
     400
    ],
-   "webhookId": "d374e3c5-dbf7-49b9-9538-465403bcbbb6",
+   "webhookId": "aa4be098-25ff-4bdb-9554-19ddcbbbdf82",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/pending",
@@ -150,7 +150,7 @@
    }
   },
   {
-   "id": "e0a6d83a-4aaa-41b5-bbc0-2df19f13b4a6",
+   "id": "829e7edb-428d-4360-b7bc-921984679a27",
    "name": "Do pokazania",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -174,7 +174,7 @@
    }
   },
   {
-   "id": "dde61a61-f0b3-4a4f-a440-2e303f414b6d",
+   "id": "d84abadc-23d0-4a0d-ab60-c7d8ca162ac5",
    "name": "Odpowiedz: Do pokazania",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -191,7 +191,7 @@
    }
   },
   {
-   "id": "03823bcf-40b3-465d-b145-c45d53e2c52b",
+   "id": "47498463-53d1-4a67-8394-d37d86907142",
    "name": "POST push/subscribe",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -199,7 +199,7 @@
     0,
     600
    ],
-   "webhookId": "812a98a9-1d53-4dcd-95c1-e6f3f9188d0b",
+   "webhookId": "9e7bae28-a600-423c-8bfc-20d35946642b",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/push/subscribe",
@@ -208,7 +208,7 @@
    }
   },
   {
-   "id": "cd4c7b94-3519-4935-b451-1eb5235e5398",
+   "id": "57a99534-a1b8-4f48-90a1-b0ad109f1ea9",
    "name": "Zapisz urządzenie",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -232,7 +232,7 @@
    }
   },
   {
-   "id": "1b2a261d-d71f-4162-a22c-0eb7eb69423c",
+   "id": "404cc5e3-8990-4275-a47d-e9c6cc9330ed",
    "name": "Odpowiedz: Zapisz urządzenie",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -249,7 +249,7 @@
    }
   },
   {
-   "id": "620d981b-ade8-4c34-9d8b-3b8919067306",
+   "id": "bcb0eff2-ad7c-4686-8e0c-919daab1eaa7",
    "name": "POST push/unsubscribe",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -257,7 +257,7 @@
     0,
     800
    ],
-   "webhookId": "1e1f31bd-9f0b-4a4e-a701-d407a34a1dea",
+   "webhookId": "a7aec7f6-753f-4be3-8b6e-ebfc2b9919f1",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/push/unsubscribe",
@@ -266,7 +266,7 @@
    }
   },
   {
-   "id": "76b4b0a4-77e2-4526-9921-1efa52aa9ede",
+   "id": "b9af45b4-fbb9-4fb6-94a0-f12d98f2478a",
    "name": "Usuń urządzenie",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -290,7 +290,7 @@
    }
   },
   {
-   "id": "864989ba-7769-4f63-98fa-eaa73519cec9",
+   "id": "8352e531-1df7-461f-90f2-35652a39b32b",
    "name": "Odpowiedz: Usuń urządzenie",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -307,7 +307,7 @@
    }
   },
   {
-   "id": "e68f7d05-ec6f-4602-8f45-93edc53a5ed0",
+   "id": "e056f4bd-07cb-4d27-b34b-66e8e56a90ec",
    "name": "POST items/done",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -315,7 +315,7 @@
     0,
     1000
    ],
-   "webhookId": "05e0a682-f658-4f4f-887c-208f1ebd0155",
+   "webhookId": "035e53ed-9827-4a98-b1cc-1d4c6e2635cd",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/done",
@@ -324,7 +324,7 @@
    }
   },
   {
-   "id": "fbe3286f-a76e-45fa-8647-b6964485ab20",
+   "id": "e4d15b1f-82cb-4422-ab8d-d2b7da9f9cc3",
    "name": "Odhacz",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -348,7 +348,7 @@
    }
   },
   {
-   "id": "bbf67e6b-5e3a-444e-a715-c47171d28115",
+   "id": "cbff9a23-9ae7-4730-91a5-e9098192385d",
    "name": "Odpowiedz: Odhacz",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -365,7 +365,7 @@
    }
   },
   {
-   "id": "a5c6c9c0-fc01-4ad0-82a0-ebdd6089a62d",
+   "id": "515c2dee-bd52-4ec1-b01c-6b6c733f7462",
    "name": "POST items/check",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -373,7 +373,7 @@
     0,
     1200
    ],
-   "webhookId": "359a00da-e8e1-487c-a215-b2f54c2d5783",
+   "webhookId": "cf377596-4f06-4416-809c-d234d17a7514",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/check",
@@ -382,7 +382,7 @@
    }
   },
   {
-   "id": "415ba6fa-4528-4509-9b95-5b5b897a9a15",
+   "id": "e99b558d-7c05-4231-bc39-1faef574fbf0",
    "name": "Odhacz pozycję",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -406,7 +406,7 @@
    }
   },
   {
-   "id": "4e439132-bca9-4439-bb22-8547526e6cba",
+   "id": "4c963305-d0fb-4118-9112-eadf2646282f",
    "name": "Odpowiedz: Odhacz pozycję",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -423,15 +423,73 @@
    }
   },
   {
-   "id": "686dc26e-e9df-4024-a3f7-b629d58714a6",
-   "name": "POST items/delete",
+   "id": "fc79d2b4-0367-4365-bdc6-c9e7725bbe0b",
+   "name": "POST items/widget-state",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
    "position": [
     0,
     1400
    ],
-   "webhookId": "546fd9b5-aab8-4f99-a2a5-9fb536154931",
+   "webhookId": "9b2599a1-aa46-49d7-848c-eaab820e2032",
+   "parameters": {
+    "httpMethod": "POST",
+    "path": "oboe/items/widget-state",
+    "responseMode": "responseNode",
+    "options": {}
+   }
+  },
+  {
+   "id": "249fef72-84e4-459d-86a3-f4ba6cebb2c6",
+   "name": "Stan widgetu",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    240,
+    1400
+   ],
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   },
+   "alwaysOutputData": false,
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "WITH me AS (\n  UPDATE sessions SET last_used_at = now()\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id),\nupd AS (\n  UPDATE items SET updated_at = now(), data = jsonb_set(data, '{widget,state}', $3::jsonb)\n  WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) AND data->'widget'->>'status' = 'ready'\n    AND length($3) <= 20000 AND jsonb_typeof($3::jsonb) = 'object'\n  RETURNING 1)\nSELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN json_build_object('status', 401, 'error', 'Zaloguj się ponownie')\n  WHEN NOT EXISTS (SELECT 1 FROM upd) THEN json_build_object('status', 400, 'error', 'Nie udało się zapisać danych widgetu')\n  ELSE json_build_object('status', 200, 'ok', true) END AS result",
+    "options": {
+     "queryReplacement": "={{ [ ($json.headers.authorization || '').replace(/^Bearer\\s+/i, ''), /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000', JSON.stringify($json.body.state && typeof $json.body.state === 'object' ? $json.body.state : null).slice(0, 20001) ] }}"
+    }
+   }
+  },
+  {
+   "id": "54094492-c11b-4b4e-9430-607051046084",
+   "name": "Odpowiedz: Stan widgetu",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    480,
+    1400
+   ],
+   "parameters": {
+    "respondWith": "json",
+    "responseBody": "={{ $json.result }}",
+    "options": {
+     "responseCode": "={{ $json.result.status || 200 }}"
+    }
+   }
+  },
+  {
+   "id": "09933c8a-ead9-4f5c-821c-b1309608db6b",
+   "name": "POST items/delete",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    1600
+   ],
+   "webhookId": "8c1054df-a42f-422b-9775-12a7cac36c75",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/delete",
@@ -440,13 +498,13 @@
    }
   },
   {
-   "id": "4173f22d-8748-471f-8404-0085dae9f28d",
+   "id": "15ffd883-d415-4ea7-bf9a-6f76d81cf649",
    "name": "Usuń",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
    "position": [
     240,
-    1400
+    1600
    ],
    "credentials": {
     "postgres": {
@@ -464,13 +522,13 @@
    }
   },
   {
-   "id": "a5b691a7-6499-41e3-b3f7-0dbd5fbcaadd",
+   "id": "8902c1a3-b01f-4ced-a24e-4c05c00e5687",
    "name": "Odpowiedz: Usuń",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
    "position": [
     480,
-    1400
+    1600
    ],
    "parameters": {
     "respondWith": "json",
@@ -481,13 +539,13 @@
    }
   },
   {
-   "id": "0d7080eb-0aee-4aa0-bddf-0d42b0f0eee1",
+   "id": "8c3e397f-69b7-4216-985a-4fda4236c28b",
    "name": "POST items",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
    "position": [
     0,
-    1700
+    1900
    ],
    "parameters": {
     "httpMethod": "POST",
@@ -495,16 +553,16 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "a6d56ab4-71c3-41aa-b754-ec0dbfcd602f"
+   "webhookId": "9234c0d6-23c1-4d31-96eb-bed92951e59c"
   },
   {
-   "id": "5c2e346d-ca86-4f7c-9f96-8f6145b0aefd",
+   "id": "b5613de1-b935-4d32-bc21-5711689703cb",
    "name": "Sesja",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
    "position": [
     220,
-    1700
+    1900
    ],
    "parameters": {
     "operation": "executeQuery",
@@ -521,13 +579,13 @@
    }
   },
   {
-   "id": "a55dc304-f1eb-41f5-a9eb-aa29abcd800f",
+   "id": "a929adcc-9840-48d8-9b54-c45581c1e342",
    "name": "Zalogowany i jest tekst?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
    "position": [
     440,
-    1700
+    1900
    ],
    "parameters": {
     "conditions": {
@@ -539,7 +597,7 @@
      },
      "conditions": [
       {
-       "id": "5bfc4287-f2ea-41cf-8dc6-93c37525d37f",
+       "id": "dc68536b-319a-4213-813f-9fdfef0ec0e8",
        "leftValue": "={{ $json.user_id }}",
        "rightValue": "",
        "operator": {
@@ -549,7 +607,7 @@
        }
       },
       {
-       "id": "b4198361-2cd6-41a8-8eed-28bdaaebbbab",
+       "id": "2e3510bc-5bda-4532-ae8a-edbd12391dec",
        "leftValue": "={{ String($('POST items').item.json.body.text || '').trim() }}",
        "rightValue": "",
        "operator": {
@@ -565,13 +623,13 @@
    }
   },
   {
-   "id": "4cc25fac-b70f-493a-899d-055660fd5723",
+   "id": "34fafa24-1e98-43ea-8e09-e45bd7bf8b99",
    "name": "Odmów",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
    "position": [
     660,
-    1880
+    2080
    ],
    "parameters": {
     "respondWith": "json",
@@ -582,26 +640,26 @@
    }
   },
   {
-   "id": "aa310c20-87d0-46d0-a79e-eb5d12952474",
+   "id": "4ede5ee4-d473-4a55-94dc-b6e07d71fafa",
    "name": "Kalendarz",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
    "position": [
     660,
-    1700
+    1900
    ],
    "parameters": {
     "jsCode": "// Model źle liczy daty (\"za 3 dni\", \"w piątek\"), więc dostaje gotowy kalendarz liczony tutaj (Luxon, strefa workflow = Europe/Warsaw).\nconst DNI = ['poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela'];\nconst now = $now.setZone('Europe/Warsaw');\nconst lines = [];\nfor (let i = 0; i < 35; i++) {\n  const d = now.plus({ days: i });\n  const label = i === 0 ? 'dziś' : i === 1 ? 'jutro' : i === 2 ? 'pojutrze' : `za ${i} dni`;\n  lines.push(`${d.toFormat('yyyy-MM-dd')} ${DNI[d.weekday - 1]} (${label}), przesunięcie ${d.set({ hour: 12 }).toFormat('ZZ')}`);\n}\nreturn [{ json: {\n  teraz: `${now.toFormat('yyyy-MM-dd HH:mm')} (${DNI[now.weekday - 1]}), strefa Europe/Warsaw, przesunięcie ${now.toFormat('ZZ')}`,\n  kalendarz: lines.join('\\n'),\n} }];\n"
    }
   },
   {
-   "id": "d314f462-1152-4eff-888c-7c4d6451978f",
+   "id": "60130aff-3b52-453d-8d8f-f5a0d984e67c",
    "name": "DeepSeek: zrozum",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
    "position": [
     880,
-    1700
+    1900
    ],
    "parameters": {
     "method": "POST",
@@ -623,7 +681,7 @@
     },
     "sendBody": true,
     "specifyBody": "json",
-    "jsonBody": "={{ JSON.stringify({ model: 'deepseek/deepseek-v4.1-flash', temperature: 0.2, max_tokens: 1200, reasoning: { enabled: false }, response_format: { type: 'json_object' }, messages: [ { role: 'system', content: \"Jesteś mózgiem aplikacji Oboe. Użytkownik pisze swobodnie, co będzie robić, co ma pamiętać albo co ma się wydarzyć. Zamieniasz to na JEDEN obiekt JSON i nic poza nim.\\n\\nRzecz w Oboe NIE ma sztywnego typu. Składa się z części — użyj WSZYSTKICH, które wynikają ze zdania, i żadnej, która nie wynika:\\n- termin (jednorazowy albo cykliczny) z przypomnieniami,\\n- lista do odhaczenia,\\n- strona WWW,\\n- dodatkowe szczegóły.\\nPrzykład: „co tydzień muszę odhaczyć: klimatyzacja, dzienniki, dokumenty do urzędu” = termin cykliczny + lista 3 pozycji (odnawiana co tydzień) + przypomnienie.\\n\\nPola:\\n- \\\"title\\\": krótko, po polsku, maks. 40 znaków, bez kropki. Jeśli chcesz dopisać doprecyzowanie, oddziel je \\\" — \\\" (np. \\\"Urząd — wniosek o dotację\\\").\\n- \\\"understood\\\": jedno zdanie po polsku, co zrozumiałeś, z konkretną datą i godziną, jeśli jest termin. Pisz bezosobowo albo w 1. osobie liczby pojedynczej bez rodzaju („Przypomnę…”, „Zapisuję…”).\\n- \\\"event_at\\\": termin samego wydarzenia (dla cyklicznych: PIERWSZE wystąpienie) w ISO 8601 z przesunięciem strefy, albo null.\\n- \\\"recurrence\\\": {\\\"every\\\": liczba, \\\"unit\\\": \\\"day\\\"|\\\"week\\\"|\\\"month\\\"} albo null.\\n- \\\"notify\\\": lista momentów powiadomień [{\\\"at\\\": ISO 8601 z przesunięciem, \\\"title\\\": maks. 50 znaków, \\\"body\\\": maks. 120 znaków}]. Dla cyklicznych TYLKO najbliższe wystąpienie. Bez terminu: [].\\n- \\\"checklist\\\": lista pozycji do odhaczenia (krótkie frazy) albo []. Twórz ją, gdy użytkownik wymienia kilka rzeczy do zrobienia/kupienia/sprawdzenia albo prosi o listę.\\n- \\\"checklist_reset\\\": true, jeśli lista ma się odnawiać przy każdym powtórzeniu (cykliczne zadania), inaczej false.\\n- \\\"url\\\": pełny adres strony, jeśli użytkownik go podał, inaczej null.\\n- \\\"summarize\\\": true, jeśli użytkownik chce streszczenia/sprawdzania tej strony, inaczej false.\\n- \\\"fields\\\": do 4 dodatkowych szczegółów wprost ze zdania [{\\\"label\\\": maks. 20 znaków, \\\"value\\\": maks. 60 znaków}], np. {\\\"label\\\":\\\"Kanał\\\",\\\"value\\\":\\\"TVP 2\\\"}. Nie powtarzaj w nich terminu, tytułu ani listy. Najczęściej [].\\n- \\\"tip\\\": krótka praktyczna podpowiedź po polsku (maks. 80 znaków) albo null. Tylko jeśli naprawdę pomaga.\\n- \\\"look\\\": {\\\"tint\\\": jeden z \\\"lavender\\\"|\\\"mint\\\"|\\\"blue\\\"|\\\"pink\\\"|\\\"sky\\\", \\\"icon\\\": jeden z \\\"clock\\\"|\\\"cycle\\\"|\\\"list\\\"|\\\"globe\\\"|\\\"note\\\"|\\\"building\\\"|\\\"tv\\\"|\\\"health\\\"|\\\"car\\\"|\\\"home\\\"|\\\"cart\\\"|\\\"work\\\"|\\\"money\\\"|\\\"sport\\\"|\\\"people\\\"|\\\"doc\\\"|\\\"food\\\"|\\\"travel\\\"}.\\n  Kolory: lavender = jednorazowe sprawy i terminy, mint = rzeczy cykliczne, blue = strony i wiedza, pink = listy i zakupy, sky = pilne (dziś/jutro). Ikona ma pasować do TREŚCI (dentysta → health, urząd → building, serial → tv).\\n\\nZasady czasu:\\n- \\\"rano\\\" = 8:00, \\\"przed południem\\\" = 10:00, \\\"po południu\\\" = 15:00, \\\"wieczorem\\\" = 19:00, brak pory dnia = 9:00.\\n- Daty bierz WYŁĄCZNIE z kalendarza w wiadomości użytkownika — nie licz ich sam. \\\"za 3 dni\\\" = wiersz \\\"(za 3 dni)\\\". \\\"w piątek\\\" = pierwszy piątek po dziś. \\\"za 10 minut\\\" = teraz + 10 minut. Przesunięcie strefy przepisz z tego samego wiersza.\\n- Jednorazowy termin: przypomnij wieczorem dzień wcześniej o 20:00 ORAZ w dniu wydarzenia na godzinę przed nim (albo o 7:00, jeśli wydarzenie jest przed 8:00). Jeśli wydarzenie jest dziś — jedno przypomnienie przed nim (np. 10 minut wcześniej przy krótkim czasie). Jeśli użytkownik mówi, kiedy przypomnieć — zrób dokładnie tak.\\n- Cykliczne bez podanego startu: pierwsze wystąpienie = dziś + jeden okres o 9:00; powiadomienie = wystąpienie minus wyprzedzenie (domyślnie dzień wcześniej o 20:00; jeśli użytkownik mówi inaczej, zrób jak mówi).\\n- Lista bez terminu i bez prośby o przypomnienie: notify = [].\\n- Żaden moment powiadomienia nie może być w przeszłości. Jeśli wypada w przeszłości, pomiń go; jeśli miało być przypomnienie, a zostaje zero, daj jedno za 5 minut.\\n- Nie wymyślaj faktów, których nie ma w zdaniu.\\n\" }, { role: 'user', content: 'Teraz jest: ' + $json.teraz + '\\n\\nKalendarz (używaj WYŁĄCZNIE tych dat):\\n' + $json.kalendarz + '\\n\\nZdanie użytkownika:\\n' + String($('POST items').item.json.body.text).trim().slice(0, 1000) } ] }) }}",
+    "jsonBody": "={{ JSON.stringify({ model: 'deepseek/deepseek-v4.1-flash', temperature: 0.2, max_tokens: 1200, reasoning: { enabled: false }, response_format: { type: 'json_object' }, messages: [ { role: 'system', content: \"Jesteś mózgiem aplikacji Oboe. Użytkownik pisze swobodnie, co będzie robić, co ma pamiętać albo co ma się wydarzyć. Zamieniasz to na JEDEN obiekt JSON i nic poza nim.\\n\\nRzecz w Oboe NIE ma sztywnego typu. Składa się z części — użyj WSZYSTKICH, które wynikają ze zdania, i żadnej, która nie wynika:\\n- termin (jednorazowy albo cykliczny) z przypomnieniami,\\n- lista do odhaczenia,\\n- strona WWW,\\n- dodatkowe szczegóły.\\nPrzykład: „co tydzień muszę odhaczyć: klimatyzacja, dzienniki, dokumenty do urzędu” = termin cykliczny + lista 3 pozycji (odnawiana co tydzień) + przypomnienie.\\n\\nPola:\\n- \\\"title\\\": krótko, po polsku, maks. 40 znaków, bez kropki. Jeśli chcesz dopisać doprecyzowanie, oddziel je \\\" — \\\" (np. \\\"Urząd — wniosek o dotację\\\").\\n- \\\"understood\\\": jedno zdanie po polsku, co zrozumiałeś, z konkretną datą i godziną, jeśli jest termin. Pisz bezosobowo albo w 1. osobie liczby pojedynczej bez rodzaju („Przypomnę…”, „Zapisuję…”).\\n- \\\"event_at\\\": termin samego wydarzenia (dla cyklicznych: PIERWSZE wystąpienie) w ISO 8601 z przesunięciem strefy, albo null.\\n- \\\"recurrence\\\": {\\\"every\\\": liczba, \\\"unit\\\": \\\"day\\\"|\\\"week\\\"|\\\"month\\\"} albo null.\\n- \\\"notify\\\": lista momentów powiadomień [{\\\"at\\\": ISO 8601 z przesunięciem, \\\"title\\\": maks. 50 znaków, \\\"body\\\": maks. 120 znaków}]. Dla cyklicznych TYLKO najbliższe wystąpienie. Bez terminu: [].\\n- \\\"checklist\\\": lista pozycji do odhaczenia (krótkie frazy) albo []. Twórz ją, gdy użytkownik wymienia kilka rzeczy do zrobienia/kupienia/sprawdzenia albo prosi o listę.\\n- \\\"checklist_reset\\\": true, jeśli lista ma się odnawiać przy każdym powtórzeniu (cykliczne zadania), inaczej false.\\n- \\\"url\\\": pełny adres strony, jeśli użytkownik go podał, inaczej null.\\n- \\\"summarize\\\": true, jeśli użytkownik chce streszczenia/sprawdzania tej strony, inaczej false.\\n- \\\"fields\\\": do 4 dodatkowych szczegółów wprost ze zdania [{\\\"label\\\": maks. 20 znaków, \\\"value\\\": maks. 60 znaków}], np. {\\\"label\\\":\\\"Kanał\\\",\\\"value\\\":\\\"TVP 2\\\"}. Nie powtarzaj w nich terminu, tytułu ani listy. Najczęściej [].\\n- \\\"tip\\\": krótka praktyczna podpowiedź po polsku (maks. 80 znaków) albo null. Tylko jeśli naprawdę pomaga.\\n- \\\"widget\\\": {\\\"brief\\\": \\\"...\\\"} albo null. Ustaw TYLKO gdy użytkownik chce śledzić liczby lub postęp w czasie (kilometry, waga, wydatki, nawyki, strony, godziny), liczyć coś, porównywać, albo wprost prosi o widget/wykres/licznik. brief = po polsku, maks. 300 znaków: co widget ma pokazywać i jakie dane zbierać. Zwykłe przypomnienie, lista czy notatka: null.\\n- \\\"look\\\": {\\\"tint\\\": jeden z \\\"lavender\\\"|\\\"mint\\\"|\\\"blue\\\"|\\\"pink\\\"|\\\"sky\\\", \\\"icon\\\": jeden z \\\"clock\\\"|\\\"cycle\\\"|\\\"list\\\"|\\\"globe\\\"|\\\"note\\\"|\\\"building\\\"|\\\"tv\\\"|\\\"health\\\"|\\\"car\\\"|\\\"home\\\"|\\\"cart\\\"|\\\"work\\\"|\\\"money\\\"|\\\"sport\\\"|\\\"people\\\"|\\\"doc\\\"|\\\"food\\\"|\\\"travel\\\"}.\\n  Kolory: lavender = jednorazowe sprawy i terminy, mint = rzeczy cykliczne, blue = strony i wiedza, pink = listy i zakupy, sky = pilne (dziś/jutro). Ikona ma pasować do TREŚCI (dentysta → health, urząd → building, serial → tv).\\n\\nZasady czasu:\\n- \\\"rano\\\" = 8:00, \\\"przed południem\\\" = 10:00, \\\"po południu\\\" = 15:00, \\\"wieczorem\\\" = 19:00, brak pory dnia = 9:00.\\n- Daty bierz WYŁĄCZNIE z kalendarza w wiadomości użytkownika — nie licz ich sam. \\\"za 3 dni\\\" = wiersz \\\"(za 3 dni)\\\". \\\"w piątek\\\" = pierwszy piątek po dziś. \\\"za 10 minut\\\" = teraz + 10 minut. Przesunięcie strefy przepisz z tego samego wiersza.\\n- Jednorazowy termin: przypomnij wieczorem dzień wcześniej o 20:00 ORAZ w dniu wydarzenia na godzinę przed nim (albo o 7:00, jeśli wydarzenie jest przed 8:00). Jeśli wydarzenie jest dziś — jedno przypomnienie przed nim (np. 10 minut wcześniej przy krótkim czasie). Jeśli użytkownik mówi, kiedy przypomnieć — zrób dokładnie tak.\\n- Cykliczne bez podanego startu: pierwsze wystąpienie = dziś + jeden okres o 9:00; powiadomienie = wystąpienie minus wyprzedzenie (domyślnie dzień wcześniej o 20:00; jeśli użytkownik mówi inaczej, zrób jak mówi).\\n- Lista bez terminu i bez prośby o przypomnienie: notify = [].\\n- Żaden moment powiadomienia nie może być w przeszłości. Jeśli wypada w przeszłości, pomiń go; jeśli miało być przypomnienie, a zostaje zero, daj jedno za 5 minut.\\n- Nie wymyślaj faktów, których nie ma w zdaniu.\\n\" }, { role: 'user', content: 'Teraz jest: ' + $json.teraz + '\\n\\nKalendarz (używaj WYŁĄCZNIE tych dat):\\n' + $json.kalendarz + '\\n\\nZdanie użytkownika:\\n' + String($('POST items').item.json.body.text).trim().slice(0, 1000) } ] }) }}",
     "options": {
      "timeout": 60000
     }
@@ -639,26 +697,26 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "c8629907-9896-4aa1-af26-6f6597f512b9",
+   "id": "f969715c-4a81-43c8-9582-61908cd7a50c",
    "name": "Sprawdź odpowiedź",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
    "position": [
     1100,
-    1700
+    1900
    ],
    "parameters": {
-    "jsCode": "// Sprawdza odpowiedź modelu; niczego nie zgaduje — przy błędzie zwraca ok:false z komunikatem.\n// Rzecz składa się z części (termin, lista, strona, szczegóły); `kind` to tylko część główna — do sortowania i sekcji.\nconst src = String($('POST items').first().json.body.text || '').trim().slice(0, 1000);\nconst fail = (error) => [{ json: { ok: false, error, notify: [], spec: {}, data: {}, source_text: src } }];\n\nconst raw = $json.choices?.[0]?.message?.content;\nif (!raw) return fail('Model nie odpowiedział. Spróbuj jeszcze raz.');\nlet m;\ntry { m = JSON.parse(raw.replace(/^```(json)?|```$/g, '').trim()); } catch (e) { return fail('Nie zrozumiałem. Spróbuj napisać inaczej.'); }\n\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst now = Date.now();\nconst iso = (v) => { const t = Date.parse(v); return Number.isFinite(t) ? new Date(t).toISOString() : null; };\n\nconst notify = (Array.isArray(m.notify) ? m.notify : [])\n  .map((n) => ({ at: iso(n.at), title: cut(n.title, 50) || cut(m.title, 50), body: cut(n.body, 120) }))\n  .filter((n) => n.at && Date.parse(n.at) > now - 60000 && Date.parse(n.at) < now + 400 * 864e5)\n  .slice(0, 10);\n\nconst r = m.recurrence;\nconst recurrence = r && Number(r.every) > 0 && ['day', 'week', 'month'].includes(r.unit)\n  ? { every: Math.min(Math.round(Number(r.every)), 365), unit: r.unit } : null;\n\n// Code node nie ma URL — prosta walidacja wyrażeniem.\nconst u = String(m.url || '').trim();\nconst url = /^https?:\\/\\/[a-z0-9.-]+\\.[a-z]{2,}(:\\d+)?(\\/\\S*)?$/i.test(u) ? u.slice(0, 500) : null;\n\nconst checklist = (Array.isArray(m.checklist) ? m.checklist : [])\n  .map((x) => ({ text: cut(String(x), 80), done: false })).filter((x) => x.text).slice(0, 30);\nconst fields = (Array.isArray(m.fields) ? m.fields : [])\n  .map((f) => ({ label: cut(f?.label, 20), value: cut(String(f?.value ?? ''), 60) })).filter((f) => f.label && f.value).slice(0, 4);\n\nconst TINTS = ['lavender', 'mint', 'blue', 'pink', 'sky'];\nconst ICONS = ['clock', 'cycle', 'list', 'globe', 'note', 'building', 'tv', 'health', 'car', 'home', 'cart', 'work', 'money', 'sport', 'people', 'doc', 'food', 'travel'];\nconst event_at = iso(m.event_at);\n\nconst kind = recurrence ? 'reminder-recurring' : event_at || notify.length ? 'reminder-once'\n  : checklist.length ? 'checklist' : url ? 'page-summary' : 'note';\nconst look = {\n  tint: TINTS.includes(m.look?.tint) ? m.look.tint : { 'reminder-recurring': 'mint', checklist: 'pink', 'page-summary': 'blue' }[kind] || 'lavender',\n  icon: ICONS.includes(m.look?.icon) ? m.look.icon : { 'reminder-recurring': 'cycle', checklist: 'list', 'page-summary': 'globe', note: 'note' }[kind] || 'clock',\n};\n\nreturn [{ json: {\n  ok: true, kind, title: cut(m.title, 40) || src.slice(0, 40), source_text: src, widget_slug: kind,\n  spec: { understood: cut(m.understood, 300), event_at, recurrence, url, summarize: m.summarize === true && !!url, model: 'deepseek/deepseek-v4.1-flash' },\n  data: {\n    tip: cut(m.tip, 80) || null, look, fields,\n    checklist: checklist.length ? checklist : undefined,\n    checklist_reset: checklist.length && recurrence ? m.checklist_reset !== false : undefined,\n  },\n  notify,\n} }];\n"
+    "jsCode": "// Sprawdza odpowiedź modelu; niczego nie zgaduje — przy błędzie zwraca ok:false z komunikatem.\n// Rzecz składa się z części (termin, lista, strona, szczegóły); `kind` to tylko część główna — do sortowania i sekcji.\nconst src = String($('POST items').first().json.body.text || '').trim().slice(0, 1000);\nconst fail = (error) => [{ json: { ok: false, error, notify: [], spec: {}, data: {}, source_text: src } }];\n\nconst raw = $json.choices?.[0]?.message?.content;\nif (!raw) return fail('Model nie odpowiedział. Spróbuj jeszcze raz.');\nlet m;\ntry { m = JSON.parse(raw.replace(/^```(json)?|```$/g, '').trim()); } catch (e) { return fail('Nie zrozumiałem. Spróbuj napisać inaczej.'); }\n\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst now = Date.now();\nconst iso = (v) => { const t = Date.parse(v); return Number.isFinite(t) ? new Date(t).toISOString() : null; };\n\nconst notify = (Array.isArray(m.notify) ? m.notify : [])\n  .map((n) => ({ at: iso(n.at), title: cut(n.title, 50) || cut(m.title, 50), body: cut(n.body, 120) }))\n  .filter((n) => n.at && Date.parse(n.at) > now - 60000 && Date.parse(n.at) < now + 400 * 864e5)\n  .slice(0, 10);\n\nconst r = m.recurrence;\nconst recurrence = r && Number(r.every) > 0 && ['day', 'week', 'month'].includes(r.unit)\n  ? { every: Math.min(Math.round(Number(r.every)), 365), unit: r.unit } : null;\n\n// Code node nie ma URL — prosta walidacja wyrażeniem.\nconst u = String(m.url || '').trim();\nconst url = /^https?:\\/\\/[a-z0-9.-]+\\.[a-z]{2,}(:\\d+)?(\\/\\S*)?$/i.test(u) ? u.slice(0, 500) : null;\n\nconst checklist = (Array.isArray(m.checklist) ? m.checklist : [])\n  .map((x) => ({ text: cut(String(x), 80), done: false })).filter((x) => x.text).slice(0, 30);\nconst fields = (Array.isArray(m.fields) ? m.fields : [])\n  .map((f) => ({ label: cut(f?.label, 20), value: cut(String(f?.value ?? ''), 60) })).filter((f) => f.label && f.value).slice(0, 4);\n\nconst TINTS = ['lavender', 'mint', 'blue', 'pink', 'sky'];\nconst ICONS = ['clock', 'cycle', 'list', 'globe', 'note', 'building', 'tv', 'health', 'car', 'home', 'cart', 'work', 'money', 'sport', 'people', 'doc', 'food', 'travel'];\nconst event_at = iso(m.event_at);\n\nconst kind = recurrence ? 'reminder-recurring' : event_at || notify.length ? 'reminder-once'\n  : checklist.length ? 'checklist' : url ? 'page-summary' : 'note';\nconst look = {\n  tint: TINTS.includes(m.look?.tint) ? m.look.tint : { 'reminder-recurring': 'mint', checklist: 'pink', 'page-summary': 'blue' }[kind] || 'lavender',\n  icon: ICONS.includes(m.look?.icon) ? m.look.icon : { 'reminder-recurring': 'cycle', checklist: 'list', 'page-summary': 'globe', note: 'note' }[kind] || 'clock',\n};\n\nreturn [{ json: {\n  ok: true, kind, title: cut(m.title, 40) || src.slice(0, 40), source_text: src, widget_slug: kind,\n  spec: { understood: cut(m.understood, 300), event_at, recurrence, url, summarize: m.summarize === true && !!url, model: 'deepseek/deepseek-v4.1-flash',\n    widget_brief: cut(m.widget?.brief, 300) || undefined },\n  data: {\n    tip: cut(m.tip, 80) || null, look, fields,\n    widget: m.widget?.brief ? { status: 'generating' } : undefined,\n    checklist: checklist.length ? checklist : undefined,\n    checklist_reset: checklist.length && recurrence ? m.checklist_reset !== false : undefined,\n  },\n  notify,\n} }];\n"
    }
   },
   {
-   "id": "3e59b346-33e1-48a8-9450-1cbe4864ec63",
+   "id": "fe86f4db-3c78-4e8b-8e17-63d6f59a8e54",
    "name": "Zapisz",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
    "position": [
     1320,
-    1700
+    1900
    ],
    "parameters": {
     "operation": "executeQuery",
@@ -675,13 +733,13 @@
    }
   },
   {
-   "id": "2e7a808d-3686-4ab5-bb87-42ab786d43b4",
+   "id": "525da18c-d8ec-4d0a-9dc0-aed75ed55675",
    "name": "Odpowiedz: dodano",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
    "position": [
     1540,
-    1700
+    1900
    ],
    "parameters": {
     "respondWith": "json",
@@ -689,6 +747,86 @@
     "options": {
      "responseCode": "={{ $json.result.status || 200 }}"
     }
+   }
+  },
+  {
+   "id": "c901360d-6b3d-44f4-b6b8-0139f68d7685",
+   "name": "Potrzebny widget?",
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2.2,
+   "position": [
+    1760,
+    1900
+   ],
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "loose",
+      "version": 2
+     },
+     "conditions": [
+      {
+       "id": "b4aa27fd-344c-4ca1-ace4-b3579d54f17a",
+       "leftValue": "={{ $json.result.status === 200 && !!(($json.result.item || {}).data || {}).widget }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "6a61b0a9-4baa-4fd0-a478-660246082f67",
+   "name": "Generuj widget (w tle)",
+   "type": "n8n-nodes-base.executeWorkflow",
+   "typeVersion": 1.2,
+   "position": [
+    1980,
+    1900
+   ],
+   "parameters": {
+    "source": "database",
+    "workflowId": {
+     "__rl": true,
+     "value": "x2bvtxnOkkpIsOZK",
+     "mode": "id"
+    },
+    "options": {
+     "waitForSubWorkflow": false
+    }
+   }
+  },
+  {
+   "id": "4a161c96-9af1-4731-a916-a5270b6baac8",
+   "name": "Id rzeczy",
+   "type": "n8n-nodes-base.set",
+   "typeVersion": 3.4,
+   "position": [
+    1870,
+    1900
+   ],
+   "parameters": {
+    "mode": "manual",
+    "includeOtherFields": false,
+    "assignments": {
+     "assignments": [
+      {
+       "id": "08275bbe-8c52-4c7d-b4c8-a85ce019b24f",
+       "name": "item_id",
+       "type": "string",
+       "value": "={{ $json.result.item.id }}"
+      }
+     ]
+    },
+    "options": {}
    }
   }
  ],
@@ -847,6 +985,28 @@
     ]
    ]
   },
+  "POST items/widget-state": {
+   "main": [
+    [
+     {
+      "node": "Stan widgetu",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Stan widgetu": {
+   "main": [
+    [
+     {
+      "node": "Odpowiedz: Stan widgetu",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
   "POST items/delete": {
    "main": [
     [
@@ -863,6 +1023,39 @@
     [
      {
       "node": "Odpowiedz: Usuń",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Odpowiedz: dodano": {
+   "main": [
+    [
+     {
+      "node": "Potrzebny widget?",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Potrzebny widget?": {
+   "main": [
+    [
+     {
+      "node": "Id rzeczy",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Id rzeczy": {
+   "main": [
+    [
+     {
+      "node": "Generuj widget (w tle)",
       "type": "main",
       "index": 0
      }

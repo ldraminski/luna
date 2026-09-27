@@ -88,6 +88,19 @@ SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
   ELSE json_build_object('status', 200, 'data', (SELECT data FROM upd)) END AS result""",
    "={{ [ " + TOKEN + ", /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000', String(Math.max(0, Math.min(99, parseInt($json.body.index, 10) || 0))), $json.body.done === true ] }}"),
 
+  # Widget zapisuje swój stan (max 20 KB) — tylko do rzeczy z gotowym widgetem.
+  ("POST", "items/widget-state", "Stan widgetu", f"""
+WITH {ME},
+upd AS (
+  UPDATE items SET updated_at = now(), data = jsonb_set(data, '{{widget,state}}', $3::jsonb)
+  WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) AND data->'widget'->>'status' = 'ready'
+    AND length($3) <= 20000 AND jsonb_typeof($3::jsonb) = 'object'
+  RETURNING 1)
+SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
+  WHEN NOT EXISTS (SELECT 1 FROM upd) THEN json_build_object('status', 400, 'error', 'Nie udało się zapisać danych widgetu')
+  ELSE json_build_object('status', 200, 'ok', true) END AS result""",
+   "={{ [ " + TOKEN + ", /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000', JSON.stringify($json.body.state && typeof $json.body.state === 'object' ? $json.body.state : null).slice(0, 20001) ] }}"),
+
   ("POST", "items/delete", "Usuń", f"""
 WITH {ME},
 d AS (DELETE FROM items WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) RETURNING id)
@@ -127,6 +140,7 @@ for i, (method, path, name, sql, params) in enumerate(ROUTES):
 # ---- POST items: zdanie użytkownika → DeepSeek → rzecz + zaplanowane powiadomienia ----
 SYSTEM = open("prompt-rozumienie.txt").read()
 MODEL = "deepseek/deepseek-v4.1-flash"
+WIDGETS_WF = open(".widgets-wf-id").read().strip()  # id „Oboe: Generuj widget” w n8n
 USER_MSG = ("'Teraz jest: ' + $json.teraz + '\\n\\nKalendarz (używaj WYŁĄCZNIE tych dat):\\n' + $json.kalendarz"
             " + '\\n\\nZdanie użytkownika:\\n' + String($('POST items').item.json.body.text).trim().slice(0, 1000)")
 JSON_BODY = ("={{ JSON.stringify({ model: '" + MODEL + "', temperature: 0.2, max_tokens: 1200, reasoning: { enabled: false }, "
@@ -187,6 +201,16 @@ SELECT CASE WHEN NOT $8::boolean THEN json_build_object('status', 422, 'error', 
   credentials=PG)
 resp = node("Odpowiedz: dodano", "n8n-nodes-base.respondToWebhook", 1.1, [1540, y],
   {"respondWith": "json", "responseBody": "={{ $json.result }}", "options": {"responseCode": "={{ $json.result.status || 200 }}"}})
+wneed = node("Potrzebny widget?", "n8n-nodes-base.if", 2.2, [1760, y], {
+  "conditions": {"options": {"caseSensitive": True, "leftValue": "", "typeValidation": "loose", "version": 2},
+    "conditions": [{"id": str(uuid.uuid4()), "leftValue": "={{ $json.result.status === 200 && !!(($json.result.item || {}).data || {}).widget }}",
+      "rightValue": "", "operator": {"type": "boolean", "operation": "true", "singleValue": True}}], "combinator": "and"}, "options": {}})
+wgen = node("Generuj widget (w tle)", "n8n-nodes-base.executeWorkflow", 1.2, [1980, y], {
+  "source": "database", "workflowId": {"__rl": True, "value": WIDGETS_WF, "mode": "id"},
+  "options": {"waitForSubWorkflow": False}})
+wset = node("Id rzeczy", "n8n-nodes-base.set", 3.4, [1870, y], {"mode": "manual", "includeOtherFields": False,
+  "assignments": {"assignments": [{"id": str(uuid.uuid4()), "name": "item_id", "type": "string", "value": "={{ $json.result.item.id }}"}]}, "options": {}})
+link(resp, wneed); link(wneed, wset, 0); link(wset, wgen)
 link(w, sess); link(sess, iff); link(iff, cal, 0); link(cal, llm); link(iff, deny, 1); link(llm, code); link(code, save); link(save, resp)
 
 wf = {"name": "Oboe: API", "nodes": nodes, "connections": conns,

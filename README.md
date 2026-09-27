@@ -12,7 +12,7 @@ Design system: wariant A (pastel) — `~/Work/agents/hikari/sekkei/oboe/wariant-
 | `/opt/oboe/widgets` | **osobne repo git** z widgetami generowanymi przez AI — n8n zapisuje i commituje, nginx serwuje read-only pod `/widgets/` |
 | `/opt/oboe/db.env` | hasło do `oboe-db` (0600, nie w git) |
 
-Widgety są niezmienne: każda wersja to nowy plik `<slug>/v<N>.html`; aktywną wersję wskazuje Postgres.
+Widgety są niezmienne: każda wersja to nowy plik `<slug>.v<N>.html` (płasko — węzeł zapisu n8n nie tworzy katalogów); aktywną wersję wskazuje Postgres.
 
 ## Kontenery (w `/opt/infra/docker-compose.yml`)
 
@@ -25,3 +25,9 @@ Widgety są niezmienne: każda wersja to nowy plik `<slug>/v<N>.html`; aktywną 
 rsync -av --delete --exclude .git ~/Work/oboe/ vps.draminski.dev:/opt/oboe/app/
 ssh vps.draminski.dev "cd /opt/oboe/app && docker build -t oboe:latest . && cd /opt/infra && docker compose up -d oboe"
 ```
+
+## Widgety od AI („Oboe: Generuj widget”, `n8n/build_widgets.py`)
+Dobór z biblioteki (DeepSeek 4.1) → nowy kod (DeepSeek 4.1, kontrakt `n8n/prompt-widget.txt`) → skan (`n8n/skan.js`) →
+guardian (`n8n/prompt-guardian.txt`) → plik + commit w `/opt/oboe/widgets` → `widgets`/`widget_versions`.
+Front: `<iframe sandbox="allow-scripts">` + CSP sandbox z nginx; rozmowa `oboe:data` / `oboe:ready` / `oboe:resize` / `oboe:save`.
+Ręczne ponowienie: `POST http://127.0.0.1:5678/webhook/oboe/admin/widget {"item_id": ...}` + X-Admin-Token (z serwera).

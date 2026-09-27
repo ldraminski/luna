@@ -42,6 +42,7 @@ const I = {
   check: '<path d="m5 12 5 5L20 7"/>',
   trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
   ext: '<path d="M7 17 17 7M9 7h8v8"/>',
+  spark: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
   list: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5 2.5-2.5"/>',
   building: '<path d="M3 10 12 4l9 6z"/><path d="M5 10v9M9.5 10v9M14.5 10v9M19 10v9M3 21h18"/>',
   tv: '<rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="m8 3 4 3 4-3"/>',
@@ -100,6 +101,7 @@ async function load() {
   try {
     state.items = await api.items();
     render();
+    watchGenerating();
   } catch (err) {
     if (err.status === 401) return logout('Klucz przestał działać. Poproś Łukasza o nowy.');
     if (!state.items.length) $('#list').innerHTML = `<div class="empty"><h3>Nie udało się wczytać</h3><p>${esc(err.message)}</p></div>`;
@@ -127,12 +129,14 @@ function render() {
   const rest = dated.filter((i) => i !== hero);
   const rec = items.filter((i) => i.spec?.recurrence).sort(byTime);
   const lists = items.filter((i) => !i.spec?.recurrence && !eventOf(i) && listOf(i).length);
-  const saved = items.filter((i) => !i.spec?.recurrence && !eventOf(i) && !listOf(i).length);
+  const tracked = items.filter((i) => !i.spec?.recurrence && !eventOf(i) && i.data?.widget && i.data.widget.status !== 'rejected');
+  const saved = items.filter((i) => !i.spec?.recurrence && !eventOf(i) && !listOf(i).length && !tracked.includes(i));
 
   let html = '';
   if (hero) html += card(hero, true);
   if (rest.length) html += `<h2 class="sec">${hero ? 'Dalej' : 'Najbliższe'}</h2>` + rest.map((i) => card(i)).join('');
   if (rec.length) html += '<h2 class="sec">Powtarzalne</h2>' + rec.map((i) => card(i)).join('');
+  if (tracked.length) html += '<h2 class="sec">Śledzone</h2>' + tracked.map((i) => card(i)).join('');
   if (lists.length) html += '<h2 class="sec">Listy</h2>' + lists.map((i) => card(i)).join('');
   if (saved.length) html += '<h2 class="sec">Zapisane</h2>' + saved.map((i) => card(i)).join('');
   $('#list').innerHTML = html;
@@ -183,6 +187,7 @@ function kindLabel(it) {
   const r = it.spec?.recurrence; const ev = eventOf(it);
   if (r) return recLabel(r);
   if (ev) return (it.kind === 'reminder-once' ? 'Jednorazowe · ' : '') + rel(ev) + ', ' + fTime.format(ev);
+  if (it.data?.widget && it.data.widget.status !== 'rejected') return 'Śledzenie';
   if (listOf(it).length) return 'Lista';
   if (it.spec?.url) return it.spec?.summarize ? 'Streszczenie strony' : 'Strona';
   return 'Notatka';
@@ -212,6 +217,17 @@ function partPage(it) {
   return `<p class="dom">${svg('globe', 'width:15px;height:15px;display:inline;vertical-align:-2px')} ${esc(hostOf(url))}</p>
     ${it.spec?.summarize ? `<p class="sum">${esc(it.data?.summary || 'Streszczenie pojawi się tutaj — tę część dopiero budujemy.')}</p>` : ''}`;
 }
+// Widget wygenerowany przez AI: iframe sandbox (bez allow-same-origin) + CSP sandbox z nginx = osobny, pusty origin,
+// bez sieci i bez dostępu do Oboe. Rozmowa tylko przez postMessage (oboe:data / ready / resize / save).
+function partWidget(it) {
+  const w = it.data?.widget; if (!w) return '';
+  if (w.status === 'generating') return `<p class="gen-state">${svg('spark', 'width:15px;height:15px')} AI buduje widget do tej rzeczy…</p>`;
+  if (w.status === 'rejected') return `<p class="gen-state bad">Widget nie przeszedł kontroli bezpieczeństwa — zostaje zwykła karta.</p>`;
+  if (w.status !== 'ready' || !/^[a-z0-9-]+$/.test(w.slug || '') || !Number.isInteger(w.version)) return '';
+  return `<iframe class="wframe" data-wid="${it.id}" src="/widgets/${w.slug}.v${w.version}.html" sandbox="allow-scripts"
+    title="Widget: ${esc(it.title)}" loading="lazy" referrerpolicy="no-referrer" style="height:120px"></iframe>`;
+}
+
 function partFoot(it) {
   const rem = remindLine(it);
   const list = listOf(it); const n = list.filter((x) => x.done).length;
@@ -231,13 +247,13 @@ function card(it, hero = false) {
       <p class="big">${esc(rel(ev))}</p>
       <h3>${esc(it.title)}</h3>
       <div class="blob" aria-hidden="true"><svg class="i" viewBox="0 0 24 24" style="width:64px;height:64px;stroke-width:1.4;margin:-10px 18px 0 0">${I[icon]}</svg></div>
-      ${partFields(it)}${partList(it)}${partFoot(it)}
+      ${partFields(it)}${partWidget(it)}${partList(it)}${partFoot(it)}
     </article>`;
   }
   return `<article class="w" data-id="${it.id}" data-widget="${esc(it.kind)}" tabindex="0" role="button">
     <div class="w-h"><div class="ico" style="background:var(${TINT[tint]})" aria-hidden="true">${svg(icon)}</div>
       <div style="min-width:0"><p class="kind">${esc(kindLabel(it))}</p><h3>${esc(it.title)}</h3></div></div>
-    ${partCycle(it)}${partFields(it)}${partPage(it)}${partList(it)}${noteText}${partFoot(it)}
+    ${partCycle(it)}${partFields(it)}${partPage(it)}${partWidget(it)}${partList(it)}${it.data?.widget ? '' : noteText}${partFoot(it)}
   </article>`;
 }
 
@@ -271,6 +287,7 @@ function openDetail(id) {
     </div>
     <div class="d-body">
       <div class="quote">Wpisane ${esc(rel(dt(it.created_at)))}, ${esc(fTime.format(dt(it.created_at)))}:<q>${esc(it.source_text)}</q></div>
+      ${it.data?.widget ? `<div class="w" style="margin-top:12px;cursor:default">${partWidget(it)}</div>` : ''}
       ${list.length ? `<div class="w" data-id="${it.id}" style="margin-top:12px;cursor:default">
           <div class="w-h" style="justify-content:space-between"><h3>Do odhaczenia</h3>
           <p class="kind">${list.filter((x) => x.done).length} z ${list.length}${it.data?.checklist_reset ? ' · odnawia się' : ''}</p></div>${partList(it)}</div>` : ''}
@@ -342,6 +359,36 @@ async function bell() {
     toast('Powiadomienia włączone ✓');
   } catch (err) { toast(err.message); }
   refreshBell();
+}
+
+// ---------- most do widgetów ----------
+function frameFor(win) { return [...document.querySelectorAll('iframe.wframe')].find((f) => f.contentWindow === win); }
+function sendData(f) {
+  const it = state.items.find((x) => x.id === f.dataset.wid);
+  if (it) f.contentWindow.postMessage({ type: 'oboe:data', state: it.data?.widget?.state || {}, now: new Date().toISOString() }, '*');
+}
+const saveTimers = new Map();
+addEventListener('message', (e) => {
+  const f = frameFor(e.source); if (!f || !e.data || typeof e.data !== 'object') return;
+  const it = state.items.find((x) => x.id === f.dataset.wid); if (!it) return;
+  if (e.data.type === 'oboe:ready') sendData(f);
+  else if (e.data.type === 'oboe:resize') f.style.height = Math.max(40, Math.min(900, Number(e.data.height) || 120)) + 'px';
+  else if (e.data.type === 'oboe:save' && e.data.state && typeof e.data.state === 'object') {
+    const json = JSON.stringify(e.data.state); if (json.length > 20000) return toast('Za dużo danych w widgecie.');
+    it.data.widget.state = JSON.parse(json);
+    // inne kopie tego widgetu (karta i szczegół) dostają nowy stan
+    document.querySelectorAll(`iframe.wframe[data-wid="${it.id}"]`).forEach((g) => { if (g !== f) sendData(g); });
+    clearTimeout(saveTimers.get(it.id));
+    saveTimers.set(it.id, setTimeout(() => api.widgetState(it.id, it.data.widget.state).catch((err) => toast(err.message)), 600));
+  }
+});
+// Widget, który nie przyśle oboe:ready (np. wolno się ładuje), i tak dostaje dane po załadowaniu ramki.
+document.addEventListener('load', (e) => { if (e.target.matches?.('iframe.wframe')) sendData(e.target); }, true);
+// Dopóki jakiś widget się generuje, odświeżaj listę co 8 s.
+let genTimer;
+function watchGenerating() {
+  clearTimeout(genTimer);
+  if (state.items.some((i) => i.data?.widget?.status === 'generating')) genTimer = setTimeout(() => load(), 8000);
 }
 
 // ---------- drobne ----------

@@ -61,6 +61,7 @@ export const api = {
   done: (id) => call('items/done', { method: 'POST', body: { id } }),
   remove: (id) => call('items/delete', { method: 'POST', body: { id } }),
   check: (id, index, done) => call('items/check', { method: 'POST', body: { id, index, done } }),
+  widgetState: (id, state) => call('items/widget-state', { method: 'POST', body: { id, state } }),
 };
 
 // ---------- Web Push ----------

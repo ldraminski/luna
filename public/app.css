@@ -216,3 +216,10 @@ a.w:active{transform:scale(.985)}
 .chips small{color:var(--ink-2);font-size:12px}
 .w--hero .todo{position:relative;z-index:1;background:rgba(255,255,255,.55);border-radius:var(--r-tile);padding:0 14px;margin-top:14px}
 .w--hero h3,.w--hero .big,.w--hero .kind{position:relative;z-index:1}
+
+/* widget wygenerowany przez AI */
+.wframe{display:block;width:100%;border:0;margin-top:14px;background:transparent;color-scheme:normal}
+.gen-state{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:13px;color:var(--ink-2);background:var(--tint-pink);border-radius:var(--r-pill);padding:8px 14px;width:fit-content}
+.gen-state svg{animation:spin 2s linear infinite}
+.gen-state.bad{background:var(--surface-2)}
+.gen-state.bad svg{animation:none}

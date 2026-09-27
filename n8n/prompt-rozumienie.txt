@@ -19,6 +19,7 @@ Pola:
 - "summarize": true, jeśli użytkownik chce streszczenia/sprawdzania tej strony, inaczej false.
 - "fields": do 4 dodatkowych szczegółów wprost ze zdania [{"label": maks. 20 znaków, "value": maks. 60 znaków}], np. {"label":"Kanał","value":"TVP 2"}. Nie powtarzaj w nich terminu, tytułu ani listy. Najczęściej [].
 - "tip": krótka praktyczna podpowiedź po polsku (maks. 80 znaków) albo null. Tylko jeśli naprawdę pomaga.
+- "widget": {"brief": "..."} albo null. Ustaw TYLKO gdy użytkownik chce śledzić liczby lub postęp w czasie (kilometry, waga, wydatki, nawyki, strony, godziny), liczyć coś, porównywać, albo wprost prosi o widget/wykres/licznik. brief = po polsku, maks. 300 znaków: co widget ma pokazywać i jakie dane zbierać. Zwykłe przypomnienie, lista czy notatka: null.
 - "look": {"tint": jeden z "lavender"|"mint"|"blue"|"pink"|"sky", "icon": jeden z "clock"|"cycle"|"list"|"globe"|"note"|"building"|"tv"|"health"|"car"|"home"|"cart"|"work"|"money"|"sport"|"people"|"doc"|"food"|"travel"}.
   Kolory: lavender = jednorazowe sprawy i terminy, mint = rzeczy cykliczne, blue = strony i wiedza, pink = listy i zakupy, sky = pilne (dziś/jutro). Ikona ma pasować do TREŚCI (dentysta → health, urząd → building, serial → tv).
 

@@ -43,9 +43,11 @@ const look = {
 
 return [{ json: {
   ok: true, kind, title: cut(m.title, 40) || src.slice(0, 40), source_text: src, widget_slug: kind,
-  spec: { understood: cut(m.understood, 300), event_at, recurrence, url, summarize: m.summarize === true && !!url, model: '__MODEL__' },
+  spec: { understood: cut(m.understood, 300), event_at, recurrence, url, summarize: m.summarize === true && !!url, model: '__MODEL__',
+    widget_brief: cut(m.widget?.brief, 300) || undefined },
   data: {
     tip: cut(m.tip, 80) || null, look, fields,
+    widget: m.widget?.brief ? { status: 'generating' } : undefined,
     checklist: checklist.length ? checklist : undefined,
     checklist_reset: checklist.length && recurrence ? m.checklist_reset !== false : undefined,
   },
