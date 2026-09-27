@@ -268,7 +268,10 @@ function lookOf(it) {
   const d = DEF_LOOK[it.kind] || DEF_LOOK.note; const l = it.data?.look || {};
   return { tint: TINT[l.tint] ? l.tint : d[0], icon: I[l.icon] ? l.icon : d[1] };
 }
-const listOf = (it) => it.data?.checklist || [];
+// Rzecz może mieć kilka list z nazwami (data.lists); listOf = wszystkie punkty razem (do liczników i sekcji).
+const listsOf = (it) => (Array.isArray(it.data?.lists) ? it.data.lists : []).filter((l) => l && Array.isArray(l.items) && l.items.length);
+const listOf = (it) => listsOf(it).flatMap((l) => l.items);
+const anyReset = (it) => listsOf(it).some((l) => l.reset);
 const hostOf = (url) => (url || '').replace(/^https?:\/\//, '').replace(/\/$/, '');
 
 function kindLabel(it) {
@@ -293,9 +296,14 @@ function partCycle(it) {
   return `<div class="cycle" aria-hidden="true" style="grid-template-columns:repeat(${segs},1fr)">${bars}</div>
     <div class="cyc-l"><span>${ev ? 'następny ' + esc(rel(ev)) : ''}</span><span>${ev ? esc(fShort.format(ev)) : ''}</span></div>`;
 }
-function partList(it) {
-  const list = listOf(it); if (!list.length) return '';
-  return `<ul class="todo">${list.map((x, k) => `<li><label><input type="checkbox" data-check="${k}" ${x.done ? 'checked' : ''}><span>${esc(x.text)}</span></label></li>`).join('')}</ul>`;
+function partList(it, heads = true) {
+  const ls = (Array.isArray(it.data?.lists) ? it.data.lists : []);
+  const many = listsOf(it).length > 1;
+  return ls.map((l, li) => {
+    if (!l || !Array.isArray(l.items) || !l.items.length) return '';
+    const head = heads && (many || l.name) ? `<p class="list-h"><b>${esc(l.name || 'Lista')}</b><span>${l.items.filter((x) => x.done).length} z ${l.items.length}${l.reset ? ' · odnawia się' : ''}</span></p>` : '';
+    return head + `<ul class="todo">${l.items.map((x, k) => `<li><label><input type="checkbox" data-list="${li}" data-check="${k}" ${x.done ? 'checked' : ''}><span>${esc(x.text)}</span></label></li>`).join('')}</ul>`;
+  }).join('');
 }
 function partFields(it) {
   const f = it.data?.fields || []; if (!f.length) return '';
@@ -348,7 +356,7 @@ function partFoot(it) {
   const list = listOf(it); const n = list.filter((x) => x.done).length;
   const bits = [];
   if (rem) bits.push(`<span class="meta">${svg('bell')}${esc(rem)}</span>`);
-  if (list.length) bits.push(`<span class="meta">${n} z ${list.length} zrobione${it.data?.checklist_reset ? ' · odnawia się' : ''}</span>`);
+  if (list.length) bits.push(`<span class="meta">${n} z ${list.length} zrobione${anyReset(it) ? ' · odnawia się' : ''}</span>`);
   if (isLate(it)) bits.push(`<button type="button" class="late-done" data-done="${it.id}">${svg('check', 'width:16px;height:16px')}Zrobione</button>`);
   return bits.length ? `<div class="w-f" style="flex-wrap:wrap">${bits.join('')}</div>` : '';
 }
@@ -407,12 +415,13 @@ function openDetail(id) {
       <div class="quote">Wpisane ${esc(rel(dt(it.created_at)))}, ${esc(fTime.format(dt(it.created_at)))}:<q>${esc(it.source_text)}</q></div>
       ${it.data?.research ? `<div class="w" style="margin-top:12px;cursor:default">${partResearch(it, true)}</div>` : ''}
       ${it.data?.widget ? `<div class="w" style="margin-top:12px;cursor:default">${partWidget(it)}</div>` : ''}
-      ${list.length ? `<div class="w" data-id="${it.id}" style="margin-top:12px;cursor:default">
-          <div class="w-h" style="justify-content:space-between"><h3>Do odhaczenia</h3>
-          <p class="kind">${list.filter((x) => x.done).length} z ${list.length}${it.data?.checklist_reset ? ' · odnawia się' : ''}</p></div>${partList(it)}</div>` : ''}
+      ${(it.data?.lists || []).map((l, li) => l && Array.isArray(l.items) && l.items.length ? `<div class="w" data-id="${it.id}" style="margin-top:12px;cursor:default">
+          <div class="w-h" style="justify-content:space-between"><h3>${esc(l.name || 'Do odhaczenia')}</h3>
+          <p class="kind">${l.items.filter((x) => x.done).length} z ${l.items.length}${l.reset ? ' · odnawia się' : ''}</p></div>
+          ${partList({ data: { lists: (it.data.lists || []).map((x, k) => (k === li ? x : null)) } }, false)}</div>` : '').join('')}
       ${url ? `<div class="w" style="margin-top:12px;cursor:default"><p class="kind">${it.spec?.summarize ? 'Streszczenie strony' : 'Strona'}</p>${partPage(it, true)}</div>` : ''}
       ${rows.length ? `<ul class="rows">${rows.map(([a, b]) => `<li><span>${esc(a)}</span><b>${esc(b)}</b></li>`).join('')}</ul>` : ''}
-      <button class="cta alt wide" type="button" data-act="chat">${svg('spark')}${it.data?.widget?.slug ? 'Popraw widget' : 'Zrób widget'}</button>
+      <button class="cta alt wide" type="button" data-act="chat">${svg('spark')}Popraw</button>
       <div class="d-cta">
         <button class="cta" type="button" data-act="done">${svg('check')}${it.spec?.recurrence ? 'Zakończ powtarzanie' : 'Oznacz jako zrobione'}</button>
         <button class="ghost danger" type="button" data-act="delete" aria-label="Usuń">${svg('trash')}</button>
@@ -524,17 +533,26 @@ async function bell() {
   refreshBell();
 }
 
-// ---------- czat: popraw / zrób widget ----------
+// ---------- czat „Popraw”: rozmowa z Luną o jednej rzeczy → plan → „Zrób to” ----------
 const chat = { id: null, busy: false };
-function chatGreeting(it) {
-  return it.data?.widget?.slug
-    ? 'Co nie pasuje w tym widgecie? Opisz, co zmienić — dopytam o szczegóły, a zanim przebuduję, pokażę plan.'
-    : 'Jaki widget ma tu być? Napisz, co ma pokazywać i co chcesz w nim wpisywać.';
+function chatGreeting() {
+  return 'Co zmienić w tej rzeczy? Tytuł, termin, listy, szczegóły, wygląd — albo dodaj zdjęcie, a coś z niego zrobię. Zanim cokolwiek zmienię, pokażę plan.';
+}
+// Wiadomość ze zdjęciem: pokazujemy skrót tego, co Luna odczytała, nie cały tekst.
+function msgHtml(m) {
+  const t = String(m.text || '');
+  if (m.role === 'user' && t.startsWith('[ZDJĘCIE]')) {
+    const [photo, ...rest] = t.slice(9).trim().split('\n\n');
+    const short = photo.length > 160 ? photo.slice(0, 160) + '…' : photo;
+    return `<p class="msg me">📷 Zdjęcie<small class="photo-read">Odczytałam: ${esc(short)}</small>${rest.length ? esc('\n' + rest.join('\n\n')) : ''}</p>`;
+  }
+  return `<p class="msg ${m.role === 'user' ? 'me' : 'ai'}">${esc(t)}</p>`;
 }
 function renderChat(messages, proposal) {
   const it = state.items.find((x) => x.id === chat.id);
-  const all = [{ role: 'assistant', text: chatGreeting(it || {}) }, ...(messages || [])];
-  $('#msgs').innerHTML = all.map((m) => `<p class="msg ${m.role === 'user' ? 'me' : 'ai'}">${esc(m.text)}</p>`).join('')
+  chat.messages = messages || [];
+  const all = [{ role: 'assistant', text: chatGreeting(it || {}) }, ...chat.messages];
+  $('#msgs').innerHTML = all.map(msgHtml).join('')
     + (chat.busy ? '<p class="msg ai typing" aria-label="AI pisze"><i></i><i></i><i></i></p>' : '');
   $('#prop').hidden = !proposal;
   if (proposal) $('#prop-text').textContent = proposal.summary;
@@ -543,7 +561,7 @@ function renderChat(messages, proposal) {
 async function openChat(id) {
   const it = state.items.find((x) => x.id === id); if (!it) return;
   chat.id = id; chat.busy = false;
-  $('#chat-title').textContent = it.data?.widget?.slug ? 'Popraw widget' : 'Zrób widget';
+  $('#chat-title').textContent = 'Popraw';
   $('#chat-kind').textContent = it.title;
   renderChat([], null);
   $('#chat').showModal(); fitChat();
@@ -554,7 +572,7 @@ async function sendChat(e) {
   e.preventDefault();
   const q = $('#chat-q'); const text = q.value.trim();
   if (!text || chat.busy) return;
-  const shown = [...$('#msgs').querySelectorAll('.msg')].slice(1).map((el) => ({ role: el.classList.contains('me') ? 'user' : 'assistant', text: el.textContent }));
+  const shown = chat.messages || [];
   q.value = ''; fitChat(); chat.busy = true;
   renderChat([...shown, { role: 'user', text }], null);
   try { const r = await api.widgetChat(chat.id, text); chat.busy = false; renderChat(r.messages, r.proposal); }
@@ -569,13 +587,37 @@ async function chatAction(act) {
     return;
   }
   if (act === 'go') {
+    const b = $('[data-chat="go"]'); b.disabled = true;
     try {
-      await api.widgetRegenerate(chat.id);
+      const r = await api.widgetRegenerate(chat.id);
       $('#chat').close();
-      toast('Przebudowuję widget — obecny działa do czasu podmiany.');
+      toast(r.done || 'Zrobione ✓');
       await load(); if (state.openId) openDetail(state.openId);
+      if (r.widget) watchGenerating();
     } catch (err) { toast(err.message); }
+    finally { b.disabled = false; }
   }
+}
+
+// Zdjęcie do rozmowy: zmniejszamy w przeglądarce (dłuższy bok 1600 px, JPEG) — do Luny idzie kilkaset KB, nie 5 MB.
+async function photoToDataUrl(file) {
+  const img = await createImageBitmap(file).catch(() => null);
+  if (!img) throw new Error('Nie umiem otworzyć tego zdjęcia.');
+  const k = Math.min(1, 1600 / Math.max(img.width, img.height));
+  const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', 0.82);
+}
+async function sendPhoto(file) {
+  if (!file || chat.busy) return;
+  const text = $('#chat-q').value.trim();
+  let image;
+  try { image = await photoToDataUrl(file); } catch (err) { return toast(err.message); }
+  const shown = chat.messages || [];
+  $('#chat-q').value = ''; fitChat(); chat.busy = true;
+  renderChat([...shown, { role: 'user', text: '📷 Zdjęcie' + (text ? '\n' + text : '') }], null);
+  try { const r = await api.widgetChat(chat.id, text, image); chat.busy = false; renderChat(r.messages, r.proposal); }
+  catch (err) { chat.busy = false; renderChat(shown, null); $('#chat-q').value = text; fitChat(); toast(err.message); }
 }
 
 // ---------- most do widgetów ----------
@@ -651,7 +693,7 @@ function bind() {
     const cb = e.target.closest('[data-check]'); if (!cb) return;
     const id = cb.closest('[data-id]').dataset.id;
     try {
-      const r = await api.check(id, Number(cb.dataset.check), cb.checked);
+      const r = await api.check(id, Number(cb.dataset.list || 0), Number(cb.dataset.check), cb.checked);
       const it = state.items.find((x) => x.id === id); if (it) it.data = r.data;
       render();
       if (state.openId === id) openDetail(id);
@@ -686,6 +728,8 @@ function bind() {
   });
   $('#chat-form').addEventListener('submit', sendChat);
   $('#chat-q').addEventListener('input', fitChat);
+  $('#chat-photo').addEventListener('click', () => $('#chat-file').click());
+  $('#chat-file').addEventListener('change', (e) => { const f = e.target.files?.[0]; e.target.value = ''; sendPhoto(f); });
   $('#chat-q').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); $('#chat-form').requestSubmit(); } });
   $('#chat').addEventListener('click', (e) => { const b = e.target.closest('[data-chat]'); if (b) chatAction(b.dataset.chat); });
   $('#detail').addEventListener('click', onSum, true);

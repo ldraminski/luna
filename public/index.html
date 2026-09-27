@@ -93,7 +93,7 @@
   <div class="chat-in">
     <header class="chat-top">
       <button class="round" type="button" data-chat="close" aria-label="Zamknij"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button>
-      <div style="min-width:0"><p class="kind" id="chat-kind">Widget</p><h2 id="chat-title">Popraw widget</h2></div>
+      <div style="min-width:0"><p class="kind" id="chat-kind">Rzecz</p><h2 id="chat-title">Popraw</h2></div>
       <button class="ghost-txt" type="button" data-chat="reset">Od nowa</button>
     </header>
     <div class="msgs" id="msgs" aria-live="polite"></div>
@@ -101,11 +101,15 @@
       <p class="kind">Tak to zrobię</p>
       <p id="prop-text"></p>
       <div class="d-cta" style="margin-top:14px">
-        <button class="cta" type="button" data-chat="go"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>Przebuduj</button>
+        <button class="cta" type="button" data-chat="go"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg>Zrób to</button>
         <button class="cta alt" type="button" data-chat="more">Jeszcze nie</button>
       </div>
     </div>
     <form class="chat-form" id="chat-form">
+      <button class="btn-ic mic" type="button" id="chat-photo" aria-label="Dodaj zdjęcie">
+        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+      </button>
+      <input type="file" id="chat-file" accept="image/*" hidden>
       <label for="chat-q" class="sr">Twoja odpowiedź</label>
       <textarea id="chat-q" rows="1" autocomplete="off" enterkeyhint="send" maxlength="1000" placeholder="Opisz, co zmienić…"></textarea>
       <button class="btn-ic send" type="submit" aria-label="Wyślij"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4z"/></svg></button>

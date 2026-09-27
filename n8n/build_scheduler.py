@@ -45,12 +45,14 @@ nxt AS (
   INSERT INTO notifications (item_id, user_id, due_at, channels, title, body)
   SELECT item_id, user_id, due_at + oboe_period(spec), channels, title, body FROM rec RETURNING item_id),
 ev AS (
-  -- następne wystąpienie: przesuń termin, a listę odnawianą (checklist_reset) wyczyść na nowy cykl
+  -- następne wystąpienie: przesuń termin, a listy odnawiane (lists[].reset) wyczyść na nowy cykl
   UPDATE items i SET updated_at = now(),
     spec = CASE WHEN i.spec->>'event_at' IS NULL THEN i.spec ELSE
       jsonb_set(i.spec, '{event_at}', to_jsonb(to_char(((i.spec->>'event_at')::timestamptz + oboe_period(i.spec)) AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'))) END,
-    data = CASE WHEN (i.data->>'checklist_reset')::boolean IS TRUE AND jsonb_typeof(i.data->'checklist') = 'array' THEN
-      jsonb_set(i.data, '{checklist}', (SELECT coalesce(jsonb_agg(x || '{"done": false}'::jsonb), '[]'::jsonb) FROM jsonb_array_elements(i.data->'checklist') x))
+    data = CASE WHEN jsonb_typeof(i.data->'lists') = 'array' THEN
+      jsonb_set(i.data, '{lists}', (SELECT coalesce(jsonb_agg(CASE WHEN (l->>'reset')::boolean IS TRUE
+          THEN jsonb_set(l, '{items}', (SELECT coalesce(jsonb_agg(x || '{"done": false}'::jsonb), '[]'::jsonb) FROM jsonb_array_elements(l->'items') x))
+          ELSE l END ORDER BY n), '[]'::jsonb) FROM jsonb_array_elements(i.data->'lists') WITH ORDINALITY AS t(l, n)))
       ELSE i.data END
   WHERE i.id IN (SELECT item_id FROM nxt)
   RETURNING 1)

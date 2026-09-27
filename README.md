@@ -63,6 +63,18 @@ Wynik: `items.data.research = {query, answer, sources[{url,title,host}], checked
 - Link + „zrób notatkę / co ważne” → jednorazowe streszczenie („Oboe: Streść stronę”), bez pilnowania.
 - Wyniki wyszukiwania to dane, nie polecenia (prompt) — model niczego nie wykonuje, tekst na karcie escapowany.
 
+## Widget = kafelek; „Popraw” = rozmowa z Luną (28.09.2026, decyzja Łukasza)
+
+- **Każdy kafelek to widget.** Wbudowane części: termin, powtarzanie, przypomnienia, **listy z nazwami** (`data.lists = [{name, items:[{text,done}], reset}]`,
+  migracja `db/009-wiele-list.sql`), szczegóły, wygląd, odpowiedź z sieci, strona. Widget na zamówienie (kod AI) — tylko gdy tych części nie wystarcza.
+- **Czat „Popraw”** (`n8n/prompt-popraw.txt`, trasy `items/widget-chat` i `items/widget-regenerate`): Luna rozmawia o jednej rzeczy,
+  pokazuje plan („Tak to zrobię: • …”), a po „Zrób to” `n8n/zastosuj.js` wprowadza wszystkie zmiany naraz (tytuł, termin i przypomnienia,
+  listy: dopisz/usuń/zmień nazwę/nowa lista/usuń listę, szczegóły, wygląd, usunięcie widgetu). Widget na zamówienie przebudowuje się w tle.
+- **Nie dublujemy:** Luna rozszerza istniejącą listę; nową dodaje na wyraźną prośbę i mówi to wprost. Blokada w kodzie: widget AI wyglądający na listę jest odrzucany.
+  Widgety-listy `lista-zakupow` i `obowiazki-do-zrobienia` wycofane z biblioteki (`active_version = NULL`).
+- **Zdjęcie w rozmowie:** przeglądarka zmniejsza je do 1600 px JPEG → `xiaomi/mimo-v2.5` odczytuje treść → do rozmowy trafia TYLKO tekst
+  (`[ZDJĘCIE] …`), samo zdjęcie nie jest zapisywane. nginx: limit 4 MB tylko dla `/api/items/widget-chat` (reszta API 64 KB).
+
 ## Wdrożenie
 
 **Pamięć podręczna (27.09):** Cloudflare dokleja `max-age=14400` do CSS/JS mimo `no-cache` z nginx — telefon brał nowy HTML ze starym CSS.

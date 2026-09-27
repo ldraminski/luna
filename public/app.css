@@ -324,3 +324,15 @@ html.locked,html.locked body{overflow:hidden;height:100%}
 .chat-form textarea{flex:1;min-width:0;display:block;border:0;background:transparent;font:inherit;font-size:16px;line-height:1.4;
   padding:11px 0;margin:0;resize:none;outline:none;height:44px;overflow-y:hidden;color:var(--ink)}
 .chat-form textarea::placeholder{color:var(--ink-2)}
+
+/* kilka list z nazwami w jednej rzeczy (Hikari, 27.09) */
+.list-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:14px;font-size:13px;color:var(--ink-2)}
+.list-h b{font-size:14px;font-weight:600;color:var(--ink)}
+.list-h + .todo{margin-top:4px}
+
+/* czat „Popraw”: zdjęcie w rozmowie, plan w punktach (Hikari, 28.09) */
+.photo-read{display:block;margin-top:6px;font-size:12px;opacity:.8;line-height:1.4}
+#prop-text{white-space:pre-line}
+.chat-form{padding-left:6px}
+.chat-form .mic{align-self:flex-end}
+.chat-form textarea{padding-left:4px}

@@ -48,8 +48,8 @@ return [{ json: {
   data: {
     tip: cut(m.tip, 80) || null, look, fields,
     widget: m.widget?.brief ? { status: 'generating' } : undefined,
-    checklist: checklist.length ? checklist : undefined,
-    checklist_reset: checklist.length && recurrence ? m.checklist_reset !== false : undefined,
+    // listy z nazwami (Popraw może dołożyć kolejne); z jednego zdania powstaje najwyżej jedna, bez nazwy
+    lists: checklist.length ? [{ name: null, items: checklist, reset: !!(recurrence && m.checklist_reset !== false) }] : undefined,
   },
   notify,
   research: cut(m.research?.query, 200) || null,   // tylko sterowanie przepływem — nie trafia do bazy
