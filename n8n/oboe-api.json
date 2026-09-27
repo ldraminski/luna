@@ -2,7 +2,7 @@
  "name": "Oboe: API",
  "nodes": [
   {
-   "id": "a03e8fbb-4012-4929-83c6-9be4c208db91",
+   "id": "c431f76d-f682-4823-97a2-cff25016d600",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "35fbc6c9-b8ec-4dbe-8b32-4aede821a9cb",
+   "id": "267716fd-2777-4a77-962c-9637ae285972",
    "name": "GET me",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -25,7 +25,7 @@
     0,
     0
    ],
-   "webhookId": "2f9e3149-c2cd-4b58-a49b-ccee37b3a03a",
+   "webhookId": "70c1fdde-9420-4c46-9aef-ed41fbe145a7",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/me",
@@ -34,7 +34,7 @@
    }
   },
   {
-   "id": "73b29ad0-fa92-40f2-a5b9-48a81f9cde93",
+   "id": "0e5ee8f2-9b68-4429-9958-9c28edc0d466",
    "name": "Kim jestem",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -58,7 +58,7 @@
    }
   },
   {
-   "id": "233de997-5aa5-4cd2-8c4b-bd0c7ced23b7",
+   "id": "eb71333a-b152-4776-b5d5-b29a6065e46b",
    "name": "Odpowiedz: Kim jestem",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -75,7 +75,7 @@
    }
   },
   {
-   "id": "7eea3dc9-c5da-4bb0-a9d8-9fb2faf11618",
+   "id": "412d0dc5-0794-4cf2-bdb4-e016582f6099",
    "name": "GET items",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -83,7 +83,7 @@
     0,
     200
    ],
-   "webhookId": "8dfa9750-d3a9-4eea-8390-ab498a1a6f35",
+   "webhookId": "10ddf61a-7db5-4ecd-b60a-2c41c49324c1",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/items",
@@ -92,7 +92,7 @@
    }
   },
   {
-   "id": "b5f0b0d5-5f54-4ccf-b604-488c50c5ff21",
+   "id": "4fe30718-fc7c-45ab-ab17-214d8a46e361",
    "name": "Lista rzeczy",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -116,7 +116,7 @@
    }
   },
   {
-   "id": "24fe212c-0662-4aef-9a45-a5504faee230",
+   "id": "39df3f7f-56c1-4371-86c7-6dc498a5bbc3",
    "name": "Odpowiedz: Lista rzeczy",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -133,7 +133,7 @@
    }
   },
   {
-   "id": "34d50c7d-ad65-4538-af66-898633e15492",
+   "id": "186c8472-f304-4324-a4ba-0de73506f946",
    "name": "GET pending",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -141,7 +141,7 @@
     0,
     400
    ],
-   "webhookId": "6307d8a1-1dfb-4089-92fd-51aac68035ab",
+   "webhookId": "d374e3c5-dbf7-49b9-9538-465403bcbbb6",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/pending",
@@ -150,7 +150,7 @@
    }
   },
   {
-   "id": "0029c0fc-3f0f-48ab-a38d-f8f4efbf8c1f",
+   "id": "e0a6d83a-4aaa-41b5-bbc0-2df19f13b4a6",
    "name": "Do pokazania",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -174,7 +174,7 @@
    }
   },
   {
-   "id": "7b22da54-9334-4df5-8b2b-7ccda11252c7",
+   "id": "dde61a61-f0b3-4a4f-a440-2e303f414b6d",
    "name": "Odpowiedz: Do pokazania",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -191,7 +191,7 @@
    }
   },
   {
-   "id": "351c7b95-c2c9-47a7-9b38-aed2e1ee5e72",
+   "id": "03823bcf-40b3-465d-b145-c45d53e2c52b",
    "name": "POST push/subscribe",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -199,7 +199,7 @@
     0,
     600
    ],
-   "webhookId": "55828b34-df82-4b0f-a73a-fd8fedfe9d54",
+   "webhookId": "812a98a9-1d53-4dcd-95c1-e6f3f9188d0b",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/push/subscribe",
@@ -208,7 +208,7 @@
    }
   },
   {
-   "id": "f733863c-de20-4746-8dc2-32a2bb02ff53",
+   "id": "cd4c7b94-3519-4935-b451-1eb5235e5398",
    "name": "Zapisz urządzenie",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -232,7 +232,7 @@
    }
   },
   {
-   "id": "89462fc3-3c3d-4fc9-9da7-f6d400cd171e",
+   "id": "1b2a261d-d71f-4162-a22c-0eb7eb69423c",
    "name": "Odpowiedz: Zapisz urządzenie",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -249,7 +249,7 @@
    }
   },
   {
-   "id": "0c3e4960-0152-416e-a451-dd2b3260d6db",
+   "id": "620d981b-ade8-4c34-9d8b-3b8919067306",
    "name": "POST push/unsubscribe",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -257,7 +257,7 @@
     0,
     800
    ],
-   "webhookId": "20e22da5-e01d-4a54-b497-5cb943f07eca",
+   "webhookId": "1e1f31bd-9f0b-4a4e-a701-d407a34a1dea",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/push/unsubscribe",
@@ -266,7 +266,7 @@
    }
   },
   {
-   "id": "fd5c29f1-9a59-40e8-b8ed-35fa69a92cda",
+   "id": "76b4b0a4-77e2-4526-9921-1efa52aa9ede",
    "name": "Usuń urządzenie",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -290,7 +290,7 @@
    }
   },
   {
-   "id": "4a23598e-0d55-40d2-ae46-baa65eb7c781",
+   "id": "864989ba-7769-4f63-98fa-eaa73519cec9",
    "name": "Odpowiedz: Usuń urządzenie",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -307,7 +307,7 @@
    }
   },
   {
-   "id": "447aab5c-ee02-4d8a-8c2c-afcafc522633",
+   "id": "e68f7d05-ec6f-4602-8f45-93edc53a5ed0",
    "name": "POST items/done",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -315,7 +315,7 @@
     0,
     1000
    ],
-   "webhookId": "14028c6e-6b1b-49de-a7dc-0919b4b2658d",
+   "webhookId": "05e0a682-f658-4f4f-887c-208f1ebd0155",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/done",
@@ -324,7 +324,7 @@
    }
   },
   {
-   "id": "a87abbc1-4042-43ac-8b7c-07a0620ce90d",
+   "id": "fbe3286f-a76e-45fa-8647-b6964485ab20",
    "name": "Odhacz",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -348,7 +348,7 @@
    }
   },
   {
-   "id": "b14b9df5-bb64-4ce0-a959-60f797c6ed72",
+   "id": "bbf67e6b-5e3a-444e-a715-c47171d28115",
    "name": "Odpowiedz: Odhacz",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -365,7 +365,7 @@
    }
   },
   {
-   "id": "12b97548-32ed-46e8-b7d2-b5fac7799cee",
+   "id": "a5c6c9c0-fc01-4ad0-82a0-ebdd6089a62d",
    "name": "POST items/check",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -373,7 +373,7 @@
     0,
     1200
    ],
-   "webhookId": "3772d7f3-ba9a-4427-ad61-9ad7dfa6856b",
+   "webhookId": "359a00da-e8e1-487c-a215-b2f54c2d5783",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/check",
@@ -382,7 +382,7 @@
    }
   },
   {
-   "id": "a7fade92-8b7c-4f5a-b9a0-b42d4774cf50",
+   "id": "415ba6fa-4528-4509-9b95-5b5b897a9a15",
    "name": "Odhacz pozycję",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -406,7 +406,7 @@
    }
   },
   {
-   "id": "5a0f1e44-1e60-44c8-a868-f22de67e8dc0",
+   "id": "4e439132-bca9-4439-bb22-8547526e6cba",
    "name": "Odpowiedz: Odhacz pozycję",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -423,7 +423,7 @@
    }
   },
   {
-   "id": "5d44df10-aa1f-4f6e-ad22-bf6d30be3c77",
+   "id": "686dc26e-e9df-4024-a3f7-b629d58714a6",
    "name": "POST items/delete",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -431,7 +431,7 @@
     0,
     1400
    ],
-   "webhookId": "975dd4f7-8796-44a6-9741-c8df077e292c",
+   "webhookId": "546fd9b5-aab8-4f99-a2a5-9fb536154931",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/delete",
@@ -440,7 +440,7 @@
    }
   },
   {
-   "id": "90e6b2cd-6f5b-4eae-bb81-c48ed0688ee0",
+   "id": "4173f22d-8748-471f-8404-0085dae9f28d",
    "name": "Usuń",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -464,7 +464,7 @@
    }
   },
   {
-   "id": "3d711716-6a83-4120-b9af-0593cf859cf9",
+   "id": "a5b691a7-6499-41e3-b3f7-0dbd5fbcaadd",
    "name": "Odpowiedz: Usuń",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -481,7 +481,7 @@
    }
   },
   {
-   "id": "d3619627-6de8-48e5-9ab5-b00045c28d09",
+   "id": "0d7080eb-0aee-4aa0-bddf-0d42b0f0eee1",
    "name": "POST items",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -495,10 +495,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "50b17de2-fcde-43c9-be5b-cf33868a4202"
+   "webhookId": "a6d56ab4-71c3-41aa-b754-ec0dbfcd602f"
   },
   {
-   "id": "81c3e242-333f-4825-8e3c-57372d5dc2bf",
+   "id": "5c2e346d-ca86-4f7c-9f96-8f6145b0aefd",
    "name": "Sesja",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -521,7 +521,7 @@
    }
   },
   {
-   "id": "4435c66a-a44c-4332-baa9-b01fd9e0c91d",
+   "id": "a55dc304-f1eb-41f5-a9eb-aa29abcd800f",
    "name": "Zalogowany i jest tekst?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -539,7 +539,7 @@
      },
      "conditions": [
       {
-       "id": "c2095095-c51b-4a2d-8834-4de4a2bf8398",
+       "id": "5bfc4287-f2ea-41cf-8dc6-93c37525d37f",
        "leftValue": "={{ $json.user_id }}",
        "rightValue": "",
        "operator": {
@@ -549,7 +549,7 @@
        }
       },
       {
-       "id": "8d1cb71e-ded9-4885-b561-344aa94447fc",
+       "id": "b4198361-2cd6-41a8-8eed-28bdaaebbbab",
        "leftValue": "={{ String($('POST items').item.json.body.text || '').trim() }}",
        "rightValue": "",
        "operator": {
@@ -565,7 +565,7 @@
    }
   },
   {
-   "id": "f94044e3-c828-4478-8e66-360596fe255e",
+   "id": "4cc25fac-b70f-493a-899d-055660fd5723",
    "name": "Odmów",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -582,7 +582,7 @@
    }
   },
   {
-   "id": "62f75634-edad-4b78-a0f2-adaf4835e2e2",
+   "id": "aa310c20-87d0-46d0-a79e-eb5d12952474",
    "name": "Kalendarz",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -595,7 +595,7 @@
    }
   },
   {
-   "id": "b47cc439-1c2f-4166-bdd2-e6d75bca955b",
+   "id": "d314f462-1152-4eff-888c-7c4d6451978f",
    "name": "DeepSeek: zrozum",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -623,7 +623,7 @@
     },
     "sendBody": true,
     "specifyBody": "json",
-    "jsonBody": "={{ JSON.stringify({ model: 'deepseek/deepseek-v4.1-flash', temperature: 0.2, max_tokens: 1200, reasoning: { enabled: false }, response_format: { type: 'json_object' }, messages: [ { role: 'system', content: \"Jesteś mózgiem aplikacji Oboe. Użytkownik pisze swobodnie, co chce zapamiętać albo co ma się wydarzyć. Zamieniasz to na JEDEN obiekt JSON i nic poza nim.\\n\\nPola:\\n- \\\"kind\\\": jedno z \\\"reminder-once\\\" (jednorazowy termin), \\\"reminder-recurring\\\" (coś powtarzalnego), \\\"page-summary\\\" (sprawdź/streść stronę WWW), \\\"checklist\\\" (lista rzeczy do zrobienia/kupienia), \\\"note\\\" (sama informacja, bez terminu).\\n- \\\"title\\\": krótko, po polsku, maks. 40 znaków, bez kropki (np. \\\"Urząd — wniosek o dotację\\\").\\n- \\\"understood\\\": jedno zdanie po polsku, co zrozumiałeś, z konkretną datą i godziną (np. \\\"Przypomnę w niedzielę 20:00 i w poniedziałek 7:00, że jedziesz do urzędu złożyć wniosek\\\").\\n- \\\"event_at\\\": termin samego wydarzenia w ISO 8601 z przesunięciem strefy (np. \\\"2026-09-30T08:00:00+02:00\\\") albo null.\\n- \\\"recurrence\\\": dla \\\"reminder-recurring\\\": {\\\"every\\\": liczba, \\\"unit\\\": \\\"day\\\"|\\\"week\\\"|\\\"month\\\", \\\"lead\\\": {\\\"value\\\": liczba, \\\"unit\\\": \\\"hour\\\"|\\\"day\\\"} } — lead = z jakim wyprzedzeniem przypomnieć; inaczej null.\\n- \\\"notify\\\": lista momentów powiadomień: [{\\\"at\\\": ISO 8601 z przesunięciem, \\\"title\\\": maks. 50 znaków, \\\"body\\\": maks. 120 znaków}]. Dla cyklicznych podaj TYLKO najbliższe wystąpienie. Dla \\\"note\\\" i \\\"checklist\\\" bez terminu: [].\\n- \\\"url\\\": dla \\\"page-summary\\\" pełny adres strony, inaczej null.\\n- \\\"checklist\\\": dla \\\"checklist\\\" lista pozycji (krótkie frazy), inaczej [].\\n- \\\"tip\\\": opcjonalna krótka praktyczna podpowiedź po polsku (maks. 80 znaków) albo null. Tylko jeśli naprawdę pomaga (np. \\\"Weź dowód osobisty i wniosek\\\").\\n\\nZasady czasu:\\n- \\\"rano\\\" = 8:00, \\\"przed południem\\\" = 10:00, \\\"po południu\\\" = 15:00, \\\"wieczorem\\\" = 19:00, brak pory dnia = 9:00.\\n- Daty bierz WYŁĄCZNIE z kalendarza w wiadomości użytkownika — nie licz ich sam. \\\"za 3 dni\\\" = wiersz \\\"(za 3 dni)\\\". \\\"w piątek\\\" = pierwszy piątek po dziś. Przesunięcie strefy przepisz z tego samego wiersza.\\n- Cykliczne bez podanego startu: pierwsze wystąpienie = dziś + jeden okres (np. co 2 tygodnie → wiersz \\\"za 14 dni\\\") o 9:00; powiadomienie = pierwsze wystąpienie minus wyprzedzenie (wyprzedzenie w dniach → o 20:00 tamtego dnia).\\n- Jednorazowy termin: przypomnij wieczorem dzień wcześniej o 20:00 ORAZ w dniu wydarzenia na godzinę przed nim (albo o 7:00, jeśli wydarzenie jest przed 8:00). Jeśli użytkownik sam mówi, kiedy przypomnieć — zrób dokładnie tak.\\n- Żaden moment powiadomienia nie może być w przeszłości. Jeśli wypada w przeszłości, pomiń go; jeśli zostaje zero, daj jedno powiadomienie za 5 minut.\\n- Nie wymyślaj faktów, których nie ma w zdaniu.\\n\" }, { role: 'user', content: 'Teraz jest: ' + $json.teraz + '\\n\\nKalendarz (używaj WYŁĄCZNIE tych dat):\\n' + $json.kalendarz + '\\n\\nZdanie użytkownika:\\n' + String($('POST items').item.json.body.text).trim().slice(0, 1000) } ] }) }}",
+    "jsonBody": "={{ JSON.stringify({ model: 'deepseek/deepseek-v4.1-flash', temperature: 0.2, max_tokens: 1200, reasoning: { enabled: false }, response_format: { type: 'json_object' }, messages: [ { role: 'system', content: \"Jesteś mózgiem aplikacji Oboe. Użytkownik pisze swobodnie, co będzie robić, co ma pamiętać albo co ma się wydarzyć. Zamieniasz to na JEDEN obiekt JSON i nic poza nim.\\n\\nRzecz w Oboe NIE ma sztywnego typu. Składa się z części — użyj WSZYSTKICH, które wynikają ze zdania, i żadnej, która nie wynika:\\n- termin (jednorazowy albo cykliczny) z przypomnieniami,\\n- lista do odhaczenia,\\n- strona WWW,\\n- dodatkowe szczegóły.\\nPrzykład: „co tydzień muszę odhaczyć: klimatyzacja, dzienniki, dokumenty do urzędu” = termin cykliczny + lista 3 pozycji (odnawiana co tydzień) + przypomnienie.\\n\\nPola:\\n- \\\"title\\\": krótko, po polsku, maks. 40 znaków, bez kropki. Jeśli chcesz dopisać doprecyzowanie, oddziel je \\\" — \\\" (np. \\\"Urząd — wniosek o dotację\\\").\\n- \\\"understood\\\": jedno zdanie po polsku, co zrozumiałeś, z konkretną datą i godziną, jeśli jest termin. Pisz bezosobowo albo w 1. osobie liczby pojedynczej bez rodzaju („Przypomnę…”, „Zapisuję…”).\\n- \\\"event_at\\\": termin samego wydarzenia (dla cyklicznych: PIERWSZE wystąpienie) w ISO 8601 z przesunięciem strefy, albo null.\\n- \\\"recurrence\\\": {\\\"every\\\": liczba, \\\"unit\\\": \\\"day\\\"|\\\"week\\\"|\\\"month\\\"} albo null.\\n- \\\"notify\\\": lista momentów powiadomień [{\\\"at\\\": ISO 8601 z przesunięciem, \\\"title\\\": maks. 50 znaków, \\\"body\\\": maks. 120 znaków}]. Dla cyklicznych TYLKO najbliższe wystąpienie. Bez terminu: [].\\n- \\\"checklist\\\": lista pozycji do odhaczenia (krótkie frazy) albo []. Twórz ją, gdy użytkownik wymienia kilka rzeczy do zrobienia/kupienia/sprawdzenia albo prosi o listę.\\n- \\\"checklist_reset\\\": true, jeśli lista ma się odnawiać przy każdym powtórzeniu (cykliczne zadania), inaczej false.\\n- \\\"url\\\": pełny adres strony, jeśli użytkownik go podał, inaczej null.\\n- \\\"summarize\\\": true, jeśli użytkownik chce streszczenia/sprawdzania tej strony, inaczej false.\\n- \\\"fields\\\": do 4 dodatkowych szczegółów wprost ze zdania [{\\\"label\\\": maks. 20 znaków, \\\"value\\\": maks. 60 znaków}], np. {\\\"label\\\":\\\"Kanał\\\",\\\"value\\\":\\\"TVP 2\\\"}. Nie powtarzaj w nich terminu, tytułu ani listy. Najczęściej [].\\n- \\\"tip\\\": krótka praktyczna podpowiedź po polsku (maks. 80 znaków) albo null. Tylko jeśli naprawdę pomaga.\\n- \\\"look\\\": {\\\"tint\\\": jeden z \\\"lavender\\\"|\\\"mint\\\"|\\\"blue\\\"|\\\"pink\\\"|\\\"sky\\\", \\\"icon\\\": jeden z \\\"clock\\\"|\\\"cycle\\\"|\\\"list\\\"|\\\"globe\\\"|\\\"note\\\"|\\\"building\\\"|\\\"tv\\\"|\\\"health\\\"|\\\"car\\\"|\\\"home\\\"|\\\"cart\\\"|\\\"work\\\"|\\\"money\\\"|\\\"sport\\\"|\\\"people\\\"|\\\"doc\\\"|\\\"food\\\"|\\\"travel\\\"}.\\n  Kolory: lavender = jednorazowe sprawy i terminy, mint = rzeczy cykliczne, blue = strony i wiedza, pink = listy i zakupy, sky = pilne (dziś/jutro). Ikona ma pasować do TREŚCI (dentysta → health, urząd → building, serial → tv).\\n\\nZasady czasu:\\n- \\\"rano\\\" = 8:00, \\\"przed południem\\\" = 10:00, \\\"po południu\\\" = 15:00, \\\"wieczorem\\\" = 19:00, brak pory dnia = 9:00.\\n- Daty bierz WYŁĄCZNIE z kalendarza w wiadomości użytkownika — nie licz ich sam. \\\"za 3 dni\\\" = wiersz \\\"(za 3 dni)\\\". \\\"w piątek\\\" = pierwszy piątek po dziś. \\\"za 10 minut\\\" = teraz + 10 minut. Przesunięcie strefy przepisz z tego samego wiersza.\\n- Jednorazowy termin: przypomnij wieczorem dzień wcześniej o 20:00 ORAZ w dniu wydarzenia na godzinę przed nim (albo o 7:00, jeśli wydarzenie jest przed 8:00). Jeśli wydarzenie jest dziś — jedno przypomnienie przed nim (np. 10 minut wcześniej przy krótkim czasie). Jeśli użytkownik mówi, kiedy przypomnieć — zrób dokładnie tak.\\n- Cykliczne bez podanego startu: pierwsze wystąpienie = dziś + jeden okres o 9:00; powiadomienie = wystąpienie minus wyprzedzenie (domyślnie dzień wcześniej o 20:00; jeśli użytkownik mówi inaczej, zrób jak mówi).\\n- Lista bez terminu i bez prośby o przypomnienie: notify = [].\\n- Żaden moment powiadomienia nie może być w przeszłości. Jeśli wypada w przeszłości, pomiń go; jeśli miało być przypomnienie, a zostaje zero, daj jedno za 5 minut.\\n- Nie wymyślaj faktów, których nie ma w zdaniu.\\n\" }, { role: 'user', content: 'Teraz jest: ' + $json.teraz + '\\n\\nKalendarz (używaj WYŁĄCZNIE tych dat):\\n' + $json.kalendarz + '\\n\\nZdanie użytkownika:\\n' + String($('POST items').item.json.body.text).trim().slice(0, 1000) } ] }) }}",
     "options": {
      "timeout": 60000
     }
@@ -639,7 +639,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "a4350550-1fcf-4ef1-8171-ca4672c74afb",
+   "id": "c8629907-9896-4aa1-af26-6f6597f512b9",
    "name": "Sprawdź odpowiedź",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -648,11 +648,11 @@
     1700
    ],
    "parameters": {
-    "jsCode": "// Sprawdza odpowiedź modelu; niczego nie zgaduje — przy błędzie zwraca ok:false z komunikatem.\nconst src = String($('POST items').first().json.body.text || '').trim().slice(0, 1000);\nconst fail = (error) => [{ json: { ok: false, error, notify: [], spec: {}, data: {}, source_text: src } }];\n\nconst raw = $json.choices?.[0]?.message?.content;\nif (!raw) return fail('Model nie odpowiedział. Spróbuj jeszcze raz.');\nlet m;\ntry { m = JSON.parse(raw.replace(/^```(json)?|```$/g, '').trim()); } catch (e) { return fail('Nie zrozumiałem. Spróbuj napisać inaczej.'); }\n\nconst KINDS = ['reminder-once', 'reminder-recurring', 'page-summary', 'checklist', 'note'];\nconst kind = KINDS.includes(m.kind) ? m.kind : 'note';\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst now = Date.now();\nconst iso = (v) => { const t = Date.parse(v); return Number.isFinite(t) ? new Date(t).toISOString() : null; };\n\nlet notify = (Array.isArray(m.notify) ? m.notify : [])\n  .map((n) => ({ at: iso(n.at), title: cut(n.title, 50) || cut(m.title, 50), body: cut(n.body, 120) }))\n  .filter((n) => n.at && Date.parse(n.at) > now - 60000 && Date.parse(n.at) < now + 400 * 864e5)\n  .slice(0, 10);\n\nlet url = null;\nif (kind === 'page-summary') {\n  // Code node nie ma URL — prosta walidacja wyrażeniem.\n  const u = String(m.url || '').trim();\n  if (/^https?:\\/\\/[a-z0-9.-]+\\.[a-z]{2,}(:\\d+)?(\\/\\S*)?$/i.test(u)) url = u.slice(0, 500);\n  if (!url) return fail('Nie widzę adresu strony. Podaj pełny link.');\n}\n\nconst title = cut(m.title, 40) || src.slice(0, 40);\nconst rec = kind === 'reminder-recurring' && m.recurrence && Number(m.recurrence.every) > 0 &&\n  ['day', 'week', 'month'].includes(m.recurrence.unit) ? {\n    every: Math.min(Number(m.recurrence.every), 365), unit: m.recurrence.unit,\n    lead: m.recurrence.lead && ['hour', 'day'].includes(m.recurrence.lead.unit)\n      ? { value: Math.min(Number(m.recurrence.lead.value) || 0, 30), unit: m.recurrence.lead.unit } : null,\n  } : null;\nif (kind === 'reminder-recurring' && !rec) return fail('Nie rozumiem, co ile to powtarzać.');\n\nreturn [{ json: {\n  ok: true, kind, title, source_text: src, widget_slug: kind,\n  spec: { understood: cut(m.understood, 300), event_at: iso(m.event_at), recurrence: rec, url, model: 'deepseek/deepseek-v4.1-flash' },\n  data: {\n    tip: cut(m.tip, 80) || null,\n    checklist: kind === 'checklist' ? (Array.isArray(m.checklist) ? m.checklist : []).map((x) => ({ text: cut(String(x), 80), done: false })).filter((x) => x.text).slice(0, 30) : undefined,\n  },\n  notify,\n} }];\n"
+    "jsCode": "// Sprawdza odpowiedź modelu; niczego nie zgaduje — przy błędzie zwraca ok:false z komunikatem.\n// Rzecz składa się z części (termin, lista, strona, szczegóły); `kind` to tylko część główna — do sortowania i sekcji.\nconst src = String($('POST items').first().json.body.text || '').trim().slice(0, 1000);\nconst fail = (error) => [{ json: { ok: false, error, notify: [], spec: {}, data: {}, source_text: src } }];\n\nconst raw = $json.choices?.[0]?.message?.content;\nif (!raw) return fail('Model nie odpowiedział. Spróbuj jeszcze raz.');\nlet m;\ntry { m = JSON.parse(raw.replace(/^```(json)?|```$/g, '').trim()); } catch (e) { return fail('Nie zrozumiałem. Spróbuj napisać inaczej.'); }\n\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst now = Date.now();\nconst iso = (v) => { const t = Date.parse(v); return Number.isFinite(t) ? new Date(t).toISOString() : null; };\n\nconst notify = (Array.isArray(m.notify) ? m.notify : [])\n  .map((n) => ({ at: iso(n.at), title: cut(n.title, 50) || cut(m.title, 50), body: cut(n.body, 120) }))\n  .filter((n) => n.at && Date.parse(n.at) > now - 60000 && Date.parse(n.at) < now + 400 * 864e5)\n  .slice(0, 10);\n\nconst r = m.recurrence;\nconst recurrence = r && Number(r.every) > 0 && ['day', 'week', 'month'].includes(r.unit)\n  ? { every: Math.min(Math.round(Number(r.every)), 365), unit: r.unit } : null;\n\n// Code node nie ma URL — prosta walidacja wyrażeniem.\nconst u = String(m.url || '').trim();\nconst url = /^https?:\\/\\/[a-z0-9.-]+\\.[a-z]{2,}(:\\d+)?(\\/\\S*)?$/i.test(u) ? u.slice(0, 500) : null;\n\nconst checklist = (Array.isArray(m.checklist) ? m.checklist : [])\n  .map((x) => ({ text: cut(String(x), 80), done: false })).filter((x) => x.text).slice(0, 30);\nconst fields = (Array.isArray(m.fields) ? m.fields : [])\n  .map((f) => ({ label: cut(f?.label, 20), value: cut(String(f?.value ?? ''), 60) })).filter((f) => f.label && f.value).slice(0, 4);\n\nconst TINTS = ['lavender', 'mint', 'blue', 'pink', 'sky'];\nconst ICONS = ['clock', 'cycle', 'list', 'globe', 'note', 'building', 'tv', 'health', 'car', 'home', 'cart', 'work', 'money', 'sport', 'people', 'doc', 'food', 'travel'];\nconst event_at = iso(m.event_at);\n\nconst kind = recurrence ? 'reminder-recurring' : event_at || notify.length ? 'reminder-once'\n  : checklist.length ? 'checklist' : url ? 'page-summary' : 'note';\nconst look = {\n  tint: TINTS.includes(m.look?.tint) ? m.look.tint : { 'reminder-recurring': 'mint', checklist: 'pink', 'page-summary': 'blue' }[kind] || 'lavender',\n  icon: ICONS.includes(m.look?.icon) ? m.look.icon : { 'reminder-recurring': 'cycle', checklist: 'list', 'page-summary': 'globe', note: 'note' }[kind] || 'clock',\n};\n\nreturn [{ json: {\n  ok: true, kind, title: cut(m.title, 40) || src.slice(0, 40), source_text: src, widget_slug: kind,\n  spec: { understood: cut(m.understood, 300), event_at, recurrence, url, summarize: m.summarize === true && !!url, model: 'deepseek/deepseek-v4.1-flash' },\n  data: {\n    tip: cut(m.tip, 80) || null, look, fields,\n    checklist: checklist.length ? checklist : undefined,\n    checklist_reset: checklist.length && recurrence ? m.checklist_reset !== false : undefined,\n  },\n  notify,\n} }];\n"
    }
   },
   {
-   "id": "0f13a376-1972-4ea4-95e6-d3642811b459",
+   "id": "3e59b346-33e1-48a8-9450-1cbe4864ec63",
    "name": "Zapisz",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -675,7 +675,7 @@
    }
   },
   {
-   "id": "86439083-b5cf-40da-8674-bcb666eb1247",
+   "id": "2e7a808d-3686-4ab5-bb87-42ab786d43b4",
    "name": "Odpowiedz: dodano",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,

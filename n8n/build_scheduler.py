@@ -45,9 +45,14 @@ nxt AS (
   INSERT INTO notifications (item_id, user_id, due_at, channels, title, body)
   SELECT item_id, user_id, due_at + oboe_period(spec), channels, title, body FROM rec RETURNING item_id),
 ev AS (
+  -- następne wystąpienie: przesuń termin, a listę odnawianą (checklist_reset) wyczyść na nowy cykl
   UPDATE items i SET updated_at = now(),
-    spec = jsonb_set(i.spec, '{event_at}', to_jsonb(to_char(((i.spec->>'event_at')::timestamptz + oboe_period(i.spec)) AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')))
-  WHERE i.id IN (SELECT item_id FROM nxt) AND i.spec->>'event_at' IS NOT NULL
+    spec = CASE WHEN i.spec->>'event_at' IS NULL THEN i.spec ELSE
+      jsonb_set(i.spec, '{event_at}', to_jsonb(to_char(((i.spec->>'event_at')::timestamptz + oboe_period(i.spec)) AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'))) END,
+    data = CASE WHEN (i.data->>'checklist_reset')::boolean IS TRUE AND jsonb_typeof(i.data->'checklist') = 'array' THEN
+      jsonb_set(i.data, '{checklist}', (SELECT coalesce(jsonb_agg(x || '{"done": false}'::jsonb), '[]'::jsonb) FROM jsonb_array_elements(i.data->'checklist') x))
+      ELSE i.data END
+  WHERE i.id IN (SELECT item_id FROM nxt)
   RETURNING 1)
 SELECT c.id, c.user_id, c.title, coalesce(c.body, '') AS body, u.email, coalesce(u.name, '') AS name,
   ('email' = ANY(c.channels) OR NOT EXISTS (

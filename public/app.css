@@ -208,3 +208,11 @@ a.w:active{transform:scale(.985)}
 .detail.open{display:block;animation:up .28s var(--ease)}
 .d-cta .danger{background:var(--surface);color:#9b1c5a}
 .chk-sum{font-size:13px;color:var(--ink-2);margin-top:4px}
+
+/* szczegóły wprost ze zdania (pola „label: value”) */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.chips span{font-size:13px;background:var(--surface-2);border-radius:var(--r-pill);padding:5px 12px;color:var(--ink)}
+.w--hero .chips span{background:rgba(255,255,255,.55)}
+.chips small{color:var(--ink-2);font-size:12px}
+.w--hero .todo{position:relative;z-index:1;background:rgba(255,255,255,.55);border-radius:var(--r-tile);padding:0 14px;margin-top:14px}
+.w--hero h3,.w--hero .big,.w--hero .kind{position:relative;z-index:1}

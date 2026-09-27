@@ -42,6 +42,20 @@ const I = {
   check: '<path d="m5 12 5 5L20 7"/>',
   trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
   ext: '<path d="M7 17 17 7M9 7h8v8"/>',
+  list: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5 2.5-2.5"/>',
+  building: '<path d="M3 10 12 4l9 6z"/><path d="M5 10v9M9.5 10v9M14.5 10v9M19 10v9M3 21h18"/>',
+  tv: '<rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="m8 3 4 3 4-3"/>',
+  health: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/><path d="M9 11h6M12 8v6"/>',
+  car: '<path d="M5 16V11l2-5h10l2 5v5"/><path d="M3 16h18v3H3zM5 11h14"/><circle cx="7.5" cy="16" r="1.5"/><circle cx="16.5" cy="16" r="1.5"/>',
+  home: '<path d="M4 11 12 4l8 7"/><path d="M6 10v10h12V10"/><path d="M10 20v-6h4v6"/>',
+  cart: '<path d="M3 4h2l2.4 11h10.2L20 8H6.2"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/>',
+  work: '<rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M9 7V5h6v2M3 12h18"/>',
+  money: '<rect x="3" y="6" width="18" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.5"/><path d="M6.5 9.5h.01M17.5 14.5h.01"/>',
+  sport: '<circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18M5.6 5.6c3.5 3.5 3.5 9.3 0 12.8M18.4 5.6c-3.5 3.5-3.5 9.3 0 12.8"/>',
+  people: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2c2.8.2 5 2.6 5 5.8"/>',
+  doc: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
+  food: '<path d="M4 3v8a3 3 0 0 0 6 0V3M7 3v18M17 3c-2 2-3 5-3 8h3v10"/>',
+  travel: '<path d="M2 16l20-8-8 12-2-5z"/><path d="m12 15-4 5"/>',
   bank: '<path d="M8 24 32 10l24 14z" fill="#fff"/><path d="M12 26v22M22 26v22M32 26v22M42 26v22M52 26v22"/><path d="M7 50h50M5 55h54"/><circle cx="32" cy="19" r="2.5" fill="currentColor"/>',
 };
 const svg = (k, style = '') => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true"${style ? ` style="${style}"` : ''}>${I[k]}</svg>`;
@@ -107,19 +121,20 @@ function render() {
       <li>kup mleko, chleb i baterie</li></ul></div>`;
     return;
   }
-  const once = items.filter((i) => i.kind === 'reminder-once').sort((a, b) => (eventOf(a) || Infinity) - (eventOf(b) || Infinity));
-  const hero = once.find((i) => eventOf(i) && eventOf(i) >= startOfDay(new Date()));
-  const rest = once.filter((i) => i !== hero);
-  const rec = items.filter((i) => i.kind === 'reminder-recurring');
-  const lists = items.filter((i) => i.kind === 'checklist');
-  const saved = items.filter((i) => ['page-summary', 'note'].includes(i.kind) || !['reminder-once', 'reminder-recurring', 'checklist'].includes(i.kind));
+  const byTime = (a, b) => (eventOf(a) || Infinity) - (eventOf(b) || Infinity);
+  const dated = items.filter((i) => !i.spec?.recurrence && eventOf(i)).sort(byTime);
+  const hero = dated.find((i) => eventOf(i) >= startOfDay(new Date()));
+  const rest = dated.filter((i) => i !== hero);
+  const rec = items.filter((i) => i.spec?.recurrence).sort(byTime);
+  const lists = items.filter((i) => !i.spec?.recurrence && !eventOf(i) && listOf(i).length);
+  const saved = items.filter((i) => !i.spec?.recurrence && !eventOf(i) && !listOf(i).length);
 
   let html = '';
-  if (hero) html += heroCard(hero);
-  if (rest.length) html += `<h2 class="sec">${hero ? 'Dalej' : 'Najbliższe'}</h2>` + rest.map(onceCard).join('');
-  if (rec.length) html += '<h2 class="sec">Powtarzalne</h2>' + rec.map(recCard).join('');
-  if (lists.length) html += '<h2 class="sec">Listy</h2>' + lists.map(listCard).join('');
-  if (saved.length) html += '<h2 class="sec">Zapisane</h2>' + saved.map(savedCard).join('');
+  if (hero) html += card(hero, true);
+  if (rest.length) html += `<h2 class="sec">${hero ? 'Dalej' : 'Najbliższe'}</h2>` + rest.map((i) => card(i)).join('');
+  if (rec.length) html += '<h2 class="sec">Powtarzalne</h2>' + rec.map((i) => card(i)).join('');
+  if (lists.length) html += '<h2 class="sec">Listy</h2>' + lists.map((i) => card(i)).join('');
+  if (saved.length) html += '<h2 class="sec">Zapisane</h2>' + saved.map((i) => card(i)).join('');
   $('#list').innerHTML = html;
 }
 
@@ -144,28 +159,6 @@ function remindLine(it) {
   return 'Przypomnę ' + n.slice(0, 2).map(whenRel).join(' i ');
 }
 
-function heroCard(it) {
-  const ev = eventOf(it);
-  return `<article class="w w--hero" data-id="${it.id}" data-widget="reminder-once" tabindex="0" role="button">
-    <p class="kind">${svg('clock', 'width:16px;height:16px')} Jednorazowe · ${esc(when(ev))}</p>
-    <p class="big">${esc(rel(ev))}</p>
-    <h3>${esc(it.title)}</h3>
-    <div class="blob" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">${I.bank}</svg></div>
-    <div class="w-f"><span class="meta">${esc(remindLine(it) || it.spec?.understood || '')}</span></div>
-  </article>`;
-}
-
-function onceCard(it) {
-  const ev = eventOf(it);
-  return `<article class="w" data-id="${it.id}" data-widget="reminder-once" tabindex="0" role="button">
-    <div class="nx">
-      <div class="when">${ev ? `<b>${ev.getDate()}</b>${esc(new Intl.DateTimeFormat('pl-PL', { month: 'short' }).format(ev))}` : '—'}</div>
-      <div style="min-width:0"><p class="kind">Jednorazowe · ${ev ? esc(rel(ev) + ', ' + fTime.format(ev)) : 'bez terminu'}</p><h3>${esc(it.title)}</h3></div>
-    </div>
-    ${remindLine(it) ? `<div class="w-f"><span class="meta">${svg('bell')}${esc(remindLine(it))}</span></div>` : ''}
-  </article>`;
-}
-
 const PERIOD = { day: 1, week: 7, month: 30 };
 function recLabel(r) {
   if (!r) return 'Powtarzalne';
@@ -174,43 +167,77 @@ function recLabel(r) {
   if (n === 1) return 'Co ' + u[0];
   return `Co ${n} ` + (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? u[1] : u[2]);
 }
-function recCard(it) {
+
+// ---------- karta = części (termin, lista, strona, szczegóły) ----------
+// Wygląd każdej części 1:1 z makiety A; karta składa tylko te, które rzecz ma.
+const TINT = { lavender: '--tint-lavender', mint: '--tint-mint', blue: '--tint-blue', pink: '--tint-pink', sky: '--tint-sky' };
+const DEF_LOOK = { 'reminder-once': ['lavender', 'clock'], 'reminder-recurring': ['mint', 'cycle'], checklist: ['pink', 'list'], 'page-summary': ['blue', 'globe'], note: ['pink', 'note'] };
+function lookOf(it) {
+  const d = DEF_LOOK[it.kind] || DEF_LOOK.note; const l = it.data?.look || {};
+  return { tint: TINT[l.tint] ? l.tint : d[0], icon: I[l.icon] ? l.icon : d[1] };
+}
+const listOf = (it) => it.data?.checklist || [];
+const hostOf = (url) => (url || '').replace(/^https?:\/\//, '').replace(/\/$/, '');
+
+function kindLabel(it) {
   const r = it.spec?.recurrence; const ev = eventOf(it);
-  const days = r ? r.every * PERIOD[r.unit] : 14;
+  if (r) return recLabel(r);
+  if (ev) return (it.kind === 'reminder-once' ? 'Jednorazowe · ' : '') + rel(ev) + ', ' + fTime.format(ev);
+  if (listOf(it).length) return 'Lista';
+  if (it.spec?.url) return it.spec?.summarize ? 'Streszczenie strony' : 'Strona';
+  return 'Notatka';
+}
+
+function partCycle(it) {
+  const r = it.spec?.recurrence; if (!r) return '';
+  const ev = eventOf(it);
+  const days = r.every * PERIOD[r.unit];
   const segs = Math.max(2, Math.min(days, 14));
   const left = ev ? Math.max(0, (ev - Date.now()) / DAY) : days;
   const done = Math.max(0, Math.min(segs - 1, Math.round((1 - left / days) * segs)));
   const bars = Array.from({ length: segs }, (_, k) => `<i class="${k < done ? 'on' : k === done ? 'rem' : ''}"></i>`).join('');
-  const nx = (it.notify_at || [])[0];
-  return `<article class="w" data-id="${it.id}" data-widget="reminder-recurring" tabindex="0" role="button">
-    <div class="w-h"><div class="ico" style="background:var(--tint-mint)" aria-hidden="true">${svg('cycle')}</div>
-      <div style="min-width:0"><p class="kind">${esc(recLabel(r))}</p><h3>${esc(it.title)}</h3></div></div>
-    <div class="cycle" aria-hidden="true" style="grid-template-columns:repeat(${segs},1fr)">${bars}</div>
-    <div class="cyc-l"><span>${ev ? 'następny ' + esc(rel(ev)) : ''}</span><span>${ev ? esc(fShort.format(ev)) : ''}</span></div>
-    <div class="w-f" style="flex-direction:column;align-items:flex-start;gap:6px">
-      ${ev ? `<span class="meta">${svg('cal')}Następny: ${esc(fDay.format(ev))}</span>` : ''}
-      ${nx ? `<span class="meta">${svg('bell')}Przypomnę ${esc(whenRel(dt(nx)))}</span>` : ''}
-    </div>
-  </article>`;
+  return `<div class="cycle" aria-hidden="true" style="grid-template-columns:repeat(${segs},1fr)">${bars}</div>
+    <div class="cyc-l"><span>${ev ? 'następny ' + esc(rel(ev)) : ''}</span><span>${ev ? esc(fShort.format(ev)) : ''}</span></div>`;
+}
+function partList(it) {
+  const list = listOf(it); if (!list.length) return '';
+  return `<ul class="todo">${list.map((x, k) => `<li><label><input type="checkbox" data-check="${k}" ${x.done ? 'checked' : ''}><span>${esc(x.text)}</span></label></li>`).join('')}</ul>`;
+}
+function partFields(it) {
+  const f = it.data?.fields || []; if (!f.length) return '';
+  return `<p class="chips">${f.map((x) => `<span><small>${esc(x.label)}</small> ${esc(x.value)}</span>`).join('')}</p>`;
+}
+function partPage(it) {
+  const url = it.spec?.url; if (!url) return '';
+  return `<p class="dom">${svg('globe', 'width:15px;height:15px;display:inline;vertical-align:-2px')} ${esc(hostOf(url))}</p>
+    ${it.spec?.summarize ? `<p class="sum">${esc(it.data?.summary || 'Streszczenie pojawi się tutaj — tę część dopiero budujemy.')}</p>` : ''}`;
+}
+function partFoot(it) {
+  const rem = remindLine(it);
+  const list = listOf(it); const n = list.filter((x) => x.done).length;
+  const bits = [];
+  if (rem) bits.push(`<span class="meta">${svg('bell')}${esc(rem)}</span>`);
+  if (list.length) bits.push(`<span class="meta">${n} z ${list.length} zrobione${it.data?.checklist_reset ? ' · odnawia się' : ''}</span>`);
+  return bits.length ? `<div class="w-f" style="flex-wrap:wrap">${bits.join('')}</div>` : '';
 }
 
-function listCard(it) {
-  const list = it.data?.checklist || [];
-  const n = list.filter((x) => x.done).length;
-  return `<article class="w" data-id="${it.id}" data-widget="checklist">
-    <div class="w-h" style="justify-content:space-between"><h3>${esc(it.title)}</h3><p class="kind">${n} z ${list.length}</p></div>
-    <ul class="todo">${list.map((x, k) => `<li><label><input type="checkbox" data-check="${k}" ${x.done ? 'checked' : ''}><span>${esc(x.text)}</span></label></li>`).join('')}</ul>
-  </article>`;
-}
-
-function savedCard(it) {
-  const page = it.kind === 'page-summary';
-  const url = it.spec?.url || '';
-  const host = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+function card(it, hero = false) {
+  const { tint, icon } = lookOf(it);
+  const ev = eventOf(it);
+  const noteText = !listOf(it).length && !it.spec?.url && !ev && !it.spec?.recurrence ? `<p class="sum">${esc(it.source_text)}</p>` : '';
+  if (hero) {
+    return `<article class="w w--hero" data-id="${it.id}" data-widget="${esc(it.kind)}" tabindex="0" role="button">
+      <p class="kind">${svg('clock', 'width:16px;height:16px')} ${esc(kindLabel(it).replace(/^Jednorazowe · /, 'Jednorazowe · ') )}</p>
+      <p class="big">${esc(rel(ev))}</p>
+      <h3>${esc(it.title)}</h3>
+      <div class="blob" aria-hidden="true"><svg class="i" viewBox="0 0 24 24" style="width:64px;height:64px;stroke-width:1.4;margin:-10px 18px 0 0">${I[icon]}</svg></div>
+      ${partFields(it)}${partList(it)}${partFoot(it)}
+    </article>`;
+  }
   return `<article class="w" data-id="${it.id}" data-widget="${esc(it.kind)}" tabindex="0" role="button">
-    <div class="w-h"><div class="ico" style="background:var(${page ? '--tint-blue' : '--tint-pink'})" aria-hidden="true">${svg(page ? 'globe' : 'note')}</div>
-      <div style="min-width:0"><p class="kind">${page ? 'Streszczenie strony' : 'Notatka'}</p><h3>${esc(it.title)}</h3>${page ? `<p class="dom">${esc(host)}</p>` : ''}</div></div>
-    ${page ? `<p class="sum">${esc(it.data?.summary || 'Streszczenie pojawi się tutaj — tę część dopiero budujemy.')}</p>` : `<p class="sum">${esc(it.source_text)}</p>`}
+    <div class="w-h"><div class="ico" style="background:var(${TINT[tint]})" aria-hidden="true">${svg(icon)}</div>
+      <div style="min-width:0"><p class="kind">${esc(kindLabel(it))}</p><h3>${esc(it.title)}</h3></div></div>
+    ${partCycle(it)}${partFields(it)}${partPage(it)}${partList(it)}${noteText}${partFoot(it)}
   </article>`;
 }
 
@@ -222,34 +249,42 @@ function openDetail(id) {
   const it = state.items.find((x) => x.id === id);
   if (!it) return;
   state.openId = id;
+  const { tint } = lookOf(it);
   const ev = eventOf(it);
   const rows = [];
-  if (ev && it.kind !== 'checklist' && it.kind !== 'note') rows.push(['Kiedy', fDay.format(ev) + ', ' + fTime.format(ev)]);
-  if (it.kind === 'reminder-recurring') rows.push(['Powtarzanie', recLabel(it.spec?.recurrence)]);
+  if (ev) rows.push([it.spec?.recurrence ? 'Następny raz' : 'Kiedy', fDay.format(ev) + ', ' + fTime.format(ev)]);
+  if (it.spec?.recurrence) rows.push(['Powtarzanie', recLabel(it.spec.recurrence)]);
   if ((it.notify_at || []).length) rows.push(['Przypomnienia', it.notify_at.map((d) => whenRel(dt(d))).join(' · ')]);
+  for (const f of it.data?.fields || []) rows.push([f.label, f.value]);
   if (it.data?.tip) rows.push(['Podpowiedź', it.data.tip]);
   if (it.spec?.understood) rows.push(['Jak Oboe to rozumie', it.spec.understood]);
   const url = it.spec?.url;
+  const list = listOf(it);
   const [first, ...more] = it.title.split(/\s+[—–-]\s+/);
   $('#detail').innerHTML = `<div class="app">
-    <div class="d-top" style="background:var(${TOP[it.kind] || '--tint-lavender'})">
+    <div class="d-top" style="background:var(${TINT[tint]})">
       <span class="ring" aria-hidden="true"></span>
       <div class="d-nav"><button class="round" type="button" data-act="close" aria-label="Wróć">${svg('back')}</button>
         ${url ? `<a class="round" href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="Otwórz stronę">${svg('ext')}</a>` : ''}</div>
       <h1>${esc(first)}${more.length ? `<b>${esc(more.join(' — '))}</b>` : ''}</h1>
-      <span class="pill">${esc(KIND[it.kind] || 'Rzecz')}${ev && it.kind !== 'note' ? ' · ' + esc(rel(ev)) : ''}</span>
+      <span class="pill">${esc(kindLabel(it))}</span>
     </div>
     <div class="d-body">
       <div class="quote">Wpisane ${esc(rel(dt(it.created_at)))}, ${esc(fTime.format(dt(it.created_at)))}:<q>${esc(it.source_text)}</q></div>
+      ${list.length ? `<div class="w" data-id="${it.id}" style="margin-top:12px;cursor:default">
+          <div class="w-h" style="justify-content:space-between"><h3>Do odhaczenia</h3>
+          <p class="kind">${list.filter((x) => x.done).length} z ${list.length}${it.data?.checklist_reset ? ' · odnawia się' : ''}</p></div>${partList(it)}</div>` : ''}
+      ${url && it.spec?.summarize ? `<div class="w" style="margin-top:12px;cursor:default"><p class="kind">Streszczenie · ${esc(hostOf(url))}</p>
+          <p class="sum">${esc(it.data?.summary || 'Streszczenie pojawi się tutaj — tę część dopiero budujemy.')}</p></div>` : ''}
       ${rows.length ? `<ul class="rows">${rows.map(([a, b]) => `<li><span>${esc(a)}</span><b>${esc(b)}</b></li>`).join('')}</ul>` : ''}
       <div class="d-cta">
-        <button class="cta" type="button" data-act="done">${svg('check')}Oznacz jako zrobione</button>
+        <button class="cta" type="button" data-act="done">${svg('check')}${it.spec?.recurrence ? 'Zakończ powtarzanie' : 'Oznacz jako zrobione'}</button>
         <button class="ghost danger" type="button" data-act="delete" aria-label="Usuń">${svg('trash')}</button>
       </div>
     </div></div>`;
   $('#detail').classList.add('open');
   document.body.style.overflow = 'hidden';
-  history.pushState({ detail: id }, '');
+  if (!history.state?.detail) history.pushState({ detail: id }, '');
 }
 
 function closeDetail(fromPop = false) {
@@ -331,19 +366,22 @@ function bind() {
   $('#mic').addEventListener('click', () => { $('#q').focus(); toast('Użyj mikrofonu na klawiaturze telefonu — dyktowanie w aplikacji dojdzie później.'); });
   $('#bell').addEventListener('click', bell);
 
-  $('#list').addEventListener('change', async (e) => {
+  const onCheck = async (e) => {
     const cb = e.target.closest('[data-check]'); if (!cb) return;
     const id = cb.closest('[data-id]').dataset.id;
     try {
       const r = await api.check(id, Number(cb.dataset.check), cb.checked);
       const it = state.items.find((x) => x.id === id); if (it) it.data = r.data;
       render();
+      if (state.openId === id) openDetail(id);
     } catch (err) { cb.checked = !cb.checked; toast(err.message); }
-  });
+  };
+  $('#list').addEventListener('change', onCheck);
+  $('#detail').addEventListener('change', onCheck);
   const openFrom = (e) => {
     if (e.target.closest('label, input, a')) return;
     const card = e.target.closest('[data-id]');
-    if (card && card.dataset.widget !== 'checklist') openDetail(card.dataset.id);
+    if (card) openDetail(card.dataset.id);
   };
   $('#list').addEventListener('click', openFrom);
   $('#list').addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFrom(e); } });
