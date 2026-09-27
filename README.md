@@ -36,6 +36,20 @@ Widgety są niezmienne: każda wersja to nowy plik `<slug>.v<N>.html` (płasko �
 - `oboe` — nginx: statyczna PWA + proxy `/api/*` → `http://n8n:5678/webhook/oboe/*` + `/widgets/` z CSP sandbox. `127.0.0.1:3320`.
 - `oboe-db` — Postgres 16, bez `ports:`, n8n łączy się po nazwie `oboe-db:5432`.
 
+## Dostęp: prośba → akceptacja Łukasza → klucz mailem (27.09.2026)
+
+Workflow „Oboe: Dostęp” (`n8n/build_access.py`, id w `n8n/.access-wf-id`), migracja `db/008-prosby-o-dostep.sql`.
+1. Ekran startowy: imię + e-mail → `POST /api/access/request`.
+   - konto istnieje → nowy klucz od razu mailem (stare klucze zostają);
+   - nowa osoba → `access_requests` (pending) + powiadomienie dla adminów (`users.is_admin`) wysyłane przez „Oboe: Harmonogram”
+     (`notifications.item_id = NULL`; bez działającego pusha idzie mail);
+   - odrzucona w ciągu 30 dni → komunikat, bez nowego powiadomienia.
+2. Admin widzi na górze listy „Prośby o dostęp” → Zaakceptuj / Odrzuć (`POST /api/access/decide`).
+   Akceptacja = konto + klucz mailem; odrzucenie = mail „Przykro mi — Łukasz odrzucił Twoją prośbę”.
+- **Klucz nigdy nie wraca w odpowiedzi HTTP** — tylko mailem. Limit: 3 prośby/h na e-mail, 40/h łącznie (`access_log`).
+- Teksty wszystkich maili: `n8n/maile.py` (wspólne dla „Dostęp” i „Wydaj token”).
+- „Oboe: Wydaj token” (ręcznie z serwera) zostaje jako awaryjne.
+
 ## Wdrożenie
 
 ```bash

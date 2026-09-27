@@ -16,7 +16,7 @@ ROUTES = [
   ("GET", "me", "Kim jestem", f"""
 WITH {ME}
 SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
-  ELSE (SELECT json_build_object('status', 200, 'user', json_build_object('email', u.email, 'name', u.name))
+  ELSE (SELECT json_build_object('status', 200, 'user', json_build_object('email', u.email, 'name', u.name, 'admin', u.is_admin))
         FROM users u WHERE u.id = (SELECT user_id FROM me)) END AS result""",
    "={{ [ " + TOKEN + " ] }}"),
 

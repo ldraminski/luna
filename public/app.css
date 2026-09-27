@@ -290,3 +290,12 @@ button.chev:disabled{opacity:.4;cursor:default}
 .empty .ex button{background:var(--surface-2);box-shadow:none}
 #intro-push{margin-top:18px}
 #intro-push .cta{margin-top:10px}
+
+/* prośba o klucz (ekran startowy) i prośby o dostęp u admina (Hikari, 27.09) */
+.ask{display:grid;gap:10px}
+.ask input{height:52px;border:0;border-radius:var(--r-pill);background:var(--surface);box-shadow:var(--shadow);padding:0 20px;font-size:15px;outline:none}
+.ask input:focus{box-shadow:0 0 0 3px var(--navy)}
+.ask .ghost-txt{margin:0 auto}
+.ask.busy{opacity:.7;pointer-events:none}
+.req .d-cta .cta{flex:1}
+#requests{margin-bottom:26px}

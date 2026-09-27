@@ -6,7 +6,7 @@ const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '
 const IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const STANDALONE = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
 
-const state = { user: null, items: [], openId: null };
+const state = { user: null, items: [], openId: null, requests: [] };
 
 // ---------- daty ----------
 const DAY = 864e5;
@@ -68,6 +68,26 @@ function showHello(msg = '') {
   $('#screen-hello').hidden = false;
   $('#ios-note').hidden = !(IOS && !STANDALONE);
   $('#tok-err').textContent = msg;
+  if (msg) showKeyForm();   // klucz przestał działać → od razu pole na nowy, formularz prośby zostaje
+}
+function showKeyForm(note = '') {
+  $('#tok-form').hidden = false; $('#tok-go').hidden = false;
+  $('#have-key').hidden = true;
+  if (note) { $('#ask-done').innerHTML = note; $('#ask-done').hidden = false; $('#ask-form').hidden = true; }
+}
+// Prośba o klucz: nowa osoba czeka na akceptację Łukasza, istniejące konto dostaje nowy klucz od razu (tylko mailem).
+async function askKey(e) {
+  e.preventDefault();
+  const name = $('#ask-name').value.trim(); const email = $('#ask-email').value.trim();
+  const form = $('#ask-form'); form.classList.add('busy'); $('#tok-err').textContent = '';
+  try {
+    const r = await api.accessRequest(email, name);
+    const who = esc(r.name || name);
+    if (r.action === 'token') showKeyForm(`<b>Wysłałam klucz na ${esc(email)}.</b> Sprawdź skrzynkę (zajrzyj też do spamu) i wklej go poniżej.`);
+    else if (r.action === 'rejected') showKeyForm(`<b>Przykro mi, ${who}.</b> Łukasz odrzucił już twoją prośbę o dostęp. Jeśli to pomyłka, napisz do niego.`);
+    else showKeyForm(`<b>Dzięki, ${who}!</b> Łukasz musi zaakceptować twoją prośbę o dostęp — klucz przyjdzie mailem na ${esc(email)}. Kiedy przyjdzie, wklej go poniżej.`);
+  } catch (err) { $('#tok-err').textContent = err.message; }
+  finally { form.classList.remove('busy'); }
 }
 
 async function submitToken(e) {
@@ -124,6 +144,7 @@ function useExample(text) {
 
 async function load() {
   try {
+    if (state.user?.admin) api.accessRequests().then((r) => { state.requests = r; renderRequests(); }).catch(() => {});
     state.items = await api.items();
     render();
     watchGenerating();
@@ -148,6 +169,7 @@ function render() {
     $('#list').innerHTML = `<div class="empty"><h3>Jeszcze nic mi nie powierzono</h3>
       <p>Napisz na dole zwykłym zdaniem, co mam zapamiętać — resztą zajmę się sama. Na przykład:</p>
       <div class="ex">${exChips()}</div></div>`;
+    renderRequests();
     return;
   }
   const byTime = (a, b) => (eventOf(a) || Infinity) - (eventOf(b) || Infinity);
@@ -169,6 +191,40 @@ function render() {
   if (lists.length) html += '<h2 class="sec">Listy</h2>' + lists.map((i) => card(i)).join('');
   if (saved.length) html += '<h2 class="sec">Zapisane</h2>' + saved.map((i) => card(i)).join('');
   $('#list').innerHTML = html;
+  renderRequests();
+}
+
+// ---------- prośby o dostęp (tylko admin) ----------
+function renderRequests() {
+  let box = $('#requests');
+  const reqs = state.requests || [];
+  if (!reqs.length) { box?.remove(); return; }
+  if (!box) { box = document.createElement('div'); box.id = 'requests'; $('#list').prepend(box); }
+  box.innerHTML = `<h2 class="sec" style="margin-top:0">Prośby o dostęp</h2>` + reqs.map((r) => `
+    <article class="w req" data-req="${r.id}">
+      <div class="w-h"><div class="ico" style="background:var(--tint-pink)" aria-hidden="true">${svg('people')}</div>
+        <div style="min-width:0"><p class="kind">${esc(rel(dt(r.created_at)))}, ${esc(fTime.format(dt(r.created_at)))}</p>
+          <h3>${esc(r.name || r.email)}</h3><p class="dom">${esc(r.email)}</p></div></div>
+      <div class="d-cta" style="margin-top:14px">
+        <button class="cta" type="button" data-decide="1">${svg('check')}Zaakceptuj</button>
+        <button class="cta alt" type="button" data-decide="0">Odrzuć</button></div>
+    </article>`).join('');
+}
+async function decide(e) {
+  const b = e.target.closest('[data-decide]'); if (!b) return;
+  const card = b.closest('[data-req]'); const id = Number(card.dataset.req); const accept = b.dataset.decide === '1';
+  const who = (state.requests || []).find((x) => x.id === id)?.email || '';
+  card.querySelectorAll('button').forEach((x) => { x.disabled = true; });
+  try {
+    const r = await api.accessDecide(id, accept);
+    state.requests = (state.requests || []).filter((x) => x.id !== id); renderRequests();
+    if (accept) toast(r.emailed === false ? `Zaakceptowane, ale mail na ${who} nie wyszedł.` : `Zaakceptowane — klucz poszedł na ${who}.`);
+    else toast(r.emailed === false ? 'Odrzucone, ale mail nie wyszedł.' : `Odrzucone — wysłałam wiadomość na ${who}.`);
+  } catch (err) {
+    card.querySelectorAll('button').forEach((x) => { x.disabled = false; });
+    toast(err.message);
+    if (err.status === 404) { state.requests = (state.requests || []).filter((x) => x.id !== id); renderRequests(); }
+  }
 }
 
 function renderDays(items) {
@@ -529,6 +585,9 @@ function toast(msg) {
 
 function bind() {
   $('#tok-form').addEventListener('submit', submitToken);
+  $('#ask-form').addEventListener('submit', askKey);
+  $('#have-key').addEventListener('click', () => { showKeyForm(); $('#tok').focus(); });
+  $('#list').addEventListener('click', decide);
   $('#tok-paste').addEventListener('click', async () => {
     try { $('#tok').value = (await navigator.clipboard.readText()).trim(); submitToken(); }
     catch { $('#tok').focus(); $('#tok-err').textContent = 'Przytrzymaj pole i wybierz „Wklej”.'; }
@@ -560,7 +619,7 @@ function bind() {
   $('#list').addEventListener('change', onCheck);
   $('#detail').addEventListener('change', onCheck);
   const openFrom = (e) => {
-    if (e.target.closest('label, input, a, button[data-sum], button[data-done]')) return;
+    if (e.target.closest('label, input, a, button[data-sum], button[data-done], [data-req]')) return;
     const card = e.target.closest('[data-id]');
     if (card) openDetail(card.dataset.id);
   };

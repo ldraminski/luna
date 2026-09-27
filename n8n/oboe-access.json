@@ -1,0 +1,533 @@
+{
+ "name": "Oboe: Dostęp",
+ "nodes": [
+  {
+   "id": "121582ea-5308-4ed3-94ae-f5d55afc678b",
+   "name": "Opis",
+   "type": "n8n-nodes-base.stickyNote",
+   "typeVersion": 1,
+   "position": [
+    -420,
+    -300
+   ],
+   "parameters": {
+    "width": 600,
+    "height": 260,
+    "content": "## Oboe: Dostęp (Luna)\nKtoś podaje imię i e-mail → istniejące konto dostaje nowy klucz mailem od razu; nowa osoba czeka na akceptację Łukasza (powiadomienie przez „Oboe: Harmonogram”).\nAkceptacja → konto + klucz mailem; odrzucenie → mail „przykro mi”.\n**Klucz nigdy nie wraca w odpowiedzi HTTP.** Limit 3/h na e-mail, 40/h łącznie (`access_log`).\nTeksty maili: `n8n/maile.py`. Źródło: `~/Work/oboe/n8n/build_access.py`."
+   }
+  },
+  {
+   "id": "8f8694b9-f83e-4f75-8f79-a6e5c541bb20",
+   "name": "POST access/request",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    0
+   ],
+   "parameters": {
+    "httpMethod": "POST",
+    "path": "oboe/access/request",
+    "responseMode": "responseNode",
+    "options": {}
+   },
+   "webhookId": "8e27007d-8b8e-45b6-9c16-0ca6a19d6322"
+  },
+  {
+   "id": "c60a1ed5-2e21-4544-aa67-0a73efb890cc",
+   "name": "Prośba",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    220,
+    0
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "WITH v AS (SELECT lower(trim($1)) AS email, nullif(left(trim($2), 80), '') AS name\n           WHERE lower(trim($1)) ~ '^[^@\\s]+@[^@\\s]+\\.[a-z]{2,}$'),\nlim AS (SELECT (SELECT count(*) FROM access_log WHERE email = (SELECT email FROM v) AND at > now() - interval '1 hour') AS per_email,\n               (SELECT count(*) FROM access_log WHERE at > now() - interval '1 hour') AS total),\nok AS (SELECT v.* FROM v, lim WHERE lim.per_email < 3 AND lim.total < 40),\nlog AS (INSERT INTO access_log (email) SELECT email FROM ok RETURNING 1),\nu AS (SELECT id, email, name FROM users WHERE email = (SELECT email FROM ok)),\ntok AS (SELECT encode(gen_random_bytes(32), 'hex') AS t),\ns AS (INSERT INTO sessions (token_hash, user_id)\n      SELECT encode(digest((SELECT t FROM tok), 'sha256'), 'hex'), id FROM u RETURNING 1),\nrej AS (SELECT 1 FROM access_requests WHERE email = (SELECT email FROM ok) AND status = 'rejected'\n        AND decided_at > now() - interval '30 days' AND NOT EXISTS (SELECT 1 FROM u)),\nprev AS (SELECT 1 FROM access_requests WHERE email = (SELECT email FROM ok) AND status = 'pending'),\nreq AS (INSERT INTO access_requests (email, name) SELECT email, name FROM ok\n        WHERE NOT EXISTS (SELECT 1 FROM u) AND NOT EXISTS (SELECT 1 FROM rej) AND NOT EXISTS (SELECT 1 FROM prev)\n        RETURNING id, email, name),\nnt AS (INSERT INTO notifications (item_id, user_id, due_at, channels, title, body)\n       SELECT NULL, a.id, now(), '{push}', 'Prośba o dostęp do Luny',\n              coalesce(r.name, r.email) || ' (' || r.email || ') chce korzystać z Luny. Otwórz, żeby zaakceptować albo odrzucić.'\n       FROM req r CROSS JOIN users a WHERE a.is_admin RETURNING 1)\nSELECT CASE\n  WHEN NOT EXISTS (SELECT 1 FROM v) THEN json_build_object('status', 400, 'error', 'To nie wygląda na adres e-mail.')\n  WHEN NOT EXISTS (SELECT 1 FROM ok) THEN json_build_object('status', 429, 'error', 'Za dużo próśb naraz — spróbuj za godzinę.')\n  WHEN EXISTS (SELECT 1 FROM u) THEN json_build_object('status', 200, 'action', 'token', 'email', (SELECT email FROM u),\n       'name', coalesce((SELECT name FROM u), ''), 'token', (SELECT t FROM tok), 'issued', (SELECT count(*) FROM s))\n  WHEN EXISTS (SELECT 1 FROM rej) THEN json_build_object('status', 200, 'action', 'rejected', 'name', (SELECT name FROM ok))\n  ELSE json_build_object('status', 200, 'action', 'pending', 'name', (SELECT name FROM ok), 'notified', (SELECT count(*) FROM nt))\nEND AS result",
+    "options": {
+     "queryReplacement": "={{ [ String($json.body.email || '').slice(0, 200), String($json.body.name || '').slice(0, 80) ] }}"
+    }
+   },
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   }
+  },
+  {
+   "id": "e077c54d-92a0-4c51-83d7-5449f65dd009",
+   "name": "Istniejące konto?",
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2.2,
+   "position": [
+    440,
+    0
+   ],
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "loose",
+      "version": 2
+     },
+     "conditions": [
+      {
+       "id": "1130d5c2-8aeb-4be2-afc5-6b2b2c40731b",
+       "leftValue": "={{ $json.result.action === 'token' }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "eb84c4b1-79b7-4518-b1f3-2afbb594dc3c",
+   "name": "Mail: nowy klucz",
+   "type": "n8n-nodes-base.emailSend",
+   "typeVersion": 2.1,
+   "position": [
+    660,
+    -120
+   ],
+   "parameters": {
+    "fromEmail": "Luna <n8n@renlab.ovh>",
+    "toEmail": "={{ $json.result.email }}",
+    "subject": "Twój nowy klucz do Luny",
+    "emailFormat": "text",
+    "text": "={{ 'Cześć' + ($json.result.name ? ' ' + $json.result.name : '') + '!\\n\\nOto Twój nowy klucz do Luny:\\n\\n' + $json.result.token + '\\n\\nWklej go w aplikacji uruchomionej z ekranu początkowego. Klucze na Twoich innych urządzeniach dalej działają.\\n\\nJeśli nie prosisz o nowy klucz, po prostu zignoruj tę wiadomość — nikt nie dostał dostępu.\\n\\n— Luna' }}",
+    "options": {
+     "appendAttribution": false
+    }
+   },
+   "credentials": {
+    "smtp": {
+     "id": "DY5t4HkHVBfxB2gY",
+     "name": "SMTP n8n renlab"
+    }
+   },
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "a28873cb-d377-435a-aa93-64fb308fdc60",
+   "name": "Odpowiedz: prośba",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    880,
+    0
+   ],
+   "parameters": {
+    "respondWith": "json",
+    "responseBody": "={{ (R => ({ status: R.status, action: R.action, name: R.name, error: R.error }))($('Prośba').item.json.result) }}",
+    "options": {
+     "responseCode": "={{ $('Prośba').item.json.result.status || 200 }}"
+    }
+   }
+  },
+  {
+   "id": "6899a6fc-8822-403f-b175-10390270d2a6",
+   "name": "GET access/requests",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    400
+   ],
+   "parameters": {
+    "httpMethod": "GET",
+    "path": "oboe/access/requests",
+    "responseMode": "responseNode",
+    "options": {}
+   },
+   "webhookId": "9d98bb48-a350-447e-b5f4-020236b709d5"
+  },
+  {
+   "id": "33f3b50f-ebc3-4037-bb05-37e275f159c0",
+   "name": "Prośby czekające",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    220,
+    400
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "WITH me AS (\n  UPDATE sessions SET last_used_at = now()\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id),\nadm AS (SELECT id FROM users WHERE id = (SELECT user_id FROM me) AND is_admin)\nSELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN json_build_object('status', 401, 'error', 'Zaloguj się ponownie')\n  WHEN NOT EXISTS (SELECT 1 FROM adm) THEN json_build_object('status', 403, 'error', 'To może tylko Łukasz')\n  ELSE json_build_object('status', 200, 'requests', coalesce((SELECT json_agg(r ORDER BY r.created_at) FROM\n       (SELECT id, email, name, created_at FROM access_requests WHERE status = 'pending') r), '[]'::json)) END AS result",
+    "options": {
+     "queryReplacement": "={{ [ ($json.headers.authorization || '').replace(/^Bearer\\s+/i, '') ] }}"
+    }
+   },
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   }
+  },
+  {
+   "id": "4c22ce40-6b17-4755-86cb-564ad34600e6",
+   "name": "Odpowiedz: prośby",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    440,
+    400
+   ],
+   "parameters": {
+    "respondWith": "json",
+    "responseBody": "={{ $json.result }}",
+    "options": {
+     "responseCode": "={{ $('Prośby czekające').item.json.result.status || 200 }}"
+    }
+   }
+  },
+  {
+   "id": "ab03b57c-1599-4b79-9577-36b8bd64607d",
+   "name": "POST access/decide",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    700
+   ],
+   "parameters": {
+    "httpMethod": "POST",
+    "path": "oboe/access/decide",
+    "responseMode": "responseNode",
+    "options": {}
+   },
+   "webhookId": "2843cff4-af29-4926-be4f-87b0f37ceea6"
+  },
+  {
+   "id": "6303548c-97e8-4025-9ce4-96542dd775b0",
+   "name": "Decyzja",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    220,
+    700
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "WITH me AS (\n  UPDATE sessions SET last_used_at = now()\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id),\nadm AS (SELECT id FROM users WHERE id = (SELECT user_id FROM me) AND is_admin),\nd AS (UPDATE access_requests SET status = CASE WHEN $3::boolean THEN 'accepted' ELSE 'rejected' END,\n        decided_at = now(), decided_by = (SELECT id FROM adm)\n      WHERE id = $2::bigint AND status = 'pending' AND EXISTS (SELECT 1 FROM adm) RETURNING email, name, status),\nu AS (INSERT INTO users (email, name) SELECT email, name FROM d WHERE status = 'accepted'\n      ON CONFLICT (email) DO UPDATE SET name = coalesce(users.name, excluded.name) RETURNING id, email, name),\ntok AS (SELECT encode(gen_random_bytes(32), 'hex') AS t),\ns AS (INSERT INTO sessions (token_hash, user_id)\n      SELECT encode(digest((SELECT t FROM tok), 'sha256'), 'hex'), id FROM u RETURNING 1)\nSELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN json_build_object('status', 401, 'error', 'Zaloguj się ponownie')\n  WHEN NOT EXISTS (SELECT 1 FROM adm) THEN json_build_object('status', 403, 'error', 'To może tylko Łukasz')\n  WHEN NOT EXISTS (SELECT 1 FROM d) THEN json_build_object('status', 404, 'error', 'Tej prośby już nie ma — jest rozpatrzona.')\n  WHEN (SELECT status FROM d) = 'accepted' THEN json_build_object('status', 200, 'action', 'accepted',\n       'email', (SELECT email FROM u), 'name', coalesce((SELECT name FROM u), ''), 'token', (SELECT t FROM tok), 'issued', (SELECT count(*) FROM s))\n  ELSE json_build_object('status', 200, 'action', 'rejected', 'email', (SELECT email FROM d), 'name', coalesce((SELECT name FROM d), ''))\nEND AS result",
+    "options": {
+     "queryReplacement": "={{ [ ($json.headers.authorization || '').replace(/^Bearer\\s+/i, ''), /^[0-9]{1,18}$/.test(String($json.body.id)) ? String($json.body.id) : '0', $json.body.accept === true ? 'true' : 'false' ] }}"
+    }
+   },
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   }
+  },
+  {
+   "id": "add8379b-ca24-4933-b677-e77498c9a445",
+   "name": "Zaakceptowana?",
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2.2,
+   "position": [
+    440,
+    640
+   ],
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "loose",
+      "version": 2
+     },
+     "conditions": [
+      {
+       "id": "d80ea6ba-9b16-4d39-8736-cb4b6be1579b",
+       "leftValue": "={{ $json.result.action === 'accepted' }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "763c833e-0970-4892-8301-6f51edafe4c8",
+   "name": "Odrzucona?",
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2.2,
+   "position": [
+    660,
+    800
+   ],
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "loose",
+      "version": 2
+     },
+     "conditions": [
+      {
+       "id": "04215723-f7ff-4cb6-9cc3-43dee30473bb",
+       "leftValue": "={{ $json.result.action === 'rejected' }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "9afe7432-ea1f-4fa6-ae5b-d62708efd156",
+   "name": "Mail: witaj",
+   "type": "n8n-nodes-base.emailSend",
+   "typeVersion": 2.1,
+   "position": [
+    660,
+    560
+   ],
+   "parameters": {
+    "fromEmail": "Luna <n8n@renlab.ovh>",
+    "toEmail": "={{ $json.result.email }}",
+    "subject": "Łukasz zaakceptował Twoją prośbę — tu Luna",
+    "emailFormat": "text",
+    "text": "={{ 'Cześć' + ($json.result.name ? ' ' + $json.result.name : '') + '!\\n\\nŁukasz zaakceptował Twoją prośbę o dostęp. Jestem Luna — Twoja prywatna asystentka. Zapisuję sprawy, terminy, listy i notatki, a potem pilnuję, żeby nic Ci nie umknęło.\\n\\nOto Twój klucz:\\n\\n' + $json.result.token + '\\n\\nJak zacząć:\\n1. Otwórz na telefonie: https://luna.draminski.dev\\n2. iPhone: Udostępnij → „Do ekranu początkowego”. Android: menu → „Zainstaluj aplikację”.\\n3. Uruchom Lunę Z EKRANU POCZĄTKOWEGO i dopiero tam wklej klucz. (Na iPhonie aplikacja z ekranu początkowego nie widzi tego, co wpiszesz w Safari.)\\n\\nKlucz działa bez końca. Nie przesyłaj go nikomu — kto go ma, widzi Twoje sprawy.\\nZgubisz go? Wejdź na https://luna.draminski.dev, wpisz swój e-mail, a wyślę Ci nowy.\\n\\nDo usłyszenia!\\n— Luna' }}",
+    "options": {
+     "appendAttribution": false
+    }
+   },
+   "credentials": {
+    "smtp": {
+     "id": "DY5t4HkHVBfxB2gY",
+     "name": "SMTP n8n renlab"
+    }
+   },
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "bee0b93d-0e00-43b9-8c99-d3ca38f20097",
+   "name": "Mail: przykro mi",
+   "type": "n8n-nodes-base.emailSend",
+   "typeVersion": 2.1,
+   "position": [
+    880,
+    760
+   ],
+   "parameters": {
+    "fromEmail": "Luna <n8n@renlab.ovh>",
+    "toEmail": "={{ $json.result.email }}",
+    "subject": "Twoja prośba o dostęp do Luny",
+    "emailFormat": "text",
+    "text": "={{ 'Cześć' + ($json.result.name ? ' ' + $json.result.name : '') + '!\\n\\nPrzykro mi — Łukasz odrzucił Twoją prośbę o dostęp do Luny.\\n\\nJeśli to pomyłka, napisz do niego bezpośrednio.\\n\\n— Luna' }}",
+    "options": {
+     "appendAttribution": false
+    }
+   },
+   "credentials": {
+    "smtp": {
+     "id": "DY5t4HkHVBfxB2gY",
+     "name": "SMTP n8n renlab"
+    }
+   },
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "27f4caca-46e5-4ec4-aab0-45ffb6c92777",
+   "name": "Odpowiedz: decyzja",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    1100,
+    700
+   ],
+   "parameters": {
+    "respondWith": "json",
+    "responseBody": "={{ (R => Object.assign({ status: R.status, action: R.action, name: R.name, error: R.error , email: R.email }, { emailed: !$json.error }))($('Decyzja').item.json.result) }}",
+    "options": {
+     "responseCode": "={{ $('Decyzja').item.json.result.status || 200 }}"
+    }
+   }
+  }
+ ],
+ "connections": {
+  "POST access/request": {
+   "main": [
+    [
+     {
+      "node": "Prośba",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Prośba": {
+   "main": [
+    [
+     {
+      "node": "Istniejące konto?",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Istniejące konto?": {
+   "main": [
+    [
+     {
+      "node": "Mail: nowy klucz",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Odpowiedz: prośba",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Mail: nowy klucz": {
+   "main": [
+    [
+     {
+      "node": "Odpowiedz: prośba",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "GET access/requests": {
+   "main": [
+    [
+     {
+      "node": "Prośby czekające",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Prośby czekające": {
+   "main": [
+    [
+     {
+      "node": "Odpowiedz: prośby",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "POST access/decide": {
+   "main": [
+    [
+     {
+      "node": "Decyzja",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Decyzja": {
+   "main": [
+    [
+     {
+      "node": "Zaakceptowana?",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Zaakceptowana?": {
+   "main": [
+    [
+     {
+      "node": "Mail: witaj",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Odrzucona?",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Odrzucona?": {
+   "main": [
+    [
+     {
+      "node": "Mail: przykro mi",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Odpowiedz: decyzja",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Mail: witaj": {
+   "main": [
+    [
+     {
+      "node": "Odpowiedz: decyzja",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Mail: przykro mi": {
+   "main": [
+    [
+     {
+      "node": "Odpowiedz: decyzja",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1",
+  "timezone": "Europe/Warsaw"
+ }
+}
