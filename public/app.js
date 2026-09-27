@@ -242,7 +242,9 @@ function partWidget(it) {
   if (w.status === 'generating') return `<p class="gen-state">${svg('spark', 'width:15px;height:15px')} AI buduje widget do tej rzeczy…</p>`;
   if (w.status === 'rejected') return `<p class="gen-state bad">Widget nie przeszedł kontroli bezpieczeństwa — zostaje zwykła karta.</p>`;
   if (w.status !== 'ready' || !/^[a-z0-9-]+$/.test(w.slug || '') || !Number.isInteger(w.version)) return '';
-  return `<iframe class="wframe" data-wid="${it.id}" src="/widgets/${w.slug}.v${w.version}.html" sandbox="allow-scripts"
+  const note = w.pending ? `<p class="gen-state">${svg('spark', 'width:15px;height:15px')} AI przebudowuje widget — ten działa do czasu podmiany…</p>`
+    : w.revision_error ? `<p class="gen-state bad">Nowa wersja nie przeszła kontroli — zostaje ta. ${esc(String(w.revision_error).replace(/^ODRZUCONY( po poprawce)?: /, '').slice(0, 160))}</p>` : '';
+  return note + `<iframe class="wframe" data-wid="${it.id}" src="/widgets/${w.slug}.v${w.version}.html" sandbox="allow-scripts"
     title="Widget: ${esc(it.title)}" loading="lazy" referrerpolicy="no-referrer" style="height:120px"></iframe>`;
 }
 
@@ -311,6 +313,7 @@ function openDetail(id) {
           <p class="kind">${list.filter((x) => x.done).length} z ${list.length}${it.data?.checklist_reset ? ' · odnawia się' : ''}</p></div>${partList(it)}</div>` : ''}
       ${url ? `<div class="w" style="margin-top:12px;cursor:default"><p class="kind">${it.spec?.summarize ? 'Streszczenie strony' : 'Strona'}</p>${partPage(it, true)}</div>` : ''}
       ${rows.length ? `<ul class="rows">${rows.map(([a, b]) => `<li><span>${esc(a)}</span><b>${esc(b)}</b></li>`).join('')}</ul>` : ''}
+      <button class="cta alt wide" type="button" data-act="chat">${svg('spark')}${it.data?.widget?.slug ? 'Popraw widget' : 'Zrób widget'}</button>
       <div class="d-cta">
         <button class="cta" type="button" data-act="done">${svg('check')}${it.spec?.recurrence ? 'Zakończ powtarzanie' : 'Oznacz jako zrobione'}</button>
         <button class="ghost danger" type="button" data-act="delete" aria-label="Usuń">${svg('trash')}</button>
@@ -332,6 +335,7 @@ function closeDetail(fromPop = false) {
 async function detailAction(act) {
   const id = state.openId;
   if (act === 'close') return closeDetail();
+  if (act === 'chat') return openChat(id);
   if (act === 'delete' && !confirm('Usunąć na dobre?')) return;
   try {
     await (act === 'done' ? api.done(id) : api.remove(id));
@@ -378,6 +382,60 @@ async function bell() {
   refreshBell();
 }
 
+// ---------- czat: popraw / zrób widget ----------
+const chat = { id: null, busy: false };
+function chatGreeting(it) {
+  return it.data?.widget?.slug
+    ? 'Co nie pasuje w tym widgecie? Opisz, co zmienić — dopytam o szczegóły, a zanim przebuduję, pokażę plan.'
+    : 'Jaki widget ma tu być? Napisz, co ma pokazywać i co chcesz w nim wpisywać.';
+}
+function renderChat(messages, proposal) {
+  const it = state.items.find((x) => x.id === chat.id);
+  const all = [{ role: 'assistant', text: chatGreeting(it || {}) }, ...(messages || [])];
+  $('#msgs').innerHTML = all.map((m) => `<p class="msg ${m.role === 'user' ? 'me' : 'ai'}">${esc(m.text)}</p>`).join('')
+    + (chat.busy ? '<p class="msg ai typing" aria-label="AI pisze"><i></i><i></i><i></i></p>' : '');
+  $('#prop').hidden = !proposal;
+  if (proposal) $('#prop-text').textContent = proposal.summary;
+  const box = $('#msgs'); box.scrollTop = box.scrollHeight;
+}
+async function openChat(id) {
+  const it = state.items.find((x) => x.id === id); if (!it) return;
+  chat.id = id; chat.busy = false;
+  $('#chat-title').textContent = it.data?.widget?.slug ? 'Popraw widget' : 'Zrób widget';
+  $('#chat-kind').textContent = it.title;
+  renderChat([], null);
+  $('#chat').showModal();
+  try { const r = await api.widgetChat(id, ''); renderChat(r.messages, r.proposal); } catch (err) { toast(err.message); }
+  $('#chat-q').focus();
+}
+async function sendChat(e) {
+  e.preventDefault();
+  const q = $('#chat-q'); const text = q.value.trim();
+  if (!text || chat.busy) return;
+  const shown = [...$('#msgs').querySelectorAll('.msg')].slice(1).map((el) => ({ role: el.classList.contains('me') ? 'user' : 'assistant', text: el.textContent }));
+  q.value = ''; chat.busy = true;
+  renderChat([...shown, { role: 'user', text }], null);
+  try { const r = await api.widgetChat(chat.id, text); chat.busy = false; renderChat(r.messages, r.proposal); }
+  catch (err) { chat.busy = false; renderChat(shown, null); q.value = text; toast(err.message); }
+  q.focus();
+}
+async function chatAction(act) {
+  if (act === 'close') return $('#chat').close();
+  if (act === 'more') { $('#prop').hidden = true; $('#chat-q').placeholder = 'Co jeszcze zmienić?'; return $('#chat-q').focus(); }
+  if (act === 'reset') {
+    try { await api.widgetChatClose(chat.id); renderChat([], null); $('#chat-q').focus(); } catch (err) { toast(err.message); }
+    return;
+  }
+  if (act === 'go') {
+    try {
+      await api.widgetRegenerate(chat.id);
+      $('#chat').close();
+      toast('Przebudowuję widget — obecny działa do czasu podmiany.');
+      await load(); if (state.openId) openDetail(state.openId);
+    } catch (err) { toast(err.message); }
+  }
+}
+
 // ---------- most do widgetów ----------
 function frameFor(win) { return [...document.querySelectorAll('iframe.wframe')].find((f) => f.contentWindow === win); }
 function sendData(f) {
@@ -405,7 +463,7 @@ document.addEventListener('load', (e) => { if (e.target.matches?.('iframe.wframe
 let genTimer;
 function watchGenerating() {
   clearTimeout(genTimer);
-  if (state.items.some((i) => i.data?.widget?.status === 'generating' || i.data?.summary_status === 'working'))
+  if (state.items.some((i) => i.data?.widget?.status === 'generating' || i.data?.widget?.pending || i.data?.summary_status === 'working'))
     genTimer = setTimeout(() => load().then(() => { if (state.openId) openDetail(state.openId); }), 5000);
 }
 
@@ -463,6 +521,8 @@ function bind() {
     } catch (err) { b.disabled = false; toast(err.message); }
   };
   $('#list').addEventListener('click', onSum, true);
+  $('#chat-form').addEventListener('submit', sendChat);
+  $('#chat').addEventListener('click', (e) => { const b = e.target.closest('[data-chat]'); if (b) chatAction(b.dataset.chat); });
   $('#detail').addEventListener('click', onSum, true);
   addEventListener('popstate', () => closeDetail(true));
   addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDetail(); });

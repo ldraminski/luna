@@ -62,6 +62,9 @@ export const api = {
   remove: (id) => call('items/delete', { method: 'POST', body: { id } }),
   check: (id, index, done) => call('items/check', { method: 'POST', body: { id, index, done } }),
   summarize: (id) => call('items/summarize', { method: 'POST', body: { id } }),
+  widgetChat: (id, message = '') => call('items/widget-chat', { method: 'POST', body: { id, message } }),
+  widgetChatClose: (id) => call('items/widget-chat/close', { method: 'POST', body: { id } }),
+  widgetRegenerate: (id) => call('items/widget-regenerate', { method: 'POST', body: { id } }),
   widgetState: (id, state) => call('items/widget-state', { method: 'POST', body: { id, state } }),
 };
 

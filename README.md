@@ -36,3 +36,10 @@ Ręczne ponowienie: `POST http://127.0.0.1:5678/webhook/oboe/admin/widget {"item
 Po dodaniu (created), „Sprawdź teraz” (manual, max co 2 min) i w terminie cyklicznym (scheduled — push tylko przy istotnej zmianie).
 SSRF: DNS przez DoH (A+AAAA) → tylko publiczne IP, porty 80/443, przekierowania nie automatycznie — jedno ręczne z ponownym DNS.
 Tekst bez zmian (odcisk FNV) = bez pytania modelu. Treść strony dla modelu to dane, nie polecenia.
+
+## Czat „Popraw / Zrób widget”
+`POST /api/items/widget-chat {id, message}` — rozmowa z projektantem (DeepSeek 4.1, `n8n/prompt-czat-widgetu.txt`) w `widget_chats`;
+gdy AI jest pewne, zwraca `proposal` (plan + nowy schemat + stan przeniesiony z obecnego). `POST /api/items/widget-regenerate {id}`
+dopiero po `proposal` → „Oboe: Generuj widget” mode=revise: stary kod z pliku + plan → programista → skan → guardian.
+Widget tylko tej rzeczy → nowa wersja tego samego sluga (v2…); współdzielony → kopia z nowym slugiem. Odrzucona poprawka
+zostawia stary widget (`revision_error`). Stan użytkownika zawsze przechodzi (bezpiecznik w „Projekt z czatu”).

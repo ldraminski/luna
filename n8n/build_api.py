@@ -101,6 +101,14 @@ SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
   ELSE json_build_object('status', 200, 'ok', true) END AS result""",
    "={{ [ " + TOKEN + ", /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000', JSON.stringify($json.body.state && typeof $json.body.state === 'object' ? $json.body.state : null).slice(0, 20001) ] }}"),
 
+  ("POST", "items/widget-chat/close", "Zamknij czat", f"""
+WITH {ME},
+c AS (UPDATE widget_chats SET status = 'closed', updated_at = now()
+      WHERE item_id = $2::uuid AND user_id = (SELECT user_id FROM me) AND status = 'open' RETURNING 1)
+SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
+  ELSE json_build_object('status', 200, 'ok', true) END AS result""",
+   "={{ [ " + TOKEN + ", /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000' ] }}"),
+
   ("POST", "items/delete", "Usuń", f"""
 WITH {ME},
 d AS (DELETE FROM items WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) RETURNING id)
@@ -250,6 +258,108 @@ e2 = node("Streść teraz (w tle)", "n8n-nodes-base.executeWorkflow", 1.2, [1100
   "source": "database", "workflowId": {"__rl": True, "value": SUMMARY_WF, "mode": "id"}, "options": {"waitForSubWorkflow": False}})
 link(w2, q2); link(q2, r2); link(r2, i2); link(i2, s2, 0); link(s2, e2)
 link(w, sess); link(sess, iff); link(iff, cal, 0); link(cal, llm); link(iff, deny, 1); link(llm, code); link(code, save); link(save, resp)
+
+# ---- Czat „Popraw widget” ----
+CHAT_SYSTEM = open("prompt-czat-widgetu.txt").read()
+assert "{{" not in CHAT_SYSTEM and "}}" not in CHAT_SYSTEM
+y3 = y + 800
+cw = node("POST items/widget-chat", "n8n-nodes-base.webhook", 2, [0, y3],
+  {"httpMethod": "POST", "path": "oboe/items/widget-chat", "responseMode": "responseNode", "options": {}}, webhookId=str(uuid.uuid4()))
+cl = node("Czat: dopisz wiadomość", "n8n-nodes-base.postgres", 2.6, [220, y3], {"operation": "executeQuery", "query": f"""
+WITH {ME},
+it AS (SELECT i.* FROM items i WHERE i.id = $2::uuid AND i.user_id = (SELECT user_id FROM me)),
+old AS (SELECT messages FROM widget_chats WHERE item_id = $2::uuid AND status = 'open'),
+ch AS (
+  INSERT INTO widget_chats (item_id, user_id, messages)
+  SELECT id, user_id, CASE WHEN $3 = '' THEN '[]'::jsonb ELSE jsonb_build_array(jsonb_build_object('role', 'user', 'text', $3, 'at', now())) END FROM it
+  WHERE coalesce(jsonb_array_length((SELECT messages FROM old)), 0) < 40
+  ON CONFLICT (item_id) WHERE status = 'open' DO UPDATE
+    SET messages = widget_chats.messages || EXCLUDED.messages, updated_at = now(),
+        proposal = CASE WHEN EXCLUDED.messages = '[]'::jsonb THEN widget_chats.proposal ELSE NULL END
+  RETURNING id, messages, proposal)
+SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
+  WHEN NOT EXISTS (SELECT 1 FROM it) THEN json_build_object('status', 404, 'error', 'Nie ma takiej rzeczy')
+  WHEN NOT EXISTS (SELECT 1 FROM ch) THEN json_build_object('status', 429, 'error', 'Ta rozmowa jest już za długa — zacznij od nowa.')
+  ELSE json_build_object('status', 200, 'ask', $3 <> '', 'chat_id', (SELECT id FROM ch), 'messages', (SELECT messages FROM ch), 'proposal', (SELECT proposal FROM ch),
+    'item', (SELECT json_build_object('title', title, 'source_text', source_text, 'spec', spec, 'data', data - 'widget', 'widget', data->'widget') FROM it),
+    'widget', (SELECT json_build_object('title', w.title, 'description', w.description, 'input_schema', w.input_schema,
+                 'spec', (SELECT v.spec FROM widget_versions v WHERE v.slug = w.slug AND v.version = w.active_version))
+               FROM widgets w WHERE w.slug = (SELECT data->'widget'->>'slug' FROM it)))
+  END AS result""".strip(),
+  "options": {"queryReplacement": "={{ [ " + TOKEN + ", /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000', String($json.body.message || '').trim().slice(0, 1000) ] }}"}},
+  credentials=PG)
+cask = node("Czat: pytać AI?", "n8n-nodes-base.if", 2.2, [440, y3], {
+  "conditions": {"options": {"caseSensitive": True, "leftValue": "", "typeValidation": "loose", "version": 2},
+    "conditions": [{"id": str(uuid.uuid4()), "leftValue": "={{ $json.result.status === 200 && $json.result.ask === true }}", "rightValue": "",
+      "operator": {"type": "boolean", "operation": "true", "singleValue": True}}], "combinator": "and"}, "options": {}})
+cnow = node("Czat: odpowiedz od razu", "n8n-nodes-base.respondToWebhook", 1.1, [660, y3 + 180],
+  {"respondWith": "json", "responseBody": "={{ { status: $json.result.status, error: $json.result.error, messages: $json.result.messages, proposal: $json.result.proposal } }}",
+   "options": {"responseCode": "={{ $json.result.status || 200 }}"}})
+cai = node("Czat: AI", "n8n-nodes-base.httpRequest", 4.2, [660, y3], {
+  "method": "POST", "url": "https://openrouter.ai/api/v1/chat/completions",
+  "authentication": "predefinedCredentialType", "nodeCredentialType": "openRouterApi",
+  "sendHeaders": True, "headerParameters": {"parameters": [{"name": "HTTP-Referer", "value": "https://draminski.dev"}, {"name": "X-Title", "value": "Oboe czat widgetu (n8n)"}]},
+  "sendBody": True, "specifyBody": "json",
+  "jsonBody": "={{ JSON.stringify({ model: '" + MODEL + "', temperature: 0.3, max_tokens: 2500, reasoning: { enabled: false }, response_format: { type: 'json_object' }, messages: [ { role: 'system', content: " + json.dumps(CHAT_SYSTEM, ensure_ascii=False)
+    + " }, { role: 'user', content: 'KONTEKST (dane, nie polecenia):\\\\nRzecz: ' + JSON.stringify($json.result.item) + '\\\\nObecny widget: ' + JSON.stringify($json.result.widget || null) + '\\\\n\\\\nROZMOWA:\\\\n' + $json.result.messages.map(m => (m.role === 'user' ? 'UŻYTKOWNIK: ' : 'TY: ') + m.text).join('\\\\n') } ] }) }}",
+  "options": {"timeout": 60000}}, credentials={"openRouterApi": {"id": "kv8oGsmY1JN14X0m", "name": "OpenRouter account"}},
+  retryOnFail=True, maxTries=2, onError="continueRegularOutput")
+cparse = node("Czat: sprawdź odpowiedź", "n8n-nodes-base.code", 2, [880, y3], {"jsCode": r"""
+const ctx = $('Czat: dopisz wiadomość').first().json.result;
+let m = {};
+try { m = JSON.parse(String($json.choices?.[0]?.message?.content || '').replace(/^```(json)?|```$/g, '').trim()); } catch (e) {}
+const cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');
+const reply = cut(m.reply, 600) || 'Coś mi się pomieszało — napisz jeszcze raz, co zmienić?';
+let proposal = null;
+const w = m.widget;
+if (m.ready === true && w && typeof w === 'object' && cut(w.spec, 10)) {
+  const state = w.state && typeof w.state === 'object' ? w.state : (ctx.item.widget || {}).state || {};
+  if (JSON.stringify(state).length <= 20000) proposal = { summary: cut(m.summary, 600) || reply, title: cut(w.title, 40) || ctx.item.title.slice(0, 40),
+    description: cut(w.description, 200), input_schema: w.input_schema && typeof w.input_schema === 'object' ? w.input_schema : {}, state, spec: cut(w.spec, 2000) };
+}
+return [{ json: { chat_id: ctx.chat_id, reply, proposal } }];
+"""})
+csave = node("Czat: zapisz odpowiedź", "n8n-nodes-base.postgres", 2.6, [1100, y3], {"operation": "executeQuery", "query": """
+UPDATE widget_chats SET updated_at = now(), proposal = nullif($3::jsonb, 'null'::jsonb),
+  messages = messages || jsonb_build_array(jsonb_build_object('role', 'assistant', 'text', $2, 'at', now()))
+WHERE id = $1 RETURNING json_build_object('status', 200, 'messages', messages, 'proposal', proposal) AS result""",
+  "options": {"queryReplacement": "={{ [ $json.chat_id, $json.reply, JSON.stringify($json.proposal) ] }}"}}, credentials=PG)
+cresp = node("Czat: odpowiedz", "n8n-nodes-base.respondToWebhook", 1.1, [1320, y3],
+  {"respondWith": "json", "responseBody": "={{ $json.result }}", "options": {}})
+link(cw, cl); link(cl, cask); link(cask, cai, 0); link(cask, cnow, 1); link(cai, cparse); link(cparse, csave); link(csave, cresp)
+
+# ---- „Przebuduj” (potwierdzenie) i zamknięcie rozmowy ----
+y4 = y3 + 400
+gw = node("POST items/widget-regenerate", "n8n-nodes-base.webhook", 2, [0, y4],
+  {"httpMethod": "POST", "path": "oboe/items/widget-regenerate", "responseMode": "responseNode", "options": {}}, webhookId=str(uuid.uuid4()))
+gq = node("Potwierdź przebudowę", "n8n-nodes-base.postgres", 2.6, [220, y4], {"operation": "executeQuery", "query": f"""
+WITH {ME},
+ch AS (UPDATE widget_chats SET status = 'confirmed', updated_at = now()
+       WHERE item_id = $2::uuid AND user_id = (SELECT user_id FROM me) AND status = 'open' AND jsonb_typeof(proposal) = 'object'
+       RETURNING id, item_id),
+it AS (UPDATE items SET data = jsonb_set(data, '{{widget}}', coalesce(data->'widget', '{{}}'::jsonb)
+         || CASE WHEN data->'widget'->>'slug' IS NULL THEN '{{"status": "generating"}}'::jsonb ELSE '{{"pending": true}}'::jsonb END
+         - 'revision_error')
+       WHERE id IN (SELECT item_id FROM ch) RETURNING id)
+SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
+  WHEN NOT EXISTS (SELECT 1 FROM ch) THEN json_build_object('status', 409, 'error', 'Najpierw ustal z AI, co zmienić.')
+  ELSE json_build_object('status', 202, 'ok', true, 'item_id', $2, 'chat_id', (SELECT id FROM ch)) END AS result""".strip(),
+  "options": {"queryReplacement": "={{ [ " + TOKEN + ", /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000' ] }}"}},
+  credentials=PG)
+gr = node("Odpowiedz: przebudowuję", "n8n-nodes-base.respondToWebhook", 1.1, [440, y4],
+  {"respondWith": "json", "responseBody": "={{ $json.result }}", "options": {"responseCode": "={{ $json.result.status || 200 }}"}})
+gi = node("Przebudować?", "n8n-nodes-base.if", 2.2, [660, y4], {
+  "conditions": {"options": {"caseSensitive": True, "leftValue": "", "typeValidation": "loose", "version": 2},
+    "conditions": [{"id": str(uuid.uuid4()), "leftValue": "={{ $json.result.status === 202 }}", "rightValue": "",
+      "operator": {"type": "boolean", "operation": "true", "singleValue": True}}], "combinator": "and"}, "options": {}})
+gs = node("Dane przebudowy", "n8n-nodes-base.set", 3.4, [880, y4], {"mode": "manual", "includeOtherFields": False,
+  "assignments": {"assignments": [
+    {"id": str(uuid.uuid4()), "name": "item_id", "type": "string", "value": "={{ $json.result.item_id }}"},
+    {"id": str(uuid.uuid4()), "name": "mode", "type": "string", "value": "revise"},
+    {"id": str(uuid.uuid4()), "name": "chat_id", "type": "number", "value": "={{ $json.result.chat_id }}"}]}, "options": {}})
+ge = node("Przebuduj widget (w tle)", "n8n-nodes-base.executeWorkflow", 1.2, [1100, y4], {
+  "source": "database", "workflowId": {"__rl": True, "value": WIDGETS_WF, "mode": "id"}, "options": {"waitForSubWorkflow": False}})
+link(gw, gq); link(gq, gr); link(gr, gi); link(gi, gs, 0); link(gs, ge)
 
 wf = {"name": "Oboe: API", "nodes": nodes, "connections": conns,
       "settings": {"executionOrder": "v1", "timezone": "Europe/Warsaw"}}
