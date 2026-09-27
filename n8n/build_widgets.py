@@ -9,9 +9,10 @@ PG = {"postgres": {"id": "IAfnl61Lb7KbTeZi", "name": "Oboe - Postgres (oboe-db)"
 OR = {"openRouterApi": {"id": "kv8oGsmY1JN14X0m", "name": "OpenRouter account"}}
 ADMIN = {"httpHeaderAuth": {"id": "9Rd7Zl7NxIcEvPtL", "name": "Oboe - admin (X-Admin-Token)"}}
 TEXT_MODEL = "deepseek/deepseek-v4.1-flash"
-# Porównanie 27.09 na tym samym widgecie: DeepSeek 4.1 najlepiej trzyma kontrakt (GLM 5.3 Flash rysował własną kartę,
-# a bez limitu rozumowania ucinał kod; Kimi K2.7 Code wychodził poza ramkę i był 20× droższy).
-CODE_MODEL = "deepseek/deepseek-v4.1-flash"
+# Decyzja Łukasza 27.09: na razie GLM 5.3 Flash (tańszy output, mocny w Image-to-WebDev). DO PRZETESTOWANIA na większej
+# próbie vs DeepSeek 4.1 — w pierwszym teście DeepSeek lepiej trzymał kontrakt (GLM rysował własną kartę i tytuł).
+# GLM: rozumowania nie da się wyłączyć, `effort` jest ignorowany — działa tylko reasoning.max_tokens.
+CODE_MODEL = "z-ai/glm-5.3-flash"
 REPO = "/data/oboe-widgets"
 
 nodes, conns = [], {}
@@ -22,10 +23,11 @@ def link(a, b, out=0):
     conns.setdefault(a, {"main": []})
     while len(conns[a]["main"]) <= out: conns[a]["main"].append([])
     conns[a]["main"][out].append({"node": b, "type": "main", "index": 0})
-def llm(name, pos, model, system, user_expr, max_tokens, json_mode=True, reasoning="{ enabled: false }", timeout=120000):
+def llm(name, pos, model, system, user_expr, max_tokens, json_mode=True, reasoning="{ enabled: false }", timeout=120000, provider=None):
     assert "{{" not in system and "}}" not in system
     body = ("={{ JSON.stringify({ model: '" + model + "', temperature: 0.2, max_tokens: " + str(max_tokens)
             + (", reasoning: " + reasoning if reasoning else "")
+            + (", provider: " + provider if provider else "")
             + (", response_format: { type: 'json_object' }" if json_mode else "")
             + ", messages: [ { role: 'system', content: " + json.dumps(system, ensure_ascii=False)
             + " }, { role: 'user', content: " + user_expr + " } ] }) }}")
@@ -97,7 +99,7 @@ WHERE id = $1::uuid RETURNING id""",
 
 coder = llm("Programista", [1340, 80], CODE_MODEL, open("prompt-widget.txt").read(),
   "'Widget: ' + $json.title + '\\\\nOpis: ' + $json.description + '\\\\nSchemat stanu: ' + JSON.stringify($json.input_schema) + '\\\\nPrzykładowy stan: ' + JSON.stringify($json.state) + '\\\\n\\\\nSpecyfikacja:\\\\n' + $json.spec",
-  12000, json_mode=False, timeout=240000)
+  12000, json_mode=False, reasoning="{ max_tokens: 2000 }", provider="{ sort: 'throughput' }", timeout=240000)
 scan = code("Skan", [1560, 80], open("skan.js").read())
 guard = llm("Guardian", [1780, 80], TEXT_MODEL, open("prompt-guardian.txt").read(),
   "'Wynik automatycznego skanu: ' + ($json.violations.length ? $json.violations.join('; ') : 'bez trafień') + '\\\\n\\\\nKod widgetu:\\\\n' + $json.html.slice(0, 60000)",
@@ -122,14 +124,14 @@ tofile = node("Do pliku", "n8n-nodes-base.convertToFile", 1.1, [2660, 0], {
   "operation": "toText", "sourceProperty": "html", "binaryPropertyName": "data",
   "options": {"fileName": "={{ $json.slug }}.v1.html", "encoding": "utf8"}})
 # Convert to File bierze pole html z bieżącego elementu — składamy je w Code przed nim
-prep = code("Złóż plik", [2550, 0], "return [{ json: { slug: $json.slug, html: $('Werdykt').first().json.html } }];")
+prep = code("Złóż plik", [2550, 0], "const v = $('Werdykt 2').isExecuted ? $('Werdykt 2').first().json : $('Werdykt').first().json;\nreturn [{ json: { slug: $json.slug, html: v.html, title: v.title, description: v.description, input_schema: v.input_schema, state: v.state, notes: v.notes } }];")
 write = node("Zapisz plik", "n8n-nodes-base.readWriteFile", 1.1, [2880, 0], {
   "operation": "write", "fileName": "=" + REPO + "/{{ $('Złóż plik').first().json.slug }}.v1.html", "dataPropertyName": "data", "options": {}})
 gadd = node("Git add", "n8n-nodes-base.git", 1.1, [3100, 0], {
   "operation": "add", "repositoryPath": REPO, "pathsToAdd": "={{ $('Złóż plik').first().json.slug }}.v1.html"})
 gcom = node("Git commit", "n8n-nodes-base.git", 1.1, [3320, 0], {
   "operation": "commit", "repositoryPath": REPO,
-  "message": "=Widget {{ $('Złóż plik').first().json.slug }} v1 — {{ $('Werdykt').first().json.title }} (zatwierdzony przez guardiana)", "options": {}})
+  "message": "=Widget {{ $('Złóż plik').first().json.slug }} v1 — {{ $('Złóż plik').first().json.title }} (zatwierdzony przez guardiana)", "options": {}})
 save = pg("Zapisz w bibliotece", [3540, 0], """
 WITH w AS (
   INSERT INTO widgets (slug, title, description, input_schema, active_version, builtin, created_by)
@@ -140,7 +142,7 @@ v AS (
 UPDATE items SET updated_at = now(), data = jsonb_set(data, '{widget}', jsonb_build_object(
   'slug', (SELECT slug FROM v), 'version', 1, 'status', 'ready', 'state', $5::jsonb))
 WHERE id = $6::uuid RETURNING id""",
-  "={{ [ $('Złóż plik').first().json.slug, $('Werdykt').first().json.title, $('Werdykt').first().json.description, JSON.stringify($('Werdykt').first().json.input_schema), JSON.stringify($('Werdykt').first().json.state), $('Wejście').first().json.item_id, $('Werdykt').first().json.notes, '" + CODE_MODEL + "' ] }}")
+  "={{ [ $('Złóż plik').first().json.slug, $('Złóż plik').first().json.title, $('Złóż plik').first().json.description, JSON.stringify($('Złóż plik').first().json.input_schema), JSON.stringify($('Złóż plik').first().json.state), $('Wejście').first().json.item_id, $('Złóż plik').first().json.notes, '" + CODE_MODEL + "' ] }}")
 rej = pg("Odrzucony", [2440, 220], """
 UPDATE items SET updated_at = now(), data = jsonb_set(data, '{widget}', jsonb_build_object(
   'status', 'rejected', 'notes', left($2, 600), 'at', now()))
@@ -149,7 +151,29 @@ WHERE id = $1::uuid RETURNING id""", "={{ [ $('Wejście').first().json.item_id, 
 link(trig, inp); link(wh, inp); link(inp, load); link(load, pick); link(pick, chk); link(chk, sw)
 link(sw, reuse, 0); link(sw, coder, 1); link(sw, rej, 2)
 link(coder, scan); link(scan, guard); link(guard, verdict); link(verdict, ok)
-link(ok, free, 0); link(ok, rej, 1)
+fix = llm("Poprawka", [2440, 420], CODE_MODEL, open("prompt-widget.txt").read(),
+  "'Twój poprzedni kod widgetu został ODRZUCONY. Popraw WSZYSTKIE problemy i oddaj cały poprawiony plik (samo HTML, od <!doctype html>).\\n\\nProblemy:\\n' + $json.notes + '\\n\\nPoprzedni kod:\\n' + $json.html",
+  12000, json_mode=False, reasoning="{ max_tokens: 2000 }", provider="{ sort: 'throughput' }", timeout=240000)
+scan2 = code("Skan 2", [2660, 420], open("skan.js").read())
+guard2 = llm("Guardian 2", [2880, 420], TEXT_MODEL, open("prompt-guardian.txt").read(),
+  "'Wynik automatycznego skanu: ' + ($json.violations.length ? $json.violations.join('; ') : 'bez trafień') + '\\n\\nKod widgetu:\\n' + $json.html.slice(0, 60000)",
+  1500)
+verdict2 = code("Werdykt 2", [3100, 420], r"""
+const s = $('Skan 2').first().json; const d = $('Sprawdź dobór').first().json;
+let g = {};
+try { g = JSON.parse(String($json.choices?.[0]?.message?.content || '').replace(/^```(json)?|```$/g, '').trim()); } catch (e) {}
+const problems = [...s.violations, ...(Array.isArray(g.problems) ? g.problems.map(String) : [])];
+const approved = g.approved === true && s.violations.length === 0;
+return [{ json: { ...d, html: s.html, approved, repaired: true,
+  notes: (approved ? 'Zatwierdzony po poprawce. ' : 'ODRZUCONY po poprawce: ' + (problems.join('; ') || 'guardian nie odpowiedział') + '. ') + String(g.notes || '').slice(0, 500) } }];
+""")
+ok2 = node("Zatwierdzony po poprawce?", "n8n-nodes-base.if", 2.2, [3320, 420], {
+  "conditions": {"options": {"caseSensitive": True, "leftValue": "", "typeValidation": "loose", "version": 2},
+    "conditions": [{"id": str(uuid.uuid4()), "leftValue": "={{ $json.approved }}", "rightValue": "",
+      "operator": {"type": "boolean", "operation": "true", "singleValue": True}}], "combinator": "and"}, "options": {}})
+link(ok, free, 0); link(ok, fix, 1)
+link(fix, scan2); link(scan2, guard2); link(guard2, verdict2); link(verdict2, ok2)
+link(ok2, free, 0); link(ok2, rej, 1)
 link(free, prep); link(prep, tofile); link(tofile, write); link(write, gadd); link(gadd, gcom); link(gcom, save)
 
 json.dump({"name": "Oboe: Generuj widget", "nodes": nodes, "connections": conns,
