@@ -2,7 +2,7 @@
  "name": "Oboe: Wydaj token",
  "nodes": [
   {
-   "id": "1b65fea8-6953-4d6c-9000-f239a1344916",
+   "id": "df5cf6d0-43b2-41b9-a4fe-ccb5f6c893e0",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "d00eb7fd-a936-4058-bded-8f1c5c58b378",
+   "id": "1f21b6bc-0d5a-42f9-b8d7-f6a5813abbb9",
    "name": "POST admin/token",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -38,10 +38,10 @@
      "name": "Oboe - admin (X-Admin-Token)"
     }
    },
-   "webhookId": "e2a28fe7-062b-4bfc-99a6-c8131d9de9d5"
+   "webhookId": "84b8e8ca-4cce-40ad-b1bf-15dc521e8b8c"
   },
   {
-   "id": "2ae041cb-1f9e-4e52-899d-d32507be6e70",
+   "id": "b8441ada-4b8f-47b6-bf68-92ad4a6294a8",
    "name": "Wydaj token",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -64,7 +64,7 @@
    }
   },
   {
-   "id": "f642f3db-adb1-43bc-a5e9-7dd782cda0a2",
+   "id": "cb1adc02-4672-4944-b835-82f0522306bf",
    "name": "Wysłać mail?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -82,7 +82,7 @@
      },
      "conditions": [
       {
-       "id": "1a745142-f7ed-4b97-a4bc-3806e542a9bd",
+       "id": "2c04f347-6236-4e7c-abb1-b2ad31fd97e0",
        "leftValue": "={{ $json.result.status === 200 && $('POST admin/token').item.json.body.send_email !== false }}",
        "rightValue": "",
        "operator": {
@@ -98,7 +98,7 @@
    }
   },
   {
-   "id": "2e27b39e-9279-4984-a489-e758a734b390",
+   "id": "b1d220a9-8ed7-46da-9e28-34175e021d17",
    "name": "Wyślij token mailem",
    "type": "n8n-nodes-base.emailSend",
    "typeVersion": 2.1,
@@ -107,11 +107,11 @@
     -100
    ],
    "parameters": {
-    "fromEmail": "Oboe <n8n@renlab.ovh>",
+    "fromEmail": "Luna <n8n@renlab.ovh>",
     "toEmail": "={{ $json.result.email }}",
-    "subject": "Twój klucz do Oboe",
+    "subject": "Cześć, tu Luna — Twój klucz",
     "emailFormat": "text",
-    "text": "={{ 'Cześć' + ($json.result.name ? ' ' + $json.result.name : '') + '!\\n\\nOto Twój klucz do Oboe — aplikacji, która pamięta za Ciebie:\\n\\n' + $json.result.token + '\\n\\nJak zacząć:\\n1. Otwórz na telefonie: https://oboe.draminski.dev\\n2. iPhone: Udostępnij → „Do ekranu początkowego”. Android: menu → „Zainstaluj aplikację”.\\n3. Uruchom Oboe Z EKRANU POCZĄTKOWEGO i dopiero tam wklej klucz. (Na iPhonie aplikacja z ekranu początkowego nie widzi tego, co wpiszesz w Safari.)\\n\\nKlucz działa bez końca. Nie przesyłaj go nikomu — kto go ma, widzi Twoje przypomnienia.\\nZgubisz go? Napisz do Łukasza, dostaniesz nowy, a ten przestanie działać.\\n\\n— Oboe' }}",
+    "text": "={{ 'Cześć' + ($json.result.name ? ' ' + $json.result.name : '') + '!\\n\\nJestem Luna — Twoja prywatna asystentka. Zapisuję sprawy, terminy, listy i notatki, a potem pilnuję, żeby nic Ci nie umknęło.\\n\\nOto Twój klucz:\\n\\n' + $json.result.token + '\\n\\nJak zacząć:\\n1. Otwórz na telefonie: https://luna.draminski.dev\\n2. iPhone: Udostępnij → „Do ekranu początkowego”. Android: menu → „Zainstaluj aplikację”.\\n3. Uruchom Lunę Z EKRANU POCZĄTKOWEGO i dopiero tam wklej klucz. (Na iPhonie aplikacja z ekranu początkowego nie widzi tego, co wpiszesz w Safari.)\\n\\nKlucz działa bez końca. Nie przesyłaj go nikomu — kto go ma, widzi Twoje przypomnienia.\\nZgubisz go? Napisz do Łukasza, dostaniesz nowy, a ten przestanie działać.\\n\\nDo usłyszenia!\\n— Luna' }}",
     "options": {
      "appendAttribution": false
     }
@@ -125,7 +125,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "23a6c453-cf44-4e2e-a780-f278c48fbdbd",
+   "id": "c7f21ca9-10a2-429b-8f12-46b7a9e3917b",
    "name": "Odpowiedz: wysłano",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -140,7 +140,7 @@
    }
   },
   {
-   "id": "913761dc-44e1-40e4-9ec7-a08cb92a05f8",
+   "id": "a0b33b46-3b56-4d34-8b5e-f1e143308832",
    "name": "Odpowiedz",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,

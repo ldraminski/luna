@@ -12,7 +12,7 @@ Produkt nazywał się roboczo Oboe (覚え). Od 27.09.2026 **dla użytkownika to
 | tytuł, manifest PWA, ikona, teksty w aplikacji | repo `~/Work/oboe`, katalog `/opt/oboe`, obraz `oboe:latest` |
 | głos modeli: `understood`, powiadomienia, czat widgetu | kontenery `oboe`, `oboe-db`, baza i użytkownik `oboe` |
 | nadawca i treść maili („Luna <n8n@renlab.ovh>”) | workflow n8n „Oboe: …”, webhooki `/webhook/oboe/…`, credentiale „Oboe - …” |
-| adres `luna.draminski.dev` (`oboe.draminski.dev` działa dalej) | protokół widgetów `oboe:data/ready/resize/save` (zmiana zepsuje gotowe widgety) |
+| adres `luna.draminski.dev` (`oboe.draminski.dev` usunięty 27.09) | protokół widgetów `oboe:data/ready/resize/save` (zmiana zepsuje gotowe widgety) |
 | | `localStorage` `oboe-token`, IndexedDB `oboe`, cache SW `oboe-shell-*` (zmiana wyloguje ludzi) |
 
 Zasady: nowy tekst dla ludzi → „Luna”, w 1. osobie, forma żeńska, na „ty” („Zapisałam. Przypomnę ci…”).
