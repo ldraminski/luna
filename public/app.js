@@ -482,7 +482,8 @@ async function add(e) {
 // Pole wpisywania rośnie w górę razem z tekstem — do 80% widocznego ekranu, dalej przewija się samo pole.
 // W czacie widgetu do 50% — powyżej zostaje miejsce na rozmowę.
 function fitTA(q, frac) {
-  if (!q) return;
+  if (!q || !q.getClientRects().length) return;   // ukryte pole (zamknięty czat) ma wysokość 0 — nie przeliczamy
+  if (!q.value) { q.style.height = ''; q.style.overflowY = 'hidden'; return; }
   const vh = window.visualViewport?.height || innerHeight;
   const max = Math.round(vh * frac) - 24;
   q.style.height = 'auto';
@@ -545,7 +546,7 @@ async function openChat(id) {
   $('#chat-title').textContent = it.data?.widget?.slug ? 'Popraw widget' : 'Zrób widget';
   $('#chat-kind').textContent = it.title;
   renderChat([], null);
-  $('#chat').showModal();
+  $('#chat').showModal(); fitChat();
   try { const r = await api.widgetChat(id, ''); renderChat(r.messages, r.proposal); } catch (err) { toast(err.message); }
   $('#chat-q').focus();
 }
