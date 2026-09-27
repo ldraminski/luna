@@ -319,4 +319,8 @@ html.locked,html.locked body{overflow:hidden;height:100%}
   padding:11px 0;margin:0;resize:none;outline:none;height:44px;overflow-y:hidden;color:var(--ink)}
 .dock textarea::placeholder{color:var(--ink-2)}
 .dock.kb{padding-bottom:10px}
-.tok input,.ask input,.chat-form input{font-size:16px}
+.tok input,.ask input{font-size:16px}
+.chat-form{align-items:flex-end;border-radius:28px}
+.chat-form textarea{flex:1;min-width:0;display:block;border:0;background:transparent;font:inherit;font-size:16px;line-height:1.4;
+  padding:11px 0;margin:0;resize:none;outline:none;height:44px;overflow-y:hidden;color:var(--ink)}
+.chat-form textarea::placeholder{color:var(--ink-2)}

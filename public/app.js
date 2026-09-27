@@ -480,21 +480,27 @@ async function add(e) {
 }
 
 // Pole wpisywania rośnie w górę razem z tekstem — do 80% widocznego ekranu, dalej przewija się samo pole.
-function fitQ() {
-  const q = $('#q'); if (!q) return;
+// W czacie widgetu do 50% — powyżej zostaje miejsce na rozmowę.
+function fitTA(q, frac) {
+  if (!q) return;
   const vh = window.visualViewport?.height || innerHeight;
-  const max = Math.round(vh * 0.8) - 24;
+  const max = Math.round(vh * frac) - 24;
   q.style.height = 'auto';
   q.style.height = Math.min(q.scrollHeight, max) + 'px';
   q.style.overflowY = q.scrollHeight > max ? 'auto' : 'hidden';
 }
+const fitQ = () => fitTA($('#q'), 0.8);
+const fitChat = () => fitTA($('#chat-q'), 0.5);
 // iPhone nie zmniejsza układu przy klawiaturze — dok podnosimy ręcznie nad klawiaturę (VisualViewport).
 function keepDock() {
   const vv = window.visualViewport; if (!vv) return;
   const kb = Math.max(0, Math.round(innerHeight - vv.height - vv.offsetTop));
   $('#dock').style.bottom = kb + 'px';
   $('#dock').classList.toggle('kb', kb > 0);
-  fitQ();
+  // arkusz czatu widgetu też nad klawiaturę i nie wyższy niż widoczny ekran
+  const sheet = $('#chat .chat-in');
+  if (sheet) { sheet.style.bottom = kb + 'px'; sheet.style.height = Math.min(Math.round(vv.height * 0.92), 760) + 'px'; }
+  fitQ(); fitChat();
 }
 
 // ---------- powiadomienia ----------
@@ -548,10 +554,10 @@ async function sendChat(e) {
   const q = $('#chat-q'); const text = q.value.trim();
   if (!text || chat.busy) return;
   const shown = [...$('#msgs').querySelectorAll('.msg')].slice(1).map((el) => ({ role: el.classList.contains('me') ? 'user' : 'assistant', text: el.textContent }));
-  q.value = ''; chat.busy = true;
+  q.value = ''; fitChat(); chat.busy = true;
   renderChat([...shown, { role: 'user', text }], null);
   try { const r = await api.widgetChat(chat.id, text); chat.busy = false; renderChat(r.messages, r.proposal); }
-  catch (err) { chat.busy = false; renderChat(shown, null); q.value = text; toast(err.message); }
+  catch (err) { chat.busy = false; renderChat(shown, null); q.value = text; fitChat(); toast(err.message); }
   q.focus();
 }
 async function chatAction(act) {
@@ -678,6 +684,8 @@ function bind() {
     try { await markDone(b.dataset.done); } catch (err) { b.disabled = false; toast(err.message); }
   });
   $('#chat-form').addEventListener('submit', sendChat);
+  $('#chat-q').addEventListener('input', fitChat);
+  $('#chat-q').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); $('#chat-form').requestSubmit(); } });
   $('#chat').addEventListener('click', (e) => { const b = e.target.closest('[data-chat]'); if (b) chatAction(b.dataset.chat); });
   $('#detail').addEventListener('click', onSum, true);
   addEventListener('popstate', () => closeDetail(true));
