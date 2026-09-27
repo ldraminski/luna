@@ -113,6 +113,9 @@ async function load() {
 async function logout(msg) { await setToken(null); state.user = null; showHello(msg); }
 
 const eventOf = (it) => dt(it.spec?.event_at) || dt(it.next_at);
+// Po terminie: jednorazowa rzecz z terminem, który już minął (cykliczne przesuwa harmonogram, więc nigdy nie są „po”).
+const isLate = (it) => { const ev = !it.spec?.recurrence && eventOf(it); return !!ev && ev < Date.now(); };
+const lateLabel = (ev) => 'Po terminie · ' + rel(ev) + ', ' + fTime.format(ev);
 
 function render() {
   const items = state.items;
@@ -126,14 +129,16 @@ function render() {
   }
   const byTime = (a, b) => (eventOf(a) || Infinity) - (eventOf(b) || Infinity);
   const dated = items.filter((i) => !i.spec?.recurrence && eventOf(i)).sort(byTime);
-  const hero = dated.find((i) => eventOf(i) >= startOfDay(new Date()));
-  const rest = dated.filter((i) => i !== hero);
+  const late = dated.filter(isLate);
+  const hero = dated.find((i) => !isLate(i));
+  const rest = dated.filter((i) => i !== hero && !isLate(i));
   const rec = items.filter((i) => i.spec?.recurrence).sort(byTime);
   const lists = items.filter((i) => !i.spec?.recurrence && !eventOf(i) && listOf(i).length);
   const tracked = items.filter((i) => !i.spec?.recurrence && !eventOf(i) && i.data?.widget && i.data.widget.status !== 'rejected');
   const saved = items.filter((i) => !i.spec?.recurrence && !eventOf(i) && !listOf(i).length && !tracked.includes(i));
 
   let html = '';
+  if (late.length) html += `<h2 class="sec sec--late">Po terminie <span>${late.length}</span></h2>` + late.map((i) => card(i)).join('');
   if (hero) html += card(hero, true);
   if (rest.length) html += `<h2 class="sec">${hero ? 'Dalej' : 'Najbliższe'}</h2>` + rest.map((i) => card(i)).join('');
   if (rec.length) html += '<h2 class="sec">Powtarzalne</h2>' + rec.map((i) => card(i)).join('');
@@ -159,7 +164,7 @@ function renderDays(items) {
 }
 
 function remindLine(it) {
-  const n = (it.notify_at || []).map(dt);
+  const n = (it.notify_at || []).map(dt).filter((d) => d > Date.now());
   if (!n.length) return '';
   if (it.spec?.summarize) return 'Sprawdzę stronę ' + whenRel(n[0]) + ' — dam znać, jeśli coś się zmieni';
   return 'Przypomnę ' + n.slice(0, 2).map(whenRel).join(' i ');
@@ -188,6 +193,7 @@ const hostOf = (url) => (url || '').replace(/^https?:\/\//, '').replace(/\/$/, '
 function kindLabel(it) {
   const r = it.spec?.recurrence; const ev = eventOf(it);
   if (r) return recLabel(r);
+  if (ev && isLate(it)) return lateLabel(ev);
   if (ev) return (it.kind === 'reminder-once' ? 'Jednorazowe · ' : '') + rel(ev) + ', ' + fTime.format(ev);
   if (it.data?.widget && it.data.widget.status !== 'rejected') return 'Śledzenie';
   if (listOf(it).length) return 'Lista';
@@ -254,6 +260,7 @@ function partFoot(it) {
   const bits = [];
   if (rem) bits.push(`<span class="meta">${svg('bell')}${esc(rem)}</span>`);
   if (list.length) bits.push(`<span class="meta">${n} z ${list.length} zrobione${it.data?.checklist_reset ? ' · odnawia się' : ''}</span>`);
+  if (isLate(it)) bits.push(`<button type="button" class="late-done" data-done="${it.id}">${svg('check', 'width:16px;height:16px')}Zrobione</button>`);
   return bits.length ? `<div class="w-f" style="flex-wrap:wrap">${bits.join('')}</div>` : '';
 }
 
@@ -270,8 +277,9 @@ function card(it, hero = false) {
       ${partFields(it)}${partWidget(it)}${partList(it)}${partFoot(it)}
     </article>`;
   }
-  return `<article class="w" data-id="${it.id}" data-widget="${esc(it.kind)}" tabindex="0" role="button">
-    <div class="w-h"><div class="ico" style="background:var(${TINT[tint]})" aria-hidden="true">${svg(icon)}</div>
+  const late = isLate(it);
+  return `<article class="w${late ? ' w--late' : ''}" data-id="${it.id}" data-widget="${esc(it.kind)}" tabindex="0" role="button">
+    <div class="w-h"><div class="ico" style="background:var(${late ? '--late-bg' : TINT[tint]})" aria-hidden="true">${svg(icon)}</div>
       <div style="min-width:0"><p class="kind">${esc(kindLabel(it))}</p><h3>${esc(it.title)}</h3></div></div>
     ${partCycle(it)}${partFields(it)}${partPage(it)}${partWidget(it)}${partList(it)}${it.data?.widget ? '' : noteText}${partFoot(it)}
   </article>`;
@@ -288,7 +296,8 @@ function openDetail(id) {
   const { tint } = lookOf(it);
   const ev = eventOf(it);
   const rows = [];
-  if (ev) rows.push([it.spec?.recurrence ? 'Następny raz' : 'Kiedy', fDay.format(ev) + ', ' + fTime.format(ev)]);
+  const late = isLate(it);
+  if (ev) rows.push([it.spec?.recurrence ? 'Następny raz' : late ? 'Termin był' : 'Kiedy', fDay.format(ev) + ', ' + fTime.format(ev)]);
   if (it.spec?.recurrence) rows.push(['Powtarzanie', recLabel(it.spec.recurrence)]);
   if ((it.notify_at || []).length) rows.push(['Przypomnienia', it.notify_at.map((d) => whenRel(dt(d))).join(' · ')]);
   for (const f of it.data?.fields || []) rows.push([f.label, f.value]);
@@ -298,12 +307,12 @@ function openDetail(id) {
   const list = listOf(it);
   const [first, ...more] = it.title.split(/\s+[—–-]\s+/);
   $('#detail').innerHTML = `<div class="app">
-    <div class="d-top" style="background:var(${TINT[tint]})">
+    <div class="d-top${late ? ' d-top--late' : ''}" style="background:var(${late ? '--late-bg' : TINT[tint]})">
       <span class="ring" aria-hidden="true"></span>
       <div class="d-nav"><button class="round" type="button" data-act="close" aria-label="Wróć">${svg('back')}</button>
         ${url ? `<a class="round" href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="Otwórz stronę">${svg('ext')}</a>` : ''}</div>
       <h1>${esc(first)}${more.length ? `<b>${esc(more.join(' — '))}</b>` : ''}</h1>
-      <span class="pill">${esc(kindLabel(it))}</span>
+      <span class="pill">${late ? svg('clock', 'width:14px;height:14px') : ''}${esc(kindLabel(it))}</span>
     </div>
     <div class="d-body">
       <div class="quote">Wpisane ${esc(rel(dt(it.created_at)))}, ${esc(fTime.format(dt(it.created_at)))}:<q>${esc(it.source_text)}</q></div>
@@ -331,6 +340,23 @@ function closeDetail(fromPop = false) {
   state.openId = null;
   if (!fromPop && history.state?.detail) history.back();
 }
+
+async function markDone(id) {
+  await api.done(id);
+  state.items = state.items.filter((x) => x.id !== id);
+  render(); toast('Zrobione ✓');
+}
+
+// Gdy termin minie przy otwartej aplikacji, karta ma sama przejść do „Po terminie”. Render tylko przy zmianie zbioru,
+// bo przerysowanie listy przeładowuje iframe'y widgetów.
+let lateSig = '';
+const lateNow = () => state.items.filter(isLate).map((i) => i.id).join(',');
+setInterval(() => {
+  if (!state.user || document.hidden) return;
+  const sig = lateNow(); if (sig === lateSig) return;
+  lateSig = sig; render();
+  if (state.openId) openDetail(state.openId);
+}, 30e3);
 
 async function detailAction(act) {
   const id = state.openId;
@@ -502,7 +528,7 @@ function bind() {
   $('#list').addEventListener('change', onCheck);
   $('#detail').addEventListener('change', onCheck);
   const openFrom = (e) => {
-    if (e.target.closest('label, input, a, button[data-sum]')) return;
+    if (e.target.closest('label, input, a, button[data-sum], button[data-done]')) return;
     const card = e.target.closest('[data-id]');
     if (card) openDetail(card.dataset.id);
   };
@@ -521,6 +547,11 @@ function bind() {
     } catch (err) { b.disabled = false; toast(err.message); }
   };
   $('#list').addEventListener('click', onSum, true);
+  $('#list').addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-done]'); if (!b) return;
+    b.disabled = true;
+    try { await markDone(b.dataset.done); } catch (err) { b.disabled = false; toast(err.message); }
+  });
   $('#chat-form').addEventListener('submit', sendChat);
   $('#chat').addEventListener('click', (e) => { const b = e.target.closest('[data-chat]'); if (b) chatAction(b.dataset.chat); });
   $('#detail').addEventListener('click', onSum, true);

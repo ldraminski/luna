@@ -21,6 +21,8 @@
   --tint-sky:#87c2d4;       /* karta wyróżniona (najbliższy termin) */
   --bar:#c2d1d3;            /* słupki nieaktywne */
   --dot:#e0359f;            /* kropka powiadomienia */
+  --late:#9b1c5a;           /* po terminie: tekst i akcent (ten sam co „usuń”) */
+  --late-bg:#f6d9e6;        /* po terminie: tło kafla / nagłówka */
   --r-card:28px; --r-tile:22px; --r-pill:999px;
   --gap:12px; --pad:18px;
   --shadow:0 1px 2px rgba(9,68,87,.06), 0 8px 24px -12px rgba(9,68,87,.18);
@@ -257,3 +259,15 @@ button.chev:disabled{opacity:.4;cursor:default}
 .chat-form{display:flex;gap:8px;background:var(--surface);border-radius:var(--r-pill);padding:6px 6px 6px 20px;box-shadow:0 10px 30px -10px rgba(9,68,87,.35)}
 .chat-form:focus-within{box-shadow:0 0 0 3px var(--navy)}
 .chat-form input{flex:1;min-width:0;border:0;background:transparent;height:44px;outline:none;font-size:15px}
+
+/* po terminie (Hikari, 27.09) — różowo-bordowy akcent z palety, reszta karty bez zmian */
+.sec--late{display:flex;align-items:center;gap:10px;color:var(--late)}
+.sec--late span{font-size:13px;font-weight:600;background:var(--late);color:var(--on-navy);border-radius:var(--r-pill);min-width:24px;height:24px;padding:0 8px;display:grid;place-items:center}
+.w--late{box-shadow:inset 0 0 0 2px var(--late-bg),var(--shadow)}
+.w--late .kind{color:var(--late);font-weight:600}
+.w--late .ico{color:var(--late)}
+.late-done{display:inline-flex;align-items:center;gap:6px;margin-left:auto;min-height:40px;padding:0 16px;border:0;border-radius:var(--r-pill);
+  background:var(--late);color:var(--on-navy);font-size:13px;font-weight:500;cursor:pointer}
+.late-done:disabled{opacity:.5}
+.d-top--late .ring{border-color:rgba(255,255,255,.45)}
+.d-top--late .pill{color:var(--late);display:inline-flex;gap:6px;align-items:center}
