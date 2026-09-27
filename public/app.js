@@ -16,6 +16,8 @@ const fDay = new Intl.DateTimeFormat('pl-PL', { weekday: 'long', day: 'numeric',
 const fShort = new Intl.DateTimeFormat('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' });
 const fTime = new Intl.DateTimeFormat('pl-PL', { hour: '2-digit', minute: '2-digit' });
 const fWd = new Intl.DateTimeFormat('pl-PL', { weekday: 'short' });
+const fMonth = new Intl.DateTimeFormat('pl-PL', { month: 'long' });
+const fMonShort = new Intl.DateTimeFormat('pl-PL', { month: 'short' });
 
 function rel(d) {
   const n = dayDiff(d);
@@ -261,12 +263,24 @@ function renderDays(items) {
   for (let k = 0; k < DAYS_AHEAD; k++) {
     const d = new Date(today); d.setDate(d.getDate() + k);
     const n = count.get(d.getTime()) || 0; const sel = state.day === d.getTime();
-    out += `<li class="${k === 0 ? 'today ' : ''}${n ? 'has ' : ''}${sel ? 'sel' : ''}">
+    const nm = k > 0 && d.getDate() === 1;   // pierwszy dzień nowego miesiąca: kreska + skrót nazwy
+    out += `<li class="${k === 0 ? 'today ' : ''}${n ? 'has ' : ''}${sel ? 'sel ' : ''}${nm ? 'nm' : ''}"${nm ? ` data-mon="${esc(fMonShort.format(d).replace('.', ''))}"` : ''}>
       <button type="button" data-day="${d.getTime()}" aria-pressed="${sel}" aria-label="${esc(fDay.format(d))}${n ? `, rzeczy: ${n}` : ''}">
         <span class="wd">${esc(fWd.format(d).replace('.', ''))}</span><span class="d">${d.getDate()}</span><span class="mk"></span>
       </button></li>`;
   }
   $('#days').innerHTML = out;
+  updMonth();
+}
+// Nazwa miesiąca nad paskiem — z dni, które są aktualnie widoczne („Wrzesień – październik 2026”).
+function updMonth() {
+  const box = $('#days'); const r = box.getBoundingClientRect();
+  const vis = [...box.querySelectorAll('[data-day]')].filter((b) => { const x = b.getBoundingClientRect(); return x.right > r.left + 20 && x.left < r.right - 20; });
+  if (!vis.length) return;
+  const a = new Date(Number(vis[0].dataset.day)); const z = new Date(Number(vis[vis.length - 1].dataset.day));
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  $('#month').textContent = a.getMonth() === z.getMonth() ? `${cap(fMonth.format(a))} ${a.getFullYear()}`
+    : `${cap(fMonth.format(a))} – ${fMonth.format(z)} ${z.getFullYear()}`;
 }
 function pickDay(ms) {
   state.day = state.day === ms ? null : ms;
@@ -740,6 +754,8 @@ function bind() {
   });
   $('#wpisz').addEventListener('submit', add);
   $('#days').addEventListener('click', (e) => { const b = e.target.closest('[data-day]'); if (b) pickDay(Number(b.dataset.day)); });
+  let monT; $('#days').addEventListener('scroll', () => { cancelAnimationFrame(monT); monT = requestAnimationFrame(updMonth); }, { passive: true });
+  addEventListener('resize', updMonth);
   $('#list').addEventListener('click', (e) => { if (e.target.closest('[data-day-clear]')) { state.day = null; render(); } });
   $('#q-photo').addEventListener('click', () => $('#q-file').click());
   $('#q-file').addEventListener('change', async (e) => {

@@ -361,3 +361,9 @@ html.locked,html.locked body{overflow:hidden;height:100%}
 .day-h{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:0 4px 14px}
 .day-h .sec::first-letter{text-transform:uppercase}
 .day-h .ghost-txt{margin:0;flex:none}
+
+/* nazwa miesiąca nad kalendarzem + granica miesięcy (Hikari, 28.09) */
+.month{margin:0 4px 6px;font-size:13px;font-weight:600;color:var(--ink-2);min-height:1.2em}
+.days li.nm{position:relative;margin-left:10px}
+.days li.nm::before{content:"";position:absolute;left:-8px;top:22px;bottom:14px;width:2px;border-radius:2px;background:var(--line)}
+.days li.nm::after{content:attr(data-mon);position:absolute;left:-8px;top:-2px;transform:translateX(-50%);font-size:10px;font-weight:600;color:var(--navy);background:var(--bg);padding:0 3px;text-transform:uppercase;letter-spacing:.04em}
