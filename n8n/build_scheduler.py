@@ -54,12 +54,14 @@ ev AS (
       ELSE i.data END
   WHERE i.id IN (SELECT item_id FROM nxt)
   RETURNING 1)
-SELECT c.id, c.user_id, c.title, coalesce(c.body, '') AS body, u.email, coalesce(u.name, '') AS name,
+SELECT c.id, c.user_id, c.item_id, c.title, coalesce(c.body, '') AS body, u.email, coalesce(u.name, '') AS name,
   ('email' = ANY(c.channels) OR NOT EXISTS (
-     SELECT 1 FROM push_subscriptions s WHERE s.user_id = c.user_id AND s.failures < 3)) AS send_email,
-  ('push' = ANY(c.channels)) AS send_push,
+     SELECT 1 FROM push_subscriptions s WHERE s.user_id = c.user_id AND s.failures < 3))
+    AND NOT coalesce((i.spec->>'summarize')::boolean, false) AS send_email,
+  ('push' = ANY(c.channels)) AND NOT coalesce((i.spec->>'summarize')::boolean, false) AS send_push,
+  coalesce((i.spec->>'summarize')::boolean, false) AS summarize,
   (SELECT count(*) FROM ev) AS next_planned
-FROM claimed c JOIN users u ON u.id = c.user_id
+FROM claimed c JOIN users u ON u.id = c.user_id LEFT JOIN items i ON i.id = c.item_id
 ORDER BY c.due_at""".strip(), "options": {}}, credentials=PG)
 
 # --- mail
@@ -121,7 +123,18 @@ upd = node("Aktualizuj urządzenia", "n8n-nodes-base.postgres", 2.6, [1780, 140]
   "WHERE endpoint = $1 AND $2 NOT IN (404, 410)",
   "options": {"queryReplacement": "={{ [ $json.endpoint, $json.status ] }}"}}, credentials=PG)
 
-link(t, claim); link(claim, fm); link(claim, subs)
+SUMMARY_WF = open(".summary-wf-id").read().strip()
+fs = node("Tylko strony do streszczenia", "n8n-nodes-base.filter", 2.2, [460, -320], {
+  "conditions": {"options": {"caseSensitive": True, "leftValue": "", "typeValidation": "loose", "version": 2},
+    "conditions": [{"id": str(uuid.uuid4()), "leftValue": "={{ $json.summarize }}", "rightValue": "",
+                    "operator": {"type": "boolean", "operation": "true", "singleValue": True}}], "combinator": "and"}, "options": {}})
+fset = node("Id strony", "n8n-nodes-base.set", 3.4, [680, -320], {"mode": "manual", "includeOtherFields": False,
+  "assignments": {"assignments": [{"id": str(uuid.uuid4()), "name": "item_id", "type": "string", "value": "={{ $json.item_id }}"},
+                                  {"id": str(uuid.uuid4()), "name": "reason", "type": "string", "value": "scheduled"}]}, "options": {}})
+fx = node("Streść stronę (w tle)", "n8n-nodes-base.executeWorkflow", 1.2, [900, -320], {
+  "source": "database", "workflowId": {"__rl": True, "value": SUMMARY_WF, "mode": "id"},
+  "options": {"waitForSubWorkflow": False}})
+link(t, claim); link(claim, fm); link(claim, subs); link(claim, fs); link(fs, fset); link(fset, fx)
 link(fm, mail); link(mail, mark)
 link(subs, jwt); link(jwt, sign); link(sign, hdr); link(hdr, push); link(push, res); link(res, upd)
 

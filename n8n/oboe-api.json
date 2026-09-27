@@ -2,7 +2,7 @@
  "name": "Oboe: API",
  "nodes": [
   {
-   "id": "150dd7a3-605a-4406-b2a9-7e215cd6d06c",
+   "id": "caaf742d-3c89-483a-bc5a-3328d2b3a38a",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "c71bded6-c6a7-4384-a73a-fa88885bf049",
+   "id": "d1a35797-5a26-4cad-b930-78ed95cb7fa4",
    "name": "GET me",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -25,7 +25,7 @@
     0,
     0
    ],
-   "webhookId": "f7e7c5f0-0591-44b9-8d30-fd411612fe90",
+   "webhookId": "70aba8b4-9d48-4d06-83ce-12618deac6c5",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/me",
@@ -34,7 +34,7 @@
    }
   },
   {
-   "id": "b50a1839-2e34-4584-b6d1-9fd37a6c86e9",
+   "id": "860f5647-737e-4fe2-b4da-1ee64d08cdcf",
    "name": "Kim jestem",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -58,7 +58,7 @@
    }
   },
   {
-   "id": "4b0dd608-9456-4dc9-ba4e-7f8320571788",
+   "id": "da28879f-c6b9-46b2-875f-5cd303e01077",
    "name": "Odpowiedz: Kim jestem",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -75,7 +75,7 @@
    }
   },
   {
-   "id": "1d1a43ce-fbb7-4f2d-ab24-d25a9da24b09",
+   "id": "8c99961a-522a-4038-bed1-245be00683a7",
    "name": "GET items",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -83,7 +83,7 @@
     0,
     200
    ],
-   "webhookId": "26fd37a6-609d-40a3-8dfd-40c71da1c1e1",
+   "webhookId": "1580ec54-eee2-40de-89a0-3fe8878a8de4",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/items",
@@ -92,7 +92,7 @@
    }
   },
   {
-   "id": "7621be01-e677-4d92-bc79-70cb2dc52311",
+   "id": "151f7ed5-62eb-4ece-b428-07ca0752767b",
    "name": "Lista rzeczy",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -116,7 +116,7 @@
    }
   },
   {
-   "id": "4a21927c-8f83-49f0-96de-d1261a0a120a",
+   "id": "7fae42c7-3269-4cda-8c66-1d2e77f4d0cf",
    "name": "Odpowiedz: Lista rzeczy",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -133,7 +133,7 @@
    }
   },
   {
-   "id": "771b692b-7ad7-4fe5-b210-a50bdaecb36c",
+   "id": "81bcd68d-63d9-4320-a82c-e4f5a6f870d7",
    "name": "GET pending",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -141,7 +141,7 @@
     0,
     400
    ],
-   "webhookId": "aa4be098-25ff-4bdb-9554-19ddcbbbdf82",
+   "webhookId": "00b6cc60-0a81-4471-a5bd-ee3b9a8d3bc4",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/pending",
@@ -150,7 +150,7 @@
    }
   },
   {
-   "id": "829e7edb-428d-4360-b7bc-921984679a27",
+   "id": "0cf85bd4-918b-4a04-9df5-54ea5c6a5fa9",
    "name": "Do pokazania",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -174,7 +174,7 @@
    }
   },
   {
-   "id": "d84abadc-23d0-4a0d-ab60-c7d8ca162ac5",
+   "id": "1afcd32b-6794-4c06-974f-8d04e914315b",
    "name": "Odpowiedz: Do pokazania",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -191,7 +191,7 @@
    }
   },
   {
-   "id": "47498463-53d1-4a67-8394-d37d86907142",
+   "id": "7dcd39be-7e7a-406f-970f-daf1837351d2",
    "name": "POST push/subscribe",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -199,7 +199,7 @@
     0,
     600
    ],
-   "webhookId": "9e7bae28-a600-423c-8bfc-20d35946642b",
+   "webhookId": "6cc43e44-4cda-4e62-be2b-19d871de0007",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/push/subscribe",
@@ -208,7 +208,7 @@
    }
   },
   {
-   "id": "57a99534-a1b8-4f48-90a1-b0ad109f1ea9",
+   "id": "6f7b089d-b3d4-4b2f-8fc3-bb7a5fed53cc",
    "name": "Zapisz urządzenie",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -232,7 +232,7 @@
    }
   },
   {
-   "id": "404cc5e3-8990-4275-a47d-e9c6cc9330ed",
+   "id": "07f6f259-a730-4e98-9971-ab25230c3327",
    "name": "Odpowiedz: Zapisz urządzenie",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -249,7 +249,7 @@
    }
   },
   {
-   "id": "bcb0eff2-ad7c-4686-8e0c-919daab1eaa7",
+   "id": "9260817b-674a-4574-afee-e9ce6a6aabef",
    "name": "POST push/unsubscribe",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -257,7 +257,7 @@
     0,
     800
    ],
-   "webhookId": "a7aec7f6-753f-4be3-8b6e-ebfc2b9919f1",
+   "webhookId": "8aefbeac-529d-4d29-b830-49602d9cce96",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/push/unsubscribe",
@@ -266,7 +266,7 @@
    }
   },
   {
-   "id": "b9af45b4-fbb9-4fb6-94a0-f12d98f2478a",
+   "id": "d0e3ebe3-f3c0-46b8-ab49-22aef1922746",
    "name": "Usuń urządzenie",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -290,7 +290,7 @@
    }
   },
   {
-   "id": "8352e531-1df7-461f-90f2-35652a39b32b",
+   "id": "cfb63714-1f2a-4d61-a6db-e427b65a54a1",
    "name": "Odpowiedz: Usuń urządzenie",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -307,7 +307,7 @@
    }
   },
   {
-   "id": "e056f4bd-07cb-4d27-b34b-66e8e56a90ec",
+   "id": "0669c87e-d07b-4457-b994-034e95cf27dc",
    "name": "POST items/done",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -315,7 +315,7 @@
     0,
     1000
    ],
-   "webhookId": "035e53ed-9827-4a98-b1cc-1d4c6e2635cd",
+   "webhookId": "53919474-ac6e-48d9-b474-ec8969f88b71",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/done",
@@ -324,7 +324,7 @@
    }
   },
   {
-   "id": "e4d15b1f-82cb-4422-ab8d-d2b7da9f9cc3",
+   "id": "721bb7f0-8744-4040-a9ec-bc6453b164a9",
    "name": "Odhacz",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -348,7 +348,7 @@
    }
   },
   {
-   "id": "cbff9a23-9ae7-4730-91a5-e9098192385d",
+   "id": "d4931c5d-7596-4d89-8aa7-ca88f631a53a",
    "name": "Odpowiedz: Odhacz",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -365,7 +365,7 @@
    }
   },
   {
-   "id": "515c2dee-bd52-4ec1-b01c-6b6c733f7462",
+   "id": "3b029a7c-2e2c-4bfb-a163-ef3021c6c718",
    "name": "POST items/check",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -373,7 +373,7 @@
     0,
     1200
    ],
-   "webhookId": "cf377596-4f06-4416-809c-d234d17a7514",
+   "webhookId": "10d62c58-d868-48b6-a061-ffd9b53c23d1",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/check",
@@ -382,7 +382,7 @@
    }
   },
   {
-   "id": "e99b558d-7c05-4231-bc39-1faef574fbf0",
+   "id": "ac3af799-4386-4a45-ab0a-ecc724f6c227",
    "name": "Odhacz pozycję",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -406,7 +406,7 @@
    }
   },
   {
-   "id": "4c963305-d0fb-4118-9112-eadf2646282f",
+   "id": "eb0654e5-e5b8-4322-a278-3f517abff071",
    "name": "Odpowiedz: Odhacz pozycję",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -423,7 +423,7 @@
    }
   },
   {
-   "id": "fc79d2b4-0367-4365-bdc6-c9e7725bbe0b",
+   "id": "f7bca9ba-8f73-4b5f-ad28-0c7ad6c91396",
    "name": "POST items/widget-state",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -431,7 +431,7 @@
     0,
     1400
    ],
-   "webhookId": "9b2599a1-aa46-49d7-848c-eaab820e2032",
+   "webhookId": "5889e56c-6ac1-4979-a250-283eedb6ba49",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/widget-state",
@@ -440,7 +440,7 @@
    }
   },
   {
-   "id": "249fef72-84e4-459d-86a3-f4ba6cebb2c6",
+   "id": "2c5fef06-0deb-49b1-8007-5dc8760edea3",
    "name": "Stan widgetu",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -464,7 +464,7 @@
    }
   },
   {
-   "id": "54094492-c11b-4b4e-9430-607051046084",
+   "id": "da12f348-4af2-4b71-82ef-011dedf75280",
    "name": "Odpowiedz: Stan widgetu",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -481,7 +481,7 @@
    }
   },
   {
-   "id": "09933c8a-ead9-4f5c-821c-b1309608db6b",
+   "id": "dd317cd9-439d-41ea-bdda-6fa4594e2a88",
    "name": "POST items/delete",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -489,7 +489,7 @@
     0,
     1600
    ],
-   "webhookId": "8c1054df-a42f-422b-9775-12a7cac36c75",
+   "webhookId": "7d46d2a0-21f0-446e-90fe-fffafe2b82a8",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/delete",
@@ -498,7 +498,7 @@
    }
   },
   {
-   "id": "15ffd883-d415-4ea7-bf9a-6f76d81cf649",
+   "id": "301c7025-fc1d-4aea-825d-9a5dde4fa354",
    "name": "Usuń",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -522,7 +522,7 @@
    }
   },
   {
-   "id": "8902c1a3-b01f-4ced-a24e-4c05c00e5687",
+   "id": "fc0cf576-20c0-45ce-8158-f522efc29131",
    "name": "Odpowiedz: Usuń",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -539,7 +539,7 @@
    }
   },
   {
-   "id": "8c3e397f-69b7-4216-985a-4fda4236c28b",
+   "id": "812a0eff-81a6-4ddd-98a9-f2e1cba0d319",
    "name": "POST items",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -553,10 +553,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "9234c0d6-23c1-4d31-96eb-bed92951e59c"
+   "webhookId": "91ac35dc-38a9-4ec7-aeda-71e78896173e"
   },
   {
-   "id": "b5613de1-b935-4d32-bc21-5711689703cb",
+   "id": "18aade28-55e4-4b33-abe6-ce542a42ec71",
    "name": "Sesja",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -579,7 +579,7 @@
    }
   },
   {
-   "id": "a929adcc-9840-48d8-9b54-c45581c1e342",
+   "id": "af51f481-3226-42a7-8c6a-6f829995433b",
    "name": "Zalogowany i jest tekst?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -597,7 +597,7 @@
      },
      "conditions": [
       {
-       "id": "dc68536b-319a-4213-813f-9fdfef0ec0e8",
+       "id": "0053be8c-fadc-42f7-9d97-be269e3602c4",
        "leftValue": "={{ $json.user_id }}",
        "rightValue": "",
        "operator": {
@@ -607,7 +607,7 @@
        }
       },
       {
-       "id": "2e3510bc-5bda-4532-ae8a-edbd12391dec",
+       "id": "1a07e092-82a2-41a3-baaa-c6240c80c915",
        "leftValue": "={{ String($('POST items').item.json.body.text || '').trim() }}",
        "rightValue": "",
        "operator": {
@@ -623,7 +623,7 @@
    }
   },
   {
-   "id": "34fafa24-1e98-43ea-8e09-e45bd7bf8b99",
+   "id": "1d4b55c0-3c89-495b-954a-1e3d0a2be3fd",
    "name": "Odmów",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -640,7 +640,7 @@
    }
   },
   {
-   "id": "4ede5ee4-d473-4a55-94dc-b6e07d71fafa",
+   "id": "cf2f0b27-216b-4968-a71e-3914e38d0896",
    "name": "Kalendarz",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -653,7 +653,7 @@
    }
   },
   {
-   "id": "60130aff-3b52-453d-8d8f-f5a0d984e67c",
+   "id": "da9d49b0-28c6-4537-b3a3-998036a1a6f0",
    "name": "DeepSeek: zrozum",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -697,7 +697,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "f969715c-4a81-43c8-9582-61908cd7a50c",
+   "id": "0209d794-6f67-47c7-b8ba-484cc463fa31",
    "name": "Sprawdź odpowiedź",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -710,7 +710,7 @@
    }
   },
   {
-   "id": "fe86f4db-3c78-4e8b-8e17-63d6f59a8e54",
+   "id": "a2287412-40c9-4f91-9333-e56d777ee06c",
    "name": "Zapisz",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -733,7 +733,7 @@
    }
   },
   {
-   "id": "525da18c-d8ec-4d0a-9dc0-aed75ed55675",
+   "id": "1220a088-da97-453d-8001-0f082a30136b",
    "name": "Odpowiedz: dodano",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -750,7 +750,7 @@
    }
   },
   {
-   "id": "c901360d-6b3d-44f4-b6b8-0139f68d7685",
+   "id": "66a6d619-e801-466f-981d-9e69cb224ca2",
    "name": "Potrzebny widget?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -768,7 +768,7 @@
      },
      "conditions": [
       {
-       "id": "b4aa27fd-344c-4ca1-ace4-b3579d54f17a",
+       "id": "238a6738-634f-432d-9aa1-f944da468619",
        "leftValue": "={{ $json.result.status === 200 && !!(($json.result.item || {}).data || {}).widget }}",
        "rightValue": "",
        "operator": {
@@ -784,7 +784,7 @@
    }
   },
   {
-   "id": "6a61b0a9-4baa-4fd0-a478-660246082f67",
+   "id": "c9430ed8-21d9-4e43-a5e8-b1e9d6a26b0b",
    "name": "Generuj widget (w tle)",
    "type": "n8n-nodes-base.executeWorkflow",
    "typeVersion": 1.2,
@@ -805,7 +805,7 @@
    }
   },
   {
-   "id": "4a161c96-9af1-4731-a916-a5270b6baac8",
+   "id": "bccbdcd8-77cf-4eaf-9072-15f166eb582a",
    "name": "Id rzeczy",
    "type": "n8n-nodes-base.set",
    "typeVersion": 3.4,
@@ -819,7 +819,7 @@
     "assignments": {
      "assignments": [
       {
-       "id": "08275bbe-8c52-4c7d-b4c8-a85ce019b24f",
+       "id": "2918dbf5-5278-4704-9eb0-88b27b2b37c3",
        "name": "item_id",
        "type": "string",
        "value": "={{ $json.result.item.id }}"
@@ -827,6 +827,235 @@
      ]
     },
     "options": {}
+   }
+  },
+  {
+   "id": "bd462104-e17e-4626-a619-4a280d34a156",
+   "name": "Streścić stronę?",
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2.2,
+   "position": [
+    1760,
+    2100
+   ],
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "loose",
+      "version": 2
+     },
+     "conditions": [
+      {
+       "id": "b52daf58-818d-4007-8fe2-943b8377af12",
+       "leftValue": "={{ $json.result.status === 200 && !!(($json.result.item || {}).spec || {}).summarize }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "8a329b88-9f71-47e0-92ef-c0a0a5e13914",
+   "name": "Id do streszczenia",
+   "type": "n8n-nodes-base.set",
+   "typeVersion": 3.4,
+   "position": [
+    1870,
+    2100
+   ],
+   "parameters": {
+    "mode": "manual",
+    "includeOtherFields": false,
+    "assignments": {
+     "assignments": [
+      {
+       "id": "57d2fd7c-a824-4b90-aca3-7a01e3512bf5",
+       "name": "item_id",
+       "type": "string",
+       "value": "={{ $json.result.item.id }}"
+      },
+      {
+       "id": "717cfe5d-f030-465e-bbff-74abaa8da399",
+       "name": "reason",
+       "type": "string",
+       "value": "created"
+      }
+     ]
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "0cc9ed8d-d2fb-4295-ba6e-8a160c0eb048",
+   "name": "Streść (w tle)",
+   "type": "n8n-nodes-base.executeWorkflow",
+   "typeVersion": 1.2,
+   "position": [
+    1980,
+    2100
+   ],
+   "parameters": {
+    "source": "database",
+    "workflowId": {
+     "__rl": true,
+     "value": "hnyATiJRYfJUvdXF",
+     "mode": "id"
+    },
+    "options": {
+     "waitForSubWorkflow": false
+    }
+   }
+  },
+  {
+   "id": "ddb9939e-4d1d-483e-b7f9-30cc7b54c9d1",
+   "name": "POST items/summarize",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    2400
+   ],
+   "parameters": {
+    "httpMethod": "POST",
+    "path": "oboe/items/summarize",
+    "responseMode": "responseNode",
+    "options": {}
+   },
+   "webhookId": "22627969-65eb-4196-9f46-734c92627c29"
+  },
+  {
+   "id": "2fbb67ba-85d0-48de-a91f-ca503527abee",
+   "name": "Sprawdź teraz",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    220,
+    2400
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "WITH me AS (\n  UPDATE sessions SET last_used_at = now()\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id),\nit AS (SELECT id FROM items WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) AND spec->>'url' IS NOT NULL),\nbusy AS (SELECT 1 FROM items WHERE id = $2::uuid AND data->>'summary_status' = 'working' AND updated_at > now() - interval '2 minutes')\nSELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN json_build_object('status', 401, 'error', 'Zaloguj się ponownie')\n  WHEN NOT EXISTS (SELECT 1 FROM it) THEN json_build_object('status', 404, 'error', 'Nie ma takiej strony')\n  WHEN EXISTS (SELECT 1 FROM busy) THEN json_build_object('status', 429, 'error', 'Już sprawdzam — chwilę.')\n  ELSE json_build_object('status', 202, 'ok', true, 'id', $2) END AS result",
+    "options": {
+     "queryReplacement": "={{ [ ($json.headers.authorization || '').replace(/^Bearer\\s+/i, ''), /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000' ] }}"
+    }
+   },
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   }
+  },
+  {
+   "id": "eb293517-bf3f-4e4f-8ab8-0496e99a6985",
+   "name": "Odpowiedz: sprawdzam",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    440,
+    2400
+   ],
+   "parameters": {
+    "respondWith": "json",
+    "responseBody": "={{ $json.result }}",
+    "options": {
+     "responseCode": "={{ $json.result.status || 200 }}"
+    }
+   }
+  },
+  {
+   "id": "b5f5ec85-ee1d-45f0-af13-a1d8f8d4d96d",
+   "name": "Ruszać?",
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2.2,
+   "position": [
+    660,
+    2400
+   ],
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "loose",
+      "version": 2
+     },
+     "conditions": [
+      {
+       "id": "de6b76fa-3275-4f74-99b5-d5d02547735d",
+       "leftValue": "={{ $json.result.status === 202 }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "ef20e585-565f-4f37-8574-e1c36eaf97c0",
+   "name": "Id (sprawdź teraz)",
+   "type": "n8n-nodes-base.set",
+   "typeVersion": 3.4,
+   "position": [
+    880,
+    2400
+   ],
+   "parameters": {
+    "mode": "manual",
+    "includeOtherFields": false,
+    "assignments": {
+     "assignments": [
+      {
+       "id": "f85a048f-ca75-4f58-a82c-ede69e083765",
+       "name": "item_id",
+       "type": "string",
+       "value": "={{ $json.result.id }}"
+      },
+      {
+       "id": "443303a5-0266-47f0-8fd3-18a19ddc5b13",
+       "name": "reason",
+       "type": "string",
+       "value": "manual"
+      }
+     ]
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "830479fe-de1b-4485-ab6a-fcffe23e09e8",
+   "name": "Streść teraz (w tle)",
+   "type": "n8n-nodes-base.executeWorkflow",
+   "typeVersion": 1.2,
+   "position": [
+    1100,
+    2400
+   ],
+   "parameters": {
+    "source": "database",
+    "workflowId": {
+     "__rl": true,
+     "value": "hnyATiJRYfJUvdXF",
+     "mode": "id"
+    },
+    "options": {
+     "waitForSubWorkflow": false
+    }
    }
   }
  ],
@@ -1036,6 +1265,11 @@
       "node": "Potrzebny widget?",
       "type": "main",
       "index": 0
+     },
+     {
+      "node": "Streścić stronę?",
+      "type": "main",
+      "index": 0
      }
     ]
    ]
@@ -1056,6 +1290,83 @@
     [
      {
       "node": "Generuj widget (w tle)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Streścić stronę?": {
+   "main": [
+    [
+     {
+      "node": "Id do streszczenia",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Id do streszczenia": {
+   "main": [
+    [
+     {
+      "node": "Streść (w tle)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "POST items/summarize": {
+   "main": [
+    [
+     {
+      "node": "Sprawdź teraz",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Sprawdź teraz": {
+   "main": [
+    [
+     {
+      "node": "Odpowiedz: sprawdzam",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Odpowiedz: sprawdzam": {
+   "main": [
+    [
+     {
+      "node": "Ruszać?",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Ruszać?": {
+   "main": [
+    [
+     {
+      "node": "Id (sprawdź teraz)",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Id (sprawdź teraz)": {
+   "main": [
+    [
+     {
+      "node": "Streść teraz (w tle)",
       "type": "main",
       "index": 0
      }

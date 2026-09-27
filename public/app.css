@@ -223,3 +223,12 @@ a.w:active{transform:scale(.985)}
 .gen-state svg{animation:spin 2s linear infinite}
 .gen-state.bad{background:var(--surface-2)}
 .gen-state.bad svg{animation:none}
+
+/* streszczenie strony */
+.sum-h{font-size:15px;font-weight:500;line-height:1.4;margin-top:14px}
+.w .sum{padding-left:0}
+ul.sum{margin-top:8px}
+.chg{display:flex;gap:6px;align-items:flex-start;font-size:13px;background:var(--tint-pink);border-radius:14px;padding:8px 12px;margin-top:14px}
+.chg svg{flex:none;margin-top:2px}
+button.chev{background:transparent;cursor:pointer}
+button.chev:disabled{opacity:.4;cursor:default}

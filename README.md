@@ -31,3 +31,8 @@ Dobór z biblioteki (DeepSeek 4.1) → nowy kod (DeepSeek 4.1, kontrakt `n8n/pro
 guardian (`n8n/prompt-guardian.txt`) → plik + commit w `/opt/oboe/widgets` → `widgets`/`widget_versions`.
 Front: `<iframe sandbox="allow-scripts">` + CSP sandbox z nginx; rozmowa `oboe:data` / `oboe:ready` / `oboe:resize` / `oboe:save`.
 Ręczne ponowienie: `POST http://127.0.0.1:5678/webhook/oboe/admin/widget {"item_id": ...}` + X-Admin-Token (z serwera).
+
+## Streszczanie stron („Oboe: Streść stronę”, `n8n/build_summary.py`)
+Po dodaniu (created), „Sprawdź teraz” (manual, max co 2 min) i w terminie cyklicznym (scheduled — push tylko przy istotnej zmianie).
+SSRF: DNS przez DoH (A+AAAA) → tylko publiczne IP, porty 80/443, przekierowania nie automatycznie — jedno ręczne z ponownym DNS.
+Tekst bez zmian (odcisk FNV) = bez pytania modelu. Treść strony dla modelu to dane, nie polecenia.

@@ -141,6 +141,7 @@ for i, (method, path, name, sql, params) in enumerate(ROUTES):
 SYSTEM = open("prompt-rozumienie.txt").read()
 MODEL = "deepseek/deepseek-v4.1-flash"
 WIDGETS_WF = open(".widgets-wf-id").read().strip()  # id „Oboe: Generuj widget” w n8n
+SUMMARY_WF = open(".summary-wf-id").read().strip()  # id „Oboe: Streść stronę” w n8n
 USER_MSG = ("'Teraz jest: ' + $json.teraz + '\\n\\nKalendarz (używaj WYŁĄCZNIE tych dat):\\n' + $json.kalendarz"
             " + '\\n\\nZdanie użytkownika:\\n' + String($('POST items').item.json.body.text).trim().slice(0, 1000)")
 JSON_BODY = ("={{ JSON.stringify({ model: '" + MODEL + "', temperature: 0.2, max_tokens: 1200, reasoning: { enabled: false }, "
@@ -210,7 +211,44 @@ wgen = node("Generuj widget (w tle)", "n8n-nodes-base.executeWorkflow", 1.2, [19
   "options": {"waitForSubWorkflow": False}})
 wset = node("Id rzeczy", "n8n-nodes-base.set", 3.4, [1870, y], {"mode": "manual", "includeOtherFields": False,
   "assignments": {"assignments": [{"id": str(uuid.uuid4()), "name": "item_id", "type": "string", "value": "={{ $json.result.item.id }}"}]}, "options": {}})
+sneed = node("Streścić stronę?", "n8n-nodes-base.if", 2.2, [1760, y + 200], {
+  "conditions": {"options": {"caseSensitive": True, "leftValue": "", "typeValidation": "loose", "version": 2},
+    "conditions": [{"id": str(uuid.uuid4()), "leftValue": "={{ $json.result.status === 200 && !!(($json.result.item || {}).spec || {}).summarize }}",
+      "rightValue": "", "operator": {"type": "boolean", "operation": "true", "singleValue": True}}], "combinator": "and"}, "options": {}})
+sset = node("Id do streszczenia", "n8n-nodes-base.set", 3.4, [1870, y + 200], {"mode": "manual", "includeOtherFields": False,
+  "assignments": {"assignments": [{"id": str(uuid.uuid4()), "name": "item_id", "type": "string", "value": "={{ $json.result.item.id }}"},
+                                  {"id": str(uuid.uuid4()), "name": "reason", "type": "string", "value": "created"}]}, "options": {}})
+sgen = node("Streść (w tle)", "n8n-nodes-base.executeWorkflow", 1.2, [1980, y + 200], {
+  "source": "database", "workflowId": {"__rl": True, "value": SUMMARY_WF, "mode": "id"}, "options": {"waitForSubWorkflow": False}})
 link(resp, wneed); link(wneed, wset, 0); link(wset, wgen)
+link(resp, sneed); link(sneed, sset, 0); link(sset, sgen)
+
+# ---- POST items/summarize: „Sprawdź teraz” (nie częściej niż co 2 min na rzecz) ----
+y2 = y + 500
+w2 = node("POST items/summarize", "n8n-nodes-base.webhook", 2, [0, y2],
+  {"httpMethod": "POST", "path": "oboe/items/summarize", "responseMode": "responseNode", "options": {}}, webhookId=str(uuid.uuid4()))
+q2 = node("Sprawdź teraz", "n8n-nodes-base.postgres", 2.6, [220, y2], {"operation": "executeQuery", "query": f"""
+WITH {ME},
+it AS (SELECT id FROM items WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) AND spec->>'url' IS NOT NULL),
+busy AS (SELECT 1 FROM items WHERE id = $2::uuid AND data->>'summary_status' = 'working' AND updated_at > now() - interval '2 minutes')
+SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
+  WHEN NOT EXISTS (SELECT 1 FROM it) THEN json_build_object('status', 404, 'error', 'Nie ma takiej strony')
+  WHEN EXISTS (SELECT 1 FROM busy) THEN json_build_object('status', 429, 'error', 'Już sprawdzam — chwilę.')
+  ELSE json_build_object('status', 202, 'ok', true, 'id', $2) END AS result""".strip(),
+  "options": {"queryReplacement": "={{ [ " + TOKEN + ", /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000' ] }}"}},
+  credentials=PG)
+r2 = node("Odpowiedz: sprawdzam", "n8n-nodes-base.respondToWebhook", 1.1, [440, y2],
+  {"respondWith": "json", "responseBody": "={{ $json.result }}", "options": {"responseCode": "={{ $json.result.status || 200 }}"}})
+i2 = node("Ruszać?", "n8n-nodes-base.if", 2.2, [660, y2], {
+  "conditions": {"options": {"caseSensitive": True, "leftValue": "", "typeValidation": "loose", "version": 2},
+    "conditions": [{"id": str(uuid.uuid4()), "leftValue": "={{ $json.result.status === 202 }}", "rightValue": "",
+      "operator": {"type": "boolean", "operation": "true", "singleValue": True}}], "combinator": "and"}, "options": {}})
+s2 = node("Id (sprawdź teraz)", "n8n-nodes-base.set", 3.4, [880, y2], {"mode": "manual", "includeOtherFields": False,
+  "assignments": {"assignments": [{"id": str(uuid.uuid4()), "name": "item_id", "type": "string", "value": "={{ $json.result.id }}"},
+                                  {"id": str(uuid.uuid4()), "name": "reason", "type": "string", "value": "manual"}]}, "options": {}})
+e2 = node("Streść teraz (w tle)", "n8n-nodes-base.executeWorkflow", 1.2, [1100, y2], {
+  "source": "database", "workflowId": {"__rl": True, "value": SUMMARY_WF, "mode": "id"}, "options": {"waitForSubWorkflow": False}})
+link(w2, q2); link(q2, r2); link(r2, i2); link(i2, s2, 0); link(s2, e2)
 link(w, sess); link(sess, iff); link(iff, cal, 0); link(cal, llm); link(iff, deny, 1); link(llm, code); link(code, save); link(save, resp)
 
 wf = {"name": "Oboe: API", "nodes": nodes, "connections": conns,

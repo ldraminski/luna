@@ -43,6 +43,7 @@ const I = {
   trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
   ext: '<path d="M7 17 17 7M9 7h8v8"/>',
   spark: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
+  refresh: '<path d="M20 12a8 8 0 1 1-2.3-5.7L20 8.6"/><path d="M20 4v4.6h-4.6"/>',
   list: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5 2.5-2.5"/>',
   building: '<path d="M3 10 12 4l9 6z"/><path d="M5 10v9M9.5 10v9M14.5 10v9M19 10v9M3 21h18"/>',
   tv: '<rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="m8 3 4 3 4-3"/>',
@@ -160,6 +161,7 @@ function renderDays(items) {
 function remindLine(it) {
   const n = (it.notify_at || []).map(dt);
   if (!n.length) return '';
+  if (it.spec?.summarize) return 'Sprawdzę stronę ' + whenRel(n[0]) + ' — dam znać, jeśli coś się zmieni';
   return 'Przypomnę ' + n.slice(0, 2).map(whenRel).join(' i ');
 }
 
@@ -212,10 +214,26 @@ function partFields(it) {
   const f = it.data?.fields || []; if (!f.length) return '';
   return `<p class="chips">${f.map((x) => `<span><small>${esc(x.label)}</small> ${esc(x.value)}</span>`).join('')}</p>`;
 }
-function partPage(it) {
+function partPage(it, full = false) {
   const url = it.spec?.url; if (!url) return '';
-  return `<p class="dom">${svg('globe', 'width:15px;height:15px;display:inline;vertical-align:-2px')} ${esc(hostOf(url))}</p>
-    ${it.spec?.summarize ? `<p class="sum">${esc(it.data?.summary || 'Streszczenie pojawi się tutaj — tę część dopiero budujemy.')}</p>` : ''}`;
+  const d = it.data || {}; const sm = d.summary;
+  let body = '';
+  if (it.spec?.summarize || sm) {
+    if (d.summary_status === 'working') body = `<p class="gen-state">${svg('spark', 'width:15px;height:15px')} Czytam stronę…</p>`;
+    else if (d.summary_status === 'error' && !sm) body = `<p class="gen-state bad">${esc(d.summary_error || 'Nie udało się streścić strony.')}</p>`;
+    if (sm) {
+      const bl = full ? sm.bullets : sm.bullets.slice(0, 3);
+      body += `${sm.changed && sm.changes ? `<p class="chg">${svg('spark', 'width:14px;height:14px')} ${esc(sm.changes)}</p>` : ''}
+        <p class="sum-h">${esc(sm.headline)}</p>
+        ${bl.length ? `<ul class="sum">${bl.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}`;
+    }
+  }
+  const checked = sm?.checked_at ? `Sprawdzono ${rel(dt(sm.checked_at))}, ${fTime.format(dt(sm.checked_at))}` : '';
+  return `${body}<div class="w-f"><span class="meta">${svg('globe', 'width:15px;height:15px')}<span class="dom">${esc(hostOf(url))}</span></span>
+      <span style="display:flex;gap:8px;align-items:center">
+        ${it.spec?.summarize || sm ? `<button type="button" class="chev" data-sum="${it.id}" aria-label="Sprawdź teraz"${d.summary_status === 'working' ? ' disabled' : ''}>${svg('refresh')}</button>` : ''}
+        <a class="chev" href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="Otwórz stronę">${svg('ext')}</a></span></div>
+    ${checked ? `<p class="dom" style="margin-top:6px">${esc(checked)}${d.summary_status === 'error' && sm ? ' · ostatnia próba: ' + esc(d.summary_error || 'błąd') : ''}</p>` : ''}`;
 }
 // Widget wygenerowany przez AI: iframe sandbox (bez allow-same-origin) + CSP sandbox z nginx = osobny, pusty origin,
 // bez sieci i bez dostępu do Oboe. Rozmowa tylko przez postMessage (oboe:data / ready / resize / save).
@@ -291,8 +309,7 @@ function openDetail(id) {
       ${list.length ? `<div class="w" data-id="${it.id}" style="margin-top:12px;cursor:default">
           <div class="w-h" style="justify-content:space-between"><h3>Do odhaczenia</h3>
           <p class="kind">${list.filter((x) => x.done).length} z ${list.length}${it.data?.checklist_reset ? ' · odnawia się' : ''}</p></div>${partList(it)}</div>` : ''}
-      ${url && it.spec?.summarize ? `<div class="w" style="margin-top:12px;cursor:default"><p class="kind">Streszczenie · ${esc(hostOf(url))}</p>
-          <p class="sum">${esc(it.data?.summary || 'Streszczenie pojawi się tutaj — tę część dopiero budujemy.')}</p></div>` : ''}
+      ${url ? `<div class="w" style="margin-top:12px;cursor:default"><p class="kind">${it.spec?.summarize ? 'Streszczenie strony' : 'Strona'}</p>${partPage(it, true)}</div>` : ''}
       ${rows.length ? `<ul class="rows">${rows.map(([a, b]) => `<li><span>${esc(a)}</span><b>${esc(b)}</b></li>`).join('')}</ul>` : ''}
       <div class="d-cta">
         <button class="cta" type="button" data-act="done">${svg('check')}${it.spec?.recurrence ? 'Zakończ powtarzanie' : 'Oznacz jako zrobione'}</button>
@@ -388,7 +405,8 @@ document.addEventListener('load', (e) => { if (e.target.matches?.('iframe.wframe
 let genTimer;
 function watchGenerating() {
   clearTimeout(genTimer);
-  if (state.items.some((i) => i.data?.widget?.status === 'generating')) genTimer = setTimeout(() => load(), 8000);
+  if (state.items.some((i) => i.data?.widget?.status === 'generating' || i.data?.summary_status === 'working'))
+    genTimer = setTimeout(() => load().then(() => { if (state.openId) openDetail(state.openId); }), 5000);
 }
 
 // ---------- drobne ----------
@@ -426,13 +444,26 @@ function bind() {
   $('#list').addEventListener('change', onCheck);
   $('#detail').addEventListener('change', onCheck);
   const openFrom = (e) => {
-    if (e.target.closest('label, input, a')) return;
+    if (e.target.closest('label, input, a, button[data-sum]')) return;
     const card = e.target.closest('[data-id]');
     if (card) openDetail(card.dataset.id);
   };
   $('#list').addEventListener('click', openFrom);
   $('#list').addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFrom(e); } });
   $('#detail').addEventListener('click', (e) => { const b = e.target.closest('[data-act]'); if (b) detailAction(b.dataset.act); });
+  const onSum = async (e) => {
+    const b = e.target.closest('[data-sum]'); if (!b) return;
+    e.stopPropagation(); b.disabled = true;
+    const it = state.items.find((x) => x.id === b.dataset.sum);
+    try {
+      await api.summarize(b.dataset.sum);
+      if (it) it.data = { ...(it.data || {}), summary_status: 'working' };
+      render(); if (state.openId === it?.id) openDetail(it.id);
+      toast('Sprawdzam stronę…'); watchGenerating();
+    } catch (err) { b.disabled = false; toast(err.message); }
+  };
+  $('#list').addEventListener('click', onSum, true);
+  $('#detail').addEventListener('click', onSum, true);
   addEventListener('popstate', () => closeDetail(true));
   addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDetail(); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden && state.user) { load(); refreshBell(); } });
