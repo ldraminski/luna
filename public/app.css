@@ -312,3 +312,11 @@ html.locked,html.locked body{overflow:hidden;height:100%}
 .res:not(.res--full) .res-a{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .res-s{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .res-s a{font-size:12px;color:var(--navy);background:var(--surface);border-radius:var(--r-pill);padding:4px 10px;text-decoration:none;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* pole wpisywania: bez zbliżania na iPhonie (≥16px), rośnie w górę, dok nad klawiaturą (Hikari, 27.09) */
+.dock form{align-items:flex-end;border-radius:28px}
+.dock textarea{flex:1;min-width:0;display:block;border:0;background:transparent;font:inherit;font-size:16px;line-height:1.4;
+  padding:11px 0;margin:0;resize:none;outline:none;height:44px;overflow-y:hidden;color:var(--ink)}
+.dock textarea::placeholder{color:var(--ink-2)}
+.dock.kb{padding-bottom:10px}
+.tok input,.ask input,.chat-form input{font-size:16px}

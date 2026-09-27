@@ -140,7 +140,7 @@ function closeIntro() {
 }
 function useExample(text) {
   closeIntro();
-  const q = $('#q'); q.value = text; q.focus();
+  const q = $('#q'); q.value = text; fitQ(); q.focus();
   toast('Wyślij, a zapiszę — albo zmień po swojemu.');
 }
 
@@ -470,13 +470,31 @@ async function add(e) {
   const slow = setTimeout(() => toast('Chwilkę — sprawdzam w sieci…'), 3500);   // sprawdzanie w sieci trwa kilka–kilkanaście sekund
   try {
     const r = await api.add(text);
-    q.value = ''; q.blur();
+    q.value = ''; fitQ(); q.blur();
     toast(r.item?.spec?.understood || 'Zapisałam.');
     await load();
   } catch (err) {
     if (err.status === 401) return logout('Klucz przestał działać. Poproś Łukasza o nowy.');
     toast(err.message);
   } finally { clearTimeout(slow); form.classList.remove('busy'); }
+}
+
+// Pole wpisywania rośnie w górę razem z tekstem — do 80% widocznego ekranu, dalej przewija się samo pole.
+function fitQ() {
+  const q = $('#q'); if (!q) return;
+  const vh = window.visualViewport?.height || innerHeight;
+  const max = Math.round(vh * 0.8) - 24;
+  q.style.height = 'auto';
+  q.style.height = Math.min(q.scrollHeight, max) + 'px';
+  q.style.overflowY = q.scrollHeight > max ? 'auto' : 'hidden';
+}
+// iPhone nie zmniejsza układu przy klawiaturze — dok podnosimy ręcznie nad klawiaturę (VisualViewport).
+function keepDock() {
+  const vv = window.visualViewport; if (!vv) return;
+  const kb = Math.max(0, Math.round(innerHeight - vv.height - vv.offsetTop));
+  $('#dock').style.bottom = kb + 'px';
+  $('#dock').classList.toggle('kb', kb > 0);
+  fitQ();
 }
 
 // ---------- powiadomienia ----------
@@ -605,6 +623,11 @@ function bind() {
     catch { $('#tok').focus(); $('#tok-err').textContent = 'Przytrzymaj pole i wybierz „Wklej”.'; }
   });
   $('#wpisz').addEventListener('submit', add);
+  $('#q').addEventListener('input', fitQ);
+  // Enter wysyła (klawiatura pokazuje „Wyślij”), Shift+Enter = nowa linia
+  $('#q').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); $('#wpisz').requestSubmit(); } });
+  window.visualViewport?.addEventListener('resize', keepDock);
+  window.visualViewport?.addEventListener('scroll', keepDock);
   $('#plus').addEventListener('click', () => $('#q').focus());
   $('#mic').addEventListener('click', () => { $('#q').focus(); toast('Na razie podyktuj mi to mikrofonem z klawiatury telefonu — własne słuchanie dostanę później.'); });
   $('#bell').addEventListener('click', bell);
@@ -615,7 +638,7 @@ function bind() {
     if (b.dataset.intro === 'close') return closeIntro();
     if (b.dataset.intro === 'push') { await bell(); openIntro(); }
   });
-  $('#list').addEventListener('click', (e) => { const ex = e.target.closest('.empty [data-ex]'); if (ex) { const q = $('#q'); q.value = ex.dataset.ex; q.focus(); } });
+  $('#list').addEventListener('click', (e) => { const ex = e.target.closest('.empty [data-ex]'); if (ex) { const q = $('#q'); q.value = ex.dataset.ex; fitQ(); q.focus(); } });
 
   const onCheck = async (e) => {
     const cb = e.target.closest('[data-check]'); if (!cb) return;
