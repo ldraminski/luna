@@ -330,6 +330,13 @@ function partPage(it, full = false) {
         <a class="chev" href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="Otwórz stronę">${svg('ext')}</a></span></div>
     ${checked ? `<p class="dom" style="margin-top:6px">${esc(checked)}${d.summary_status === 'error' && sm ? ' · ostatnia próba: ' + esc(d.summary_error || 'błąd') : ''}</p>` : ''}`;
 }
+// Ze zdjęcia: opis (jak analyzer) i — w szczególe — odczytany tekst.
+function partPhoto(it, full = false) {
+  const p = it.data?.photo; if (!p || (!p.description && !p.text)) return '';
+  return `<div class="res${full ? ' res--full' : ''}"><p class="kind">📷 Ze zdjęcia</p>
+    ${p.description ? `<p class="res-a">${esc(p.description)}</p>` : ''}
+    ${full && p.text ? `<p class="res-a photo-text">${esc(p.text)}</p>` : ''}</div>`;
+}
 // Sprawdzone w sieci: odpowiedź Luny + źródła (host jako link). Na karcie skrót, w szczególe całość.
 function partResearch(it, full = false) {
   const r = it.data?.research; if (!r || (!r.answer && !(r.sources || []).length)) return '';
@@ -364,21 +371,21 @@ function partFoot(it) {
 function card(it, hero = false) {
   const { tint, icon } = lookOf(it);
   const ev = eventOf(it);
-  const noteText = !listOf(it).length && !it.spec?.url && !ev && !it.spec?.recurrence && !it.data?.research ? `<p class="sum">${esc(it.source_text)}</p>` : '';
+  const noteText = !listOf(it).length && !it.spec?.url && !ev && !it.spec?.recurrence && !it.data?.research && !it.data?.photo ? `<p class="sum">${esc(it.source_text)}</p>` : '';
   if (hero) {
     return `<article class="w w--hero" data-id="${it.id}" data-widget="${esc(it.kind)}" tabindex="0" role="button">
       <p class="kind">${svg('clock', 'width:16px;height:16px')} ${esc(kindLabel(it).replace(/^Jednorazowe · /, 'Jednorazowe · ') )}</p>
       <p class="big">${esc(rel(ev))}</p>
       <h3>${esc(it.title)}</h3>
       <div class="blob" aria-hidden="true"><svg class="i" viewBox="0 0 24 24" style="width:64px;height:64px;stroke-width:1.4;margin:-10px 18px 0 0">${I[icon]}</svg></div>
-      ${partFields(it)}${partResearch(it)}${partWidget(it)}${partList(it)}${partFoot(it)}
+      ${partFields(it)}${partPhoto(it)}${partResearch(it)}${partWidget(it)}${partList(it)}${partFoot(it)}
     </article>`;
   }
   const late = isLate(it);
   return `<article class="w${late ? ' w--late' : ''}" data-id="${it.id}" data-widget="${esc(it.kind)}" tabindex="0" role="button">
     <div class="w-h"><div class="ico" style="background:var(${late ? '--late-bg' : TINT[tint]})" aria-hidden="true">${svg(icon)}</div>
       <div style="min-width:0"><p class="kind">${esc(kindLabel(it))}</p><h3>${esc(it.title)}</h3></div></div>
-    ${partCycle(it)}${partFields(it)}${partResearch(it)}${partPage(it)}${partWidget(it)}${partList(it)}${it.data?.widget ? '' : noteText}${partFoot(it)}
+    ${partCycle(it)}${partFields(it)}${partPhoto(it)}${partResearch(it)}${partPage(it)}${partWidget(it)}${partList(it)}${it.data?.widget ? '' : noteText}${partFoot(it)}
   </article>`;
 }
 
@@ -413,6 +420,7 @@ function openDetail(id) {
     </div>
     <div class="d-body">
       <div class="quote">Wpisane ${esc(rel(dt(it.created_at)))}, ${esc(fTime.format(dt(it.created_at)))}:<q>${esc(it.source_text)}</q></div>
+      ${it.data?.photo ? `<div class="w" style="margin-top:12px;cursor:default">${partPhoto(it, true)}</div>` : ''}
       ${it.data?.research ? `<div class="w" style="margin-top:12px;cursor:default">${partResearch(it, true)}</div>` : ''}
       ${it.data?.widget ? `<div class="w" style="margin-top:12px;cursor:default">${partWidget(it)}</div>` : ''}
       ${(it.data?.lists || []).map((l, li) => l && Array.isArray(l.items) && l.items.length ? `<div class="w" data-id="${it.id}" style="margin-top:12px;cursor:default">
@@ -473,19 +481,26 @@ async function detailAction(act) {
 // ---------- dodawanie ----------
 async function add(e) {
   e.preventDefault();
-  const q = $('#q'); const text = q.value.trim();
-  if (!text) { q.focus(); return; }
+  const q = $('#q'); const text = q.value.trim(); const image = state.photo || '';
+  if (!text && !image) { q.focus(); return; }
   const form = $('#wpisz'); form.classList.add('busy');
-  const slow = setTimeout(() => toast('Chwilkę — sprawdzam w sieci…'), 3500);   // sprawdzanie w sieci trwa kilka–kilkanaście sekund
+  const slow = setTimeout(() => toast(image ? 'Chwilkę — oglądam zdjęcie…' : 'Chwilkę — sprawdzam w sieci…'), 3500);   // zdjęcie / sieć trwają kilka–kilkanaście sekund
   try {
-    const r = await api.add(text);
-    q.value = ''; fitQ(); q.blur();
+    const r = await api.add(text, image);
+    q.value = ''; fitQ(); q.blur(); setPhoto(null);
     toast(r.item?.spec?.understood || 'Zapisałam.');
     await load();
   } catch (err) {
     if (err.status === 401) return logout('Klucz przestał działać. Poproś Łukasza o nowy.');
     toast(err.message);
   } finally { clearTimeout(slow); form.classList.remove('busy'); }
+}
+
+// Zdjęcie do nowej rzeczy: miniatura nad polem; samo zdjęcie też można wysłać (Luna sama zdecyduje: przypomnienie / lista / notatka).
+function setPhoto(url) {
+  state.photo = url || null;
+  $('#q-pic').hidden = !url;
+  if (url) $('#q-pic img').src = url;
 }
 
 // Pole wpisywania rośnie w górę razem z tekstem — do 80% widocznego ekranu, dalej przewija się samo pole.
@@ -672,6 +687,12 @@ function bind() {
     catch { $('#tok').focus(); $('#tok-err').textContent = 'Przytrzymaj pole i wybierz „Wklej”.'; }
   });
   $('#wpisz').addEventListener('submit', add);
+  $('#q-photo').addEventListener('click', () => $('#q-file').click());
+  $('#q-file').addEventListener('change', async (e) => {
+    const f = e.target.files?.[0]; e.target.value = ''; if (!f) return;
+    try { setPhoto(await photoToDataUrl(f)); $('#q').focus(); } catch (err) { toast(err.message); }
+  });
+  $('#q-pic-x').addEventListener('click', () => setPhoto(null));
   $('#q').addEventListener('input', fitQ);
   // Enter wysyła (klawiatura pokazuje „Wyślij”), Shift+Enter = nowa linia
   $('#q').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); $('#wpisz').requestSubmit(); } });

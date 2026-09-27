@@ -75,6 +75,14 @@ Wynik: `items.data.research = {query, answer, sources[{url,title,host}], checked
 - **Zdjęcie w rozmowie:** przeglądarka zmniejsza je do 1600 px JPEG → `deepseek/deepseek-v4.1-flash` (obsługuje obrazy) odczytuje treść → do rozmowy trafia TYLKO tekst
   (`[ZDJĘCIE] …`), samo zdjęcie nie jest zapisywane. nginx: limit 4 MB tylko dla `/api/items/widget-chat` (reszta API 64 KB).
 
+## Zdjęcie przy dodawaniu (28.09.2026, Łukasz)
+
+Przycisk aparatu w głównym polu (miniatura z ✕ nad polem). `POST /api/items` przyjmuje `image` (JPEG ≤1600 px, nginx 4 MB tylko dla tej trasy).
+DeepSeek 4.1 Flash robi analizę „jak analyzer.draminski.dev” (krótki tytuł, opis 2–3 zdania) + odczytany tekst — BEZ `response_format`
+(z nim DeepSeek potrafił oddać samo `{"type":"json_object"}`), z drugą próbą. Potem ZWYKŁE rozumienie: termin na zdjęciu → przypomnienie,
+lista → lista, miejsce/rzecz → zwykła notatka z polami (adres, godziny, cena). Z tekstem użytkownika — tekst decyduje. `data.photo` = opis + tekst;
+samego zdjęcia nie zapisujemy. Nieczytelne zdjęcie bez tekstu → 422 „Nie udało mi się obejrzeć tego zdjęcia” (Luna nic nie wymyśla).
+
 ## Wdrożenie
 
 **Pamięć podręczna (27.09):** Cloudflare dokleja `max-age=14400` do CSS/JS mimo `no-cache` z nginx — telefon brał nowy HTML ze starym CSS.

@@ -60,7 +60,7 @@ export const api = {
   accessRequests: () => call('access/requests').then((d) => d.requests || []),
   accessDecide: (id, accept) => call('access/decide', { method: 'POST', body: { id, accept } }),
   items: () => call('items').then((d) => d.items || []),
-  add: (text) => call('items', { method: 'POST', body: { text } }),
+  add: (text, image = '') => call('items', { method: 'POST', body: { text, ...(image ? { image } : {}) } }),
   done: (id) => call('items/done', { method: 'POST', body: { id } }),
   remove: (id) => call('items/delete', { method: 'POST', body: { id } }),
   check: (id, list, index, done) => call('items/check', { method: 'POST', body: { id, list, index, done } }),

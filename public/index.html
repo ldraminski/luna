@@ -76,9 +76,15 @@
 
 <!-- GŁÓWNE WEJŚCIE -->
 <div class="dock" id="dock" hidden>
+  <div class="q-pic" id="q-pic" hidden><img alt="Wybrane zdjęcie"><span>Zdjęcie — wyślij samo albo dopisz, co z nim zrobić</span>
+    <button type="button" id="q-pic-x" aria-label="Usuń zdjęcie">✕</button></div>
   <form id="wpisz" aria-label="Powiedz Lunie, co zapisać">
     <label for="q" class="sr">Napisz, co mam zapamiętać</label>
-    <textarea id="q" rows="1" placeholder="Napisz, co mam zapamiętać…" autocomplete="off" enterkeyhint="send" maxlength="1000"></textarea>
+    <button class="btn-ic mic" type="button" id="q-photo" aria-label="Dodaj zdjęcie">
+      <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+    </button>
+    <input type="file" id="q-file" accept="image/*" hidden>
+    <textarea id="q" rows="1" placeholder="Co mam zapamiętać?" autocomplete="off" enterkeyhint="send" maxlength="1000"></textarea>
     <button class="btn-ic mic" type="button" id="mic" aria-label="Podyktuj">
       <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
     </button>

@@ -336,3 +336,13 @@ html.locked,html.locked body{overflow:hidden;height:100%}
 .chat-form{padding-left:6px}
 .chat-form .mic{align-self:flex-end}
 .chat-form textarea{padding-left:4px}
+
+/* zdjęcie w głównym polu (Hikari, 28.09) */
+.q-pic{max-width:398px;margin:0 auto 8px;display:flex;align-items:center;gap:10px;background:var(--surface);border-radius:18px;padding:6px 8px 6px 6px;box-shadow:var(--shadow);font-size:13px;color:var(--ink-2)}
+.q-pic img{width:44px;height:44px;border-radius:12px;object-fit:cover;flex:none}
+.q-pic span{flex:1;min-width:0}
+.q-pic button{width:36px;height:36px;border:0;border-radius:50%;background:var(--surface-2);cursor:pointer;flex:none;color:var(--ink)}
+.dock form{padding-left:6px}
+.dock textarea{padding-left:4px}
+.dock #q-photo{align-self:flex-end}
+.photo-text{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}

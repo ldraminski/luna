@@ -1,6 +1,6 @@
 // Sprawdza odpowiedź modelu; niczego nie zgaduje — przy błędzie zwraca ok:false z komunikatem.
 // Rzecz składa się z części (termin, lista, strona, szczegóły); `kind` to tylko część główna — do sortowania i sekcji.
-const src = String($('POST items').first().json.body.text || '').trim().slice(0, 1000);
+const src = String($('POST items').first().json.body.text || '').trim().slice(0, 1000) || '📷 Zdjęcie';
 const fail = (error) => [{ json: { ok: false, error, notify: [], spec: {}, data: {}, source_text: src } }];
 
 const raw = $json.choices?.[0]?.message?.content;
@@ -49,6 +49,7 @@ return [{ json: {
     tip: cut(m.tip, 80) || null, look, fields,
     widget: m.widget?.brief ? { status: 'generating' } : undefined,
     // listy z nazwami (Popraw może dołożyć kolejne); z jednego zdania powstaje najwyżej jedna, bez nazwy
+    photo: (() => { try { return $('Wejście do modelu').first().json.photo || undefined; } catch (e) { return undefined; } })(),   // opis zdjęcia, jeśli było
     lists: checklist.length ? [{ name: null, items: checklist, reset: !!(recurrence && m.checklist_reset !== false) }] : undefined,
   },
   notify,
