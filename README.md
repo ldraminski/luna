@@ -84,6 +84,18 @@ lista → lista, miejsce/rzecz → zwykła notatka z polami (adres, godziny, cen
 zapisujemy tylko **miniaturę** (≤800 px JPEG ~30–100 KB, robi ją przeglądarka) w tabeli `item_photos` (migracja 010) —
 pobierana osobno `GET /api/items/photo?id=` wyłącznie z kluczem właściciela; lista rzeczy ma tylko `has_photo`. Usunięcie rzeczy kasuje zdjęcie. Nieczytelne zdjęcie bez tekstu → 422 „Nie udało mi się obejrzeć tego zdjęcia” (Luna nic nie wymyśla).
 
+## Raport dnia / tygodnia i przypomnienie o zaległych (28.09.2026, Łukasz)
+
+Workflow „Oboe: Raport” (`n8n/build_report.py`, id w `n8n/.report-wf-id`), migracja `db/011-raporty.sql`.
+- Co 5 min: komu wypadła godzina (`users.report_time`, domyślnie **9:00**, okno 4 h; `report_enabled`) i nie ma raportu na dziś (`reports`, jeden na dzień).
+- **Pon = raport tygodnia** (7 dni), inne dni = **dziś + jutro**. Plan liczy KOD (`n8n/raport-plan.js`, cykliczne jak w aplikacji);
+  DeepSeek (`n8n/prompt-raport.txt`) pisze tylko wstęp, rady „przygotuj się wcześniej”, pytanie o zaległe i treść pusha.
+- Powiadomienia (przez Harmonogram, `item_id NULL`): „Twój plan na dziś / Twój tydzień z Luną” + gdy są zaległe osobne
+  „Masz N przeterminowane rzeczy — wykonaj je albo oznacz jako zakończone — inaczej będę ci ciągle przypominać.”
+- Aplikacja: raport otwiera się sam raz dziennie (`seen_at`), potem ikona raportu w nagłówku; na dole wybór godziny / wyłączenie (`POST /api/settings`).
+  **Zaległe:** karta od dołu przy otwarciu / powrocie do aplikacji (najwyżej co 3 h, localStorage) z „Zrobione” / „Nieaktualne — zamknij”.
+- Ręcznie (test): `POST /webhook/oboe/admin/report {email, weekly}` z X-Admin-Token, tylko z serwera.
+
 ## Wdrożenie
 
 **Pamięć podręczna (27.09):** Cloudflare dokleja `max-age=14400` do CSS/JS mimo `no-cache` z nginx — telefon brał nowy HTML ze starym CSS.

@@ -367,3 +367,36 @@ html.locked,html.locked body{overflow:hidden;height:100%}
 .days li.nm{position:relative;margin-left:10px}
 .days li.nm::before{content:"";position:absolute;left:-8px;top:22px;bottom:14px;width:2px;border-radius:2px;background:var(--line)}
 .days li.nm::after{content:attr(data-mon);position:absolute;left:-8px;top:-2px;transform:translateX(-50%);font-size:10px;font-weight:600;color:var(--navy);background:var(--bg);padding:0 3px;text-transform:uppercase;letter-spacing:.04em}
+
+/* raport dnia/tygodnia i karta zaległych (Hikari, 28.09) */
+.round .badge{pointer-events:none}
+.top > div{flex:none}
+.top .round{width:46px;height:46px}
+#report h2{font-size:26px;line-height:1.15;margin-top:6px}
+#report .lead{color:var(--ink);margin-top:10px;font-size:15px;line-height:1.5}
+.rep-prep,.rep-late{margin-top:18px;border-radius:var(--r-tile);padding:14px 16px}
+.rep-prep{background:var(--tint-lavender)}
+.rep-prep ul{margin:8px 0 0 1.1em;font-size:14px;line-height:1.5}
+.rep-prep li + li{margin-top:4px}
+.rep-late{background:var(--late-bg)}
+.rep-late > .kind{color:var(--late)}
+.rep-late > p:not(.kind){font-size:14px;margin-top:6px;line-height:1.5}
+.rep-day{margin-top:20px}
+.rep-day h3{font-size:16px;margin:0 2px 8px}
+.rep-rows{list-style:none;display:grid;gap:8px}
+.rep-rows button{width:100%;display:flex;gap:12px;align-items:baseline;text-align:left;border:0;background:var(--surface);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow);cursor:pointer;color:var(--ink);font-size:15px}
+.rep-rows .t{flex:none;width:44px;font-weight:600;color:var(--navy);font-variant-numeric:tabular-nums}
+.rep-rows small{display:block;font-size:12px;color:var(--ink-2);margin-top:2px}
+.rep-none{font-size:13px;color:var(--ink-2);margin:0 2px}
+.rep-set{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);border-radius:var(--r-pill);padding:6px 6px 6px 18px;margin-bottom:10px;box-shadow:var(--shadow);font-size:14px}
+.rep-set select{font:inherit;font-size:16px;border:0;background:var(--surface-2);border-radius:var(--r-pill);padding:8px 14px;color:var(--ink)}
+.nudge-in{height:auto!important;max-height:80dvh;overflow:auto;padding-top:22px}
+.nudge h2{font-size:21px;line-height:1.2;color:var(--late)}
+.nudge-lead{font-size:14px;color:var(--ink-2);margin-top:6px}
+.nudge-list{list-style:none;display:grid;gap:8px;margin:14px 0}
+.nudge-list li{background:var(--surface);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow)}
+.nudge-list .n{display:block;font-size:15px;font-weight:500}
+.nudge-list small{display:block;font-size:12px;color:var(--ink-2);font-weight:400;margin-top:2px}
+.nudge-list .b{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap}
+.nudge-list .late-done{margin-left:0}
+.nudge-list .ghost-txt{margin-left:0;min-height:40px}

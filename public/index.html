@@ -52,6 +52,10 @@
   <header class="top">
     <h1 id="hello-name">Dzień dobry</h1>
     <div style="display:flex;gap:10px">
+    <button class="round" id="report-btn" type="button" aria-label="Raport dnia">
+      <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/></svg>
+      <span class="badge" id="report-badge" hidden></span>
+    </button>
     <button class="round" id="luna" type="button" aria-label="Kim jest Luna">
       <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
     </button>
@@ -144,6 +148,30 @@
     <div class="intro-foot"><button class="cta wide" type="button" data-intro="close">Zaczynamy</button></div>
   </div>
 </section>
+
+<!-- RAPORT DNIA / TYGODNIA (pełny ekran, jak karta powitalna) -->
+<section class="intro" id="report" role="dialog" aria-modal="true" aria-labelledby="rep-title" hidden>
+  <div class="intro-in">
+    <div class="intro-body" id="rep-body"></div>
+    <div class="intro-foot">
+      <div class="rep-set">
+        <label for="rep-time">Raport codziennie o</label>
+        <select id="rep-time"></select>
+      </div>
+      <button class="cta wide" type="button" data-rep="close">Zamknij</button>
+    </div>
+  </div>
+</section>
+
+<!-- PRZYPOMNIENIE O ZALEGŁYCH (karta od dołu) -->
+<dialog class="chat nudge" id="nudge" aria-labelledby="nudge-title">
+  <div class="chat-in nudge-in">
+    <h2 id="nudge-title"></h2>
+    <p class="nudge-lead">Wykonaj je albo oznacz jako zakończone — inaczej będę ci ciągle przypominać.</p>
+    <ul class="nudge-list" id="nudge-list"></ul>
+    <button class="cta alt wide" type="button" data-nudge="later">Później</button>
+  </div>
+</dialog>
 
 <!-- EKRAN 2 · szczegół -->
 <section class="detail" id="detail" aria-label="Szczegóły" aria-modal="true" role="dialog"></section>

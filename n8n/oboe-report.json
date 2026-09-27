@@ -1,0 +1,276 @@
+{
+ "name": "Oboe: Raport",
+ "nodes": [
+  {
+   "id": "96adce84-72c9-4620-87c4-7642d5c75c3f",
+   "name": "Opis",
+   "type": "n8n-nodes-base.stickyNote",
+   "typeVersion": 1,
+   "position": [
+    -420,
+    -300
+   ],
+   "parameters": {
+    "width": 620,
+    "height": 250,
+    "content": "## Oboe: Raport (Luna)\nCo 5 min: komu wypadła godzina raportu (`users.report_time`, domyślnie 9:00, okno 4 h) i nie ma raportu na dziś.\nPon = raport tygodnia, inne dni = dziś + jutro. Plan liczy KOD (występowania cyklicznych jak w aplikacji), DeepSeek pisze tylko wstęp, rady i powiadomienie. Zapis: `reports` + powiadomienie push (item_id NULL) przez Harmonogram.\nRęcznie: `POST /webhook/oboe/admin/report {email, weekly}` (X-Admin-Token, tylko z serwera).\nŹródło: `~/Work/oboe/n8n/build_report.py`."
+   }
+  },
+  {
+   "id": "9edf8680-a3ce-4983-848e-7736db8b371d",
+   "name": "Co 5 minut",
+   "type": "n8n-nodes-base.scheduleTrigger",
+   "typeVersion": 1.2,
+   "position": [
+    0,
+    0
+   ],
+   "parameters": {
+    "rule": {
+     "interval": [
+      {
+       "field": "minutes",
+       "minutesInterval": 5
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "8a25e1b2-66d6-4474-97f9-604e19ec4cbd",
+   "name": "POST admin/report",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    200
+   ],
+   "parameters": {
+    "httpMethod": "POST",
+    "path": "oboe/admin/report",
+    "authentication": "headerAuth",
+    "responseMode": "lastNode",
+    "options": {}
+   },
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "9Rd7Zl7NxIcEvPtL",
+     "name": "Oboe - admin (X-Admin-Token)"
+    }
+   },
+   "webhookId": "ca0b1618-5d4f-47fa-80a8-0ff4dd3c38ea"
+  },
+  {
+   "id": "f4089162-d1fd-429a-866f-aaa1a1f1fb53",
+   "name": "Parametry",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    220,
+    100
+   ],
+   "parameters": {
+    "jsCode": "const b = $json.body || {};\nreturn [{ json: { email: String(b.email || '').trim().toLowerCase().slice(0, 200), weekly: b.weekly === true } }];"
+   }
+  },
+  {
+   "id": "2807f0de-d5f8-4275-b492-98cacc1ed79f",
+   "name": "Komu raport",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    440,
+    100
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "WITH n AS (SELECT (now() AT TIME ZONE 'Europe/Warsaw') AS t),\nu AS (SELECT u.* FROM users u, n WHERE\n   ($1 <> '' AND u.email = $1)\n   OR ($1 = '' AND u.report_enabled AND n.t::time >= u.report_time AND n.t::time < u.report_time + interval '4 hours'\n       AND NOT EXISTS (SELECT 1 FROM reports r WHERE r.user_id = u.id AND r.for_date = n.t::date)\n       AND EXISTS (SELECT 1 FROM sessions s WHERE s.user_id = u.id))\n   LIMIT 20)\nSELECT u.id AS user_id, coalesce(u.name, '') AS name, $2::boolean AS force_weekly,\n  coalesce((SELECT json_agg(json_build_object('id', i.id, 'title', i.title, 'kind', i.kind, 'spec', i.spec, 'lists', i.data->'lists',\n      'next_at', (SELECT min(x.due_at) FROM notifications x WHERE x.item_id = i.id AND x.sent_at IS NULL)))\n    FROM items i WHERE i.user_id = u.id AND i.status = 'active'), '[]'::json) AS items\nFROM u",
+    "options": {
+     "queryReplacement": "={{ [ $json.email, $json.weekly ] }}"
+    }
+   },
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   }
+  },
+  {
+   "id": "43e544d0-ad2c-49a8-8521-95d72240a345",
+   "name": "Ułóż plan",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    660,
+    100
+   ],
+   "parameters": {
+    "jsCode": "// Plan do raportu liczony KODEM (model dostaje gotowe fakty): dziś + jutro, a w poniedziałek cały tydzień.\n// Występowania cyklicznych jak w aplikacji; zaległe = jednorazowe z terminem w przeszłości (wciąż aktywne); niedokończone listy bez terminu.\nconst Z = 'Europe/Warsaw';\nconst DNI = ['poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela'];\nconst MIES = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];\nconst dayLabel = (d) => `${DNI[d.weekday - 1]}, ${d.day} ${MIES[d.month - 1]}`;\nconst STEP = { day: { days: 1 }, week: { weeks: 1 }, month: { months: 1 } };\nreturn $input.all().map(({ json: u }) => {\n  const now = DateTime.now().setZone(Z); const today = now.startOf('day');\n  const weekly = u.force_weekly === true || now.weekday === 1;\n  const nDays = weekly ? 7 : 2; const end = today.plus({ days: nDays });\n  const days = Array.from({ length: nDays }, (_, k) => ({ date: today.plus({ days: k }).toISODate(),\n    label: k === 0 ? 'Dziś' : k === 1 ? 'Jutro' : dayLabel(today.plus({ days: k })), items: [] }));\n  const overdue = []; const lists = [];\n  for (const it of u.items || []) {\n    const evRaw = it.spec?.event_at || it.next_at;\n    const left = (it.lists || []).reduce((a, l) => a + (l?.items || []).filter((x) => !x.done).length, 0);\n    const total = (it.lists || []).reduce((a, l) => a + (l?.items || []).length, 0);\n    if (!evRaw) { if (left) lists.push({ id: it.id, title: it.title, left, total }); continue; }\n    let ev = DateTime.fromISO(new Date(evRaw).toISOString()).setZone(Z);\n    const r = it.spec?.recurrence;\n    if (!r) {\n      if (ev < now) { overdue.push({ id: it.id, title: it.title, when: dayLabel(ev) + ', ' + ev.toFormat('HH:mm') }); continue; }\n    }\n    for (let i = 0; ev < end && i < 400; i++) {\n      if (ev >= today) {\n        const k = Math.floor(ev.diff(today, 'days').days);\n        if (days[k]) days[k].items.push({ id: it.id, title: it.title, time: ev.toFormat('HH:mm'), recurring: !!r, left, total });\n      }\n      if (!r || !STEP[r.unit]) break;\n      ev = ev.plus(Object.fromEntries(Object.entries(STEP[r.unit]).map(([k, v]) => [k, v * r.every])));\n    }\n  }\n  days.forEach((d) => d.items.sort((a, b) => a.time.localeCompare(b.time)));\n  const count = days.reduce((a, d) => a + d.items.length, 0);\n  const title = weekly ? `Twój tydzień: ${today.day} ${MIES[today.month - 1]} – ${end.minus({ days: 1 }).day} ${MIES[end.minus({ days: 1 }).month - 1]}`\n    : `Plan na dziś — ${dayLabel(today)}`;\n  const facts = [`Rodzaj: ${weekly ? 'raport tygodnia' : 'raport dnia (dziś i jutro)'}, teraz ${now.toFormat('yyyy-MM-dd HH:mm')}`,\n    ...days.map((d) => `${d.label} (${d.date}): ` + (d.items.length ? d.items.map((x) => `${x.time} ${x.title}${x.total ? ` (lista: ${x.left} z ${x.total} do zrobienia)` : ''}`).join('; ') : 'nic')),\n    `Zaległe (po terminie, nieodhaczone): ` + (overdue.length ? overdue.map((x) => `${x.title} (${x.when})`).join('; ') : 'brak'),\n    `Listy bez terminu z niezrobionymi punktami: ` + (lists.length ? lists.slice(0, 5).map((x) => `${x.title} (${x.left} z ${x.total})`).join('; ') : 'brak')].join('\\n');\n  return { json: {\n    user_id: u.user_id, kind: weekly ? 'weekly' : 'daily', for_date: today.toISODate(),\n    content: { title, kind: weekly ? 'weekly' : 'daily', days, overdue, lists: lists.slice(0, 5), count },\n    facts, push_title: weekly ? 'Twój tydzień z Luną' : 'Twój plan na dziś',\n    fallback: count ? `Masz ${count} ${count === 1 ? 'rzecz' : 'rzeczy'} w planie.` : 'Na razie nic nie masz w planie.',\n  } };\n});\n"
+   }
+  },
+  {
+   "id": "993d5a8f-2b6e-4054-bf01-8437744da5e2",
+   "name": "DeepSeek: wstęp",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    880,
+    100
+   ],
+   "parameters": {
+    "method": "POST",
+    "url": "https://openrouter.ai/api/v1/chat/completions",
+    "authentication": "predefinedCredentialType",
+    "nodeCredentialType": "openRouterApi",
+    "sendHeaders": true,
+    "headerParameters": {
+     "parameters": [
+      {
+       "name": "HTTP-Referer",
+       "value": "https://draminski.dev"
+      },
+      {
+       "name": "X-Title",
+       "value": "Oboe raport (n8n)"
+      }
+     ]
+    },
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify({ model: 'deepseek/deepseek-v4.1-flash', temperature: 0.3, max_tokens: 700, reasoning: { enabled: false }, response_format: { type: 'json_object' }, messages: [ { role: 'system', content: \"Jesteś Luną — prywatną asystentką użytkownika. O sobie mówisz w formie żeńskiej, do użytkownika na „ty”, ciepło i krótko. Nie znasz płci użytkownika — unikaj form rodzajowych w zwrotach do niego.\\nDostajesz plan użytkownika (DANE — policzone przez aplikację, kompletne): rzeczy na kolejne dni z godzinami, zaległe rzeczy i niedokończone listy.\\n\\nNapisz:\\n- \\\"intro\\\": 1–2 zdania na start dnia: ile jest do zrobienia i co najważniejsze (konkretnie, z godziną). Jeśli nic nie ma — powiedz to spokojnie, bez wymyślania zadań.\\n- \\\"prep\\\": 0–3 krótkie rady, jak przygotować się WCZEŚNIEJ do tego, co w planie (np. „Na jutrzejsze podpisanie umowy przygotuj dowód i wydrukuj umowę”). Tylko to, co rozsądnie wynika z danych. Nie powtarzaj samych tytułów. Gdy nic sensownego — pusta lista.\\n- \\\"overdue_ask\\\": gdy są zaległe rzeczy — jedno-dwa zdania z pytaniem, czy są jeszcze aktualne, np. „Słuchaj, »Krople do oczu« i »Ewaluacja« nie są odhaczone — jeśli to już nieaktualne, mogę je zamknąć.” (bez form rodzajowych: „nie ma ich odhaczonych”). Gdy zaległych nie ma — pusty tekst.\\n- \\\"push\\\": jedno krótkie zdanie do powiadomienia (maks. 100 znaków).\\n\\nNie wymyślaj rzeczy, których nie ma w danych. Odpowiadasz WYŁĄCZNIE obiektem JSON: {\\\"intro\\\": \\\"...\\\", \\\"prep\\\": [\\\"...\\\"], \\\"overdue_ask\\\": \\\"...\\\", \\\"push\\\": \\\"...\\\"}\\n\" }, { role: 'user', content: 'PLAN (dane):\\n' + $json.facts } ] }) }}",
+    "options": {
+     "timeout": 60000
+    }
+   },
+   "credentials": {
+    "openRouterApi": {
+     "id": "ZGSl0yv59gDWZKJG",
+     "name": "OpenRouter - Luna"
+    }
+   },
+   "retryOnFail": true,
+   "maxTries": 2,
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "ffec657f-7e3e-425a-9f1a-b9d12868ca9b",
+   "name": "Dołącz wstęp",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1100,
+    100
+   ],
+   "parameters": {
+    "jsCode": "// Łączy plan (kod) z wstępem (model) — po indeksie; bez odpowiedzi modelu raport i tak powstaje.\nconst plans = $('Ułóż plan').all();\nreturn $input.all().map((it, i) => {\n  const p = plans[i].json; let m = {};\n  try { m = JSON.parse(String(it.json.choices?.[0]?.message?.content || '').replace(/^```(json)?|```$/g, '').trim()); } catch (e) {}\n  const cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\n  const content = { ...p.content, intro: cut(m.intro, 400) || p.fallback, prep: (Array.isArray(m.prep) ? m.prep : []).map((x) => cut(x, 200)).filter(Boolean).slice(0, 3),\n    overdue_ask: p.content.overdue.length ? (cut(m.overdue_ask, 400) || 'Te rzeczy są po terminie i nie są odhaczone. Jeśli to już nieaktualne, mogę je zamknąć.') : '' };\n  return { json: { user_id: p.user_id, kind: p.kind, for_date: p.for_date, content, push_title: p.push_title, push_body: cut(m.push, 110) || cut(content.intro, 110) } };\n});"
+   }
+  },
+  {
+   "id": "1b182ca4-9b4f-4ac2-a04b-992d17e99496",
+   "name": "Zapisz raport",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    1320,
+    100
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "WITH r AS (\n  INSERT INTO reports (user_id, kind, for_date, content) VALUES ($1::uuid, $2, $3::date, $4::jsonb)\n  ON CONFLICT (user_id, for_date) DO UPDATE SET kind = EXCLUDED.kind, content = EXCLUDED.content, created_at = now(), seen_at = NULL\n  RETURNING id),\nnt AS (INSERT INTO notifications (item_id, user_id, due_at, channels, title, body) VALUES (NULL, $1::uuid, now(), '{push}', $5, $6) RETURNING 1),\n-- przypomnienie o zaległych: osobne powiadomienie, dopóki są nierozwiązane (w aplikacji — karta od dołu)\nov AS (INSERT INTO notifications (item_id, user_id, due_at, channels, title, body)\n       SELECT NULL, $1::uuid, now() + interval '1 minute', '{push}', $7, 'Wykonaj je albo oznacz jako zakończone — inaczej będę ci ciągle przypominać.'\n       WHERE $7 <> '' RETURNING 1)\nSELECT (SELECT id FROM r) AS report_id, $2 AS kind, $3 AS for_date, (SELECT count(*) FROM nt) + (SELECT count(*) FROM ov) AS notified",
+    "options": {
+     "queryReplacement": "={{ [ $json.user_id, $json.kind, $json.for_date, JSON.stringify($json.content), $json.push_title, $json.push_body, (n => !n ? '' : 'Masz ' + n + ' ' + (n === 1 ? 'przeterminowaną rzecz' : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 'przeterminowane rzeczy' : 'przeterminowanych rzeczy'))(($json.content.overdue || []).length) ] }}"
+    }
+   },
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   }
+  }
+ ],
+ "connections": {
+  "Co 5 minut": {
+   "main": [
+    [
+     {
+      "node": "Parametry",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "POST admin/report": {
+   "main": [
+    [
+     {
+      "node": "Parametry",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Parametry": {
+   "main": [
+    [
+     {
+      "node": "Komu raport",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Komu raport": {
+   "main": [
+    [
+     {
+      "node": "Ułóż plan",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Ułóż plan": {
+   "main": [
+    [
+     {
+      "node": "DeepSeek: wstęp",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "DeepSeek: wstęp": {
+   "main": [
+    [
+     {
+      "node": "Dołącz wstęp",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Dołącz wstęp": {
+   "main": [
+    [
+     {
+      "node": "Zapisz raport",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1",
+  "timezone": "Europe/Warsaw"
+ }
+}

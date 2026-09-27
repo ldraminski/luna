@@ -56,6 +56,9 @@ async function call(path, { method = 'GET', body, token = getToken() } = {}) {
 
 export const api = {
   me: (token) => call('me', { token }),
+  report: () => call('report'),
+  reportSeen: (id) => call('report/seen', { method: 'POST', body: { id } }),
+  settings: (time, enabled) => call('settings', { method: 'POST', body: { time, enabled } }),
   accessRequest: (email, name) => call('access/request', { method: 'POST', body: { email, name }, token: '' }),
   accessRequests: () => call('access/requests').then((d) => d.requests || []),
   accessDecide: (id, accept) => call('access/decide', { method: 'POST', body: { id, accept } }),

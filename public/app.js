@@ -117,8 +117,88 @@ function startMain() {
   $('#hello-name').innerHTML = `${hi},<br>${esc(state.user?.name || '')}`;
   $('#today').textContent = fDay.format(new Date());
   refreshBell();
-  load();
+  load().then(() => loadReport(true));
   if (!introSeen()) openIntro();
+}
+
+// ---------- raport dnia / tygodnia ----------
+const pl = (n, a, b, c) => (n === 1 ? a : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? b : c);
+async function loadReport(auto = false) {
+  try {
+    const r = await api.report(); state.report = r;
+    const rep = r.report;
+    $('#report-badge').hidden = !(rep && !rep.seen && rep.for_date === r.today);
+    // raz dziennie: świeży raport otwiera się sam przy pierwszym wejściu
+    if (auto && rep && !rep.seen && rep.for_date === r.today && $('#intro').hidden) openReport();
+    else if (auto) maybeNudge();
+  } catch {}
+}
+function reportTimes(cur) {
+  const out = ['<option value="off">wyłączony</option>'];
+  for (let h = 5; h <= 12; h++) for (const m of ['00', '30']) { const t = `${String(h).padStart(2, '0')}:${m}`; out.push(`<option value="${t}">${h}:${m}</option>`); }
+  if (cur && !out.some((o) => o.includes(`"${cur}"`))) out.push(`<option value="${cur}">${cur}</option>`);
+  return out.join('');
+}
+function openReport() {
+  const r = state.report || {}; const rep = r.report; const c = rep?.content;
+  const set = r.settings || { time: '09:00', enabled: true };
+  $('#rep-time').innerHTML = reportTimes(set.time);
+  $('#rep-time').value = set.enabled ? set.time : 'off';
+  const row = (x) => `<li><button type="button" data-open="${x.id}">${x.time ? `<span class="t">${esc(x.time)}</span>` : ''}<span class="n">${esc(x.title)}${x.total ? ` <small>${x.left} z ${x.total} do zrobienia</small>` : ''}</span></button></li>`;
+  $('#rep-body').innerHTML = !c ? `<div class="moon" aria-hidden="true">${svg('doc')}</div>
+      <h2 id="rep-title">Raport jeszcze przed tobą</h2>
+      <p class="lead">Codziennie o ${esc(set.time)} przygotuję plan na dziś i jutro, a w poniedziałki — plan całego tygodnia.</p>`
+    : `<p class="kind">${rep.kind === 'weekly' ? 'Raport tygodnia' : 'Raport dnia'}</p>
+      <h2 id="rep-title">${esc(c.title)}</h2>
+      <p class="lead">${esc(c.intro || '')}</p>
+      ${c.overdue?.length ? `<div class="rep-late"><p class="kind">Po terminie · ${c.overdue.length}</p><p>${esc(c.overdue_ask || '')}</p>
+        <ul class="nudge-list">${c.overdue.filter((x) => state.items.some((i) => i.id === x.id)).map((x) => lateRow(x)).join('')}</ul></div>` : ''}
+      ${c.prep?.length ? `<div class="rep-prep"><p class="kind">Przygotuj się wcześniej</p><ul>${c.prep.map((p) => `<li>${esc(p)}</li>`).join('')}</ul></div>` : ''}
+      ${(c.days || []).map((d) => `<div class="rep-day"><h3>${esc(d.label.charAt(0).toUpperCase() + d.label.slice(1))}</h3>
+        ${d.items.length ? `<ul class="rep-rows">${d.items.map(row).join('')}</ul>` : '<p class="rep-none">Nic zaplanowanego</p>'}</div>`).join('')}
+      ${c.lists?.length ? `<div class="rep-day"><h3>Czeka na liście</h3><ul class="rep-rows">${c.lists.map((x) => row({ ...x, time: '' })).join('')}</ul></div>` : ''}`;
+  $('#report').hidden = false; $('#report').scrollTop = 0;
+  document.documentElement.classList.add('locked');
+  if (rep && !rep.seen) { rep.seen = true; $('#report-badge').hidden = true; api.reportSeen(rep.id).catch(() => {}); }
+}
+function closeReport() { $('#report').hidden = true; document.documentElement.classList.remove('locked'); maybeNudge(); }
+async function saveReportTime() {
+  const v = $('#rep-time').value; const set = state.report?.settings || { time: '09:00' };
+  try {
+    const r = await api.settings(v === 'off' ? set.time : v, v !== 'off');
+    state.report = { ...(state.report || {}), settings: r.settings };
+    toast(v === 'off' ? 'Raport wyłączony.' : `Raport będzie przychodził codziennie o ${v}.`);
+  } catch (err) { toast(err.message); }
+}
+
+// ---------- przypomnienie o zaległych: karta od dołu, dopóki są nierozwiązane (najwyżej co 3 h) ----------
+function lateRow(x) {
+  return `<li data-late="${x.id}"><span class="n">${esc(x.title)}${x.when ? `<small>${esc(x.when)}</small>` : ''}</span>
+    <span class="b"><button type="button" class="late-done" data-late-act="done">${svg('check', 'width:15px;height:15px')}Zrobione</button>
+    <button type="button" class="ghost-txt" data-late-act="close">Nieaktualne — zamknij</button></span></li>`;
+}
+function maybeNudge(force = false) {
+  const late = state.items.filter(isLate);
+  if (!late.length || $('#nudge').open || !$('#report').hidden || !$('#intro').hidden || state.openId) return;
+  let last = 0; try { last = Number(localStorage.getItem('luna-nudge-at')) || 0; } catch {}
+  if (!force && Date.now() - last < 3 * 3600e3) return;
+  try { localStorage.setItem('luna-nudge-at', String(Date.now())); } catch {}
+  $('#nudge-title').textContent = `Masz ${late.length} ${pl(late.length, 'przeterminowaną rzecz', 'przeterminowane rzeczy', 'przeterminowanych rzeczy')}`;
+  $('#nudge-list').innerHTML = late.slice(0, 6).map((it) => lateRow({ id: it.id, title: it.title, when: lateLabel(eventOf(it)).replace('Po terminie · ', '') })).join('');
+  $('#nudge').showModal();
+}
+async function resolveLate(e) {
+  const b = e.target.closest('[data-late-act]'); if (!b) return;
+  const li = b.closest('[data-late]'); const id = li.dataset.late;
+  li.querySelectorAll('button').forEach((x) => { x.disabled = true; });
+  try {
+    await api.done(id);
+    state.items = state.items.filter((x) => x.id !== id);
+    li.remove(); render();
+    toast(b.dataset.lateAct === 'done' ? 'Zrobione ✓' : 'Zamknięte.');
+    if (!state.items.some(isLate)) { if ($('#nudge').open) $('#nudge').close(); toast('Czysto — nic nie zalega ✓'); }
+    else if ($('#nudge').open) $('#nudge-title').textContent = `Masz ${state.items.filter(isLate).length} ${pl(state.items.filter(isLate).length, 'przeterminowaną rzecz', 'przeterminowane rzeczy', 'przeterminowanych rzeczy')}`;
+  } catch (err) { li.querySelectorAll('button').forEach((x) => { x.disabled = false; }); toast(err.message); }
 }
 
 // ---------- karta powitalna: kim jest Luna ----------
@@ -773,6 +853,15 @@ function bind() {
   $('#mic').addEventListener('click', () => { $('#q').focus(); toast('Na razie podyktuj mi to mikrofonem z klawiatury telefonu — własne słuchanie dostanę później.'); });
   $('#bell').addEventListener('click', bell);
   $('#luna').addEventListener('click', openIntro);
+  $('#report-btn').addEventListener('click', async () => { if (!state.report) await loadReport(); openReport(); });
+  $('#report').addEventListener('click', (e) => {
+    if (e.target.closest('[data-rep="close"]')) return closeReport();
+    const o = e.target.closest('[data-open]');
+    if (o && state.items.some((x) => x.id === o.dataset.open)) { closeReport(); openDetail(o.dataset.open); return; }
+    resolveLate(e);
+  });
+  $('#rep-time').addEventListener('change', saveReportTime);
+  $('#nudge').addEventListener('click', (e) => { if (e.target.closest('[data-nudge="later"]') || e.target === $('#nudge')) return $('#nudge').close(); resolveLate(e); });
   $('#intro').addEventListener('click', async (e) => {
     const ex = e.target.closest('[data-ex]'); if (ex) return useExample(ex.dataset.ex);
     const b = e.target.closest('[data-intro]'); if (!b) return;
@@ -826,8 +915,8 @@ function bind() {
   $('#chat').addEventListener('click', (e) => { const b = e.target.closest('[data-chat]'); if (b) chatAction(b.dataset.chat); });
   $('#detail').addEventListener('click', onSum, true);
   addEventListener('popstate', () => closeDetail(true));
-  addEventListener('keydown', (e) => { if (e.key !== 'Escape') return; if (!$('#intro').hidden) closeIntro(); else closeDetail(); });
-  document.addEventListener('visibilitychange', () => { if (!document.hidden && state.user) { load(); refreshBell(); } });
+  addEventListener('keydown', (e) => { if (e.key !== 'Escape') return; if (!$('#intro').hidden) closeIntro(); else if (!$('#report').hidden) closeReport(); else closeDetail(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && state.user) { load().then(() => loadReport(true)); refreshBell(); } });
   navigator.serviceWorker?.addEventListener('message', (e) => { if (e.data?.type === 'open') { load().then(() => e.data.id && openDetail(e.data.id)); } });
 }
 

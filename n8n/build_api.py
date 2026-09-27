@@ -41,6 +41,32 @@ SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
   ELSE json_build_object('status', 200, 'image', (SELECT image FROM p)) END AS result""",
    "={{ [ " + TOKEN + ", /^[0-9a-f-]{36}$/i.test($json.query.id || '') ? $json.query.id : '00000000-0000-0000-0000-000000000000' ] }}"),
 
+  # Raport dzienny/tygodniowy: najnowszy + ustawienia (godzina, włączony). Raport pokazuje się raz — seen_at.
+  ("GET", "report", "Raport", f"""
+WITH {ME},
+u AS (SELECT report_time, report_enabled FROM users WHERE id = (SELECT user_id FROM me)),
+r AS (SELECT id, kind, for_date, content, seen_at, created_at FROM reports WHERE user_id = (SELECT user_id FROM me) ORDER BY for_date DESC LIMIT 1)
+SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
+  ELSE json_build_object('status', 200,
+    'settings', (SELECT json_build_object('time', to_char(report_time, 'HH24:MI'), 'enabled', report_enabled) FROM u),
+    'today', to_char(now() AT TIME ZONE 'Europe/Warsaw', 'YYYY-MM-DD'),
+    'report', (SELECT json_build_object('id', id, 'kind', kind, 'for_date', to_char(for_date, 'YYYY-MM-DD'), 'content', content, 'seen', seen_at IS NOT NULL) FROM r)) END AS result""",
+   "={{ [ " + TOKEN + " ] }}"),
+
+  ("POST", "report/seen", "Raport obejrzany", f"""
+WITH {ME},
+upd AS (UPDATE reports SET seen_at = coalesce(seen_at, now()) WHERE id = $2::bigint AND user_id = (SELECT user_id FROM me) RETURNING 1)
+SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH} ELSE json_build_object('status', 200, 'ok', EXISTS (SELECT 1 FROM upd)) END AS result""",
+   "={{ [ " + TOKEN + ", /^[0-9]{1,18}$/.test(String($json.body.id)) ? String($json.body.id) : '0' ] }}"),
+
+  ("POST", "settings", "Ustawienia raportu", f"""
+WITH {ME},
+upd AS (UPDATE users SET report_time = $2::time, report_enabled = $3::boolean WHERE id = (SELECT user_id FROM me)
+        RETURNING to_char(report_time, 'HH24:MI') AS time, report_enabled AS enabled)
+SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
+  ELSE json_build_object('status', 200, 'settings', (SELECT row_to_json(upd) FROM upd)) END AS result""",
+   "={{ [ " + TOKEN + ", /^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(String($json.body.time)) ? $json.body.time : '09:00', $json.body.enabled !== false ] }}"),
+
   ("GET", "pending", "Do pokazania", f"""
 WITH {ME},
 p AS (
