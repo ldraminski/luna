@@ -1,0 +1,266 @@
+{
+ "name": "Oboe: API",
+ "nodes": [
+  {
+   "id": "8a7627b8-9cda-4ecf-89db-2a4238c4b534",
+   "name": "Opis",
+   "type": "n8n-nodes-base.stickyNote",
+   "typeVersion": 1,
+   "position": [
+    -400,
+    -200
+   ],
+   "parameters": {
+    "width": 520,
+    "height": 220,
+    "content": "## Oboe: API\nFront `oboe` (nginx) proxuje `/api/*` → `/webhook/oboe/*`.\nAutoryzacja: `Authorization: Bearer <token>`; w bazie tylko sha256 tokenu.\nHasła: bcrypt w Postgresie (pgcrypto `crypt`), bo Code node nie ma `crypto`.\nKażdy SQL zwraca `result` z polem `status` → kod HTTP odpowiedzi.\nŹródło: `~/Work/oboe/n8n/build_api.py`."
+   }
+  },
+  {
+   "id": "4482e24b-cb82-437b-a3b5-eeebaa849d50",
+   "name": "POST login",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    0
+   ],
+   "webhookId": "6be4024b-ea15-4908-9074-224051f00835",
+   "parameters": {
+    "httpMethod": "POST",
+    "path": "oboe/login",
+    "responseMode": "responseNode",
+    "options": {}
+   }
+  },
+  {
+   "id": "87abc6a1-8d6c-4222-be0f-2d53af274740",
+   "name": "Logowanie",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    240,
+    0
+   ],
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   },
+   "alwaysOutputData": false,
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "WITH recent AS (\n  SELECT count(*) AS n FROM login_attempts\n  WHERE email = lower($1) AND NOT ok AND created_at > now() - interval '15 minutes'),\nu AS (\n  SELECT id, email, name FROM users\n  WHERE email = lower($1) AND password_hash IS NOT NULL\n    AND password_hash = crypt($2, password_hash)\n    AND (SELECT n FROM recent) < 10),\nlog AS (\n  INSERT INTO login_attempts (email, ok) VALUES (lower($1), EXISTS (SELECT 1 FROM u))),\ntok AS (SELECT encode(gen_random_bytes(32), 'hex') AS t),\ns AS (\n  INSERT INTO sessions (token_hash, user_id, expires_at)\n  SELECT encode(digest((SELECT t FROM tok), 'sha256'), 'hex'), id, now() + interval '30 days' FROM u\n  RETURNING user_id)\nSELECT CASE\n  WHEN (SELECT n FROM recent) >= 10 THEN json_build_object('status', 429, 'error', 'Za dużo prób. Spróbuj za 15 minut.')\n  WHEN EXISTS (SELECT 1 FROM s) THEN json_build_object('status', 200, 'token', (SELECT t FROM tok),\n       'user', (SELECT json_build_object('email', email, 'name', name) FROM u))\n  ELSE json_build_object('status', 401, 'error', 'Zły e-mail albo hasło')\nEND AS result",
+    "options": {
+     "queryReplacement": "={{ [ String($json.body.email || '').trim().slice(0, 200), String($json.body.password || '').slice(0, 200) ] }}"
+    }
+   }
+  },
+  {
+   "id": "dd22bca6-9d4e-4a04-8906-ddb7b2a8ec05",
+   "name": "Odpowiedz: Logowanie",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    480,
+    0
+   ],
+   "parameters": {
+    "respondWith": "json",
+    "responseBody": "={{ $json.result }}",
+    "options": {
+     "responseCode": "={{ $json.result.status || 200 }}"
+    }
+   }
+  },
+  {
+   "id": "9cb01285-d995-4c57-98bb-b83302a0d643",
+   "name": "POST logout",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    200
+   ],
+   "webhookId": "4fc7206c-09f1-4e93-b683-bc1e67b431f2",
+   "parameters": {
+    "httpMethod": "POST",
+    "path": "oboe/logout",
+    "responseMode": "responseNode",
+    "options": {}
+   }
+  },
+  {
+   "id": "afc4a6a8-4beb-46cf-a900-8023d6e9dc26",
+   "name": "Wylogowanie",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    240,
+    200
+   ],
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   },
+   "alwaysOutputData": false,
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "WITH d AS (DELETE FROM sessions WHERE token_hash = encode(digest($1, 'sha256'), 'hex') RETURNING 1)\nSELECT json_build_object('status', 200, 'ok', true) AS result",
+    "options": {
+     "queryReplacement": "={{ [ ($json.headers.authorization || '').replace(/^Bearer\\s+/i, '') ] }}"
+    }
+   }
+  },
+  {
+   "id": "3892960a-c1b4-4f96-93b0-6d2af2045c1b",
+   "name": "Odpowiedz: Wylogowanie",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    480,
+    200
+   ],
+   "parameters": {
+    "respondWith": "json",
+    "responseBody": "={{ $json.result }}",
+    "options": {
+     "responseCode": "={{ $json.result.status || 200 }}"
+    }
+   }
+  },
+  {
+   "id": "35df1cb3-44a8-48aa-b641-fb566b857f3b",
+   "name": "GET me",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    400
+   ],
+   "webhookId": "7f5a6841-59e7-42a1-94ef-94ecf10b67e1",
+   "parameters": {
+    "httpMethod": "GET",
+    "path": "oboe/me",
+    "responseMode": "responseNode",
+    "options": {}
+   }
+  },
+  {
+   "id": "bd73e843-da67-4191-84ff-b226fb14dd9e",
+   "name": "Kim jestem",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    240,
+    400
+   ],
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   },
+   "alwaysOutputData": false,
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "WITH me AS (\n  UPDATE sessions SET expires_at = greatest(expires_at, now() + interval '30 days')\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id)\nSELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN json_build_object('status', 401, 'error', 'Zaloguj się ponownie')\n  ELSE (SELECT json_build_object('status', 200, 'user', json_build_object('email', u.email, 'name', u.name))\n        FROM users u WHERE u.id = (SELECT user_id FROM me)) END AS result",
+    "options": {
+     "queryReplacement": "={{ [ ($json.headers.authorization || '').replace(/^Bearer\\s+/i, '') ] }}"
+    }
+   }
+  },
+  {
+   "id": "b5f4226d-fc15-4699-a96c-c8c2c2a82909",
+   "name": "Odpowiedz: Kim jestem",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    480,
+    400
+   ],
+   "parameters": {
+    "respondWith": "json",
+    "responseBody": "={{ $json.result }}",
+    "options": {
+     "responseCode": "={{ $json.result.status || 200 }}"
+    }
+   }
+  }
+ ],
+ "connections": {
+  "POST login": {
+   "main": [
+    [
+     {
+      "node": "Logowanie",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Logowanie": {
+   "main": [
+    [
+     {
+      "node": "Odpowiedz: Logowanie",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "POST logout": {
+   "main": [
+    [
+     {
+      "node": "Wylogowanie",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Wylogowanie": {
+   "main": [
+    [
+     {
+      "node": "Odpowiedz: Wylogowanie",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "GET me": {
+   "main": [
+    [
+     {
+      "node": "Kim jestem",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Kim jestem": {
+   "main": [
+    [
+     {
+      "node": "Odpowiedz: Kim jestem",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1",
+  "timezone": "Europe/Warsaw"
+ }
+}
