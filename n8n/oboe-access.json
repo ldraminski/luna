@@ -2,7 +2,7 @@
  "name": "Oboe: Dostęp",
  "nodes": [
   {
-   "id": "121582ea-5308-4ed3-94ae-f5d55afc678b",
+   "id": "9de5caae-5e0d-4aa2-b5e5-77e718cf928f",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -13,11 +13,11 @@
    "parameters": {
     "width": 600,
     "height": 260,
-    "content": "## Oboe: Dostęp (Luna)\nKtoś podaje imię i e-mail → istniejące konto dostaje nowy klucz mailem od razu; nowa osoba czeka na akceptację Łukasza (powiadomienie przez „Oboe: Harmonogram”).\nAkceptacja → konto + klucz mailem; odrzucenie → mail „przykro mi”.\n**Klucz nigdy nie wraca w odpowiedzi HTTP.** Limit 3/h na e-mail, 40/h łącznie (`access_log`).\nTeksty maili: `n8n/maile.py`. Źródło: `~/Work/oboe/n8n/build_access.py`."
+    "content": "## Oboe: Dostęp (Luna)\nKtoś podaje imię i e-mail → istniejące konto dostaje nowy klucz mailem od razu; nowa osoba czeka na akceptację Łukasza (powiadomienie push + mail przez „Oboe: Harmonogram”).\nAkceptacja → konto + klucz mailem; odrzucenie → mail „przykro mi”.\n**Klucz nigdy nie wraca w odpowiedzi HTTP.** Limit 3/h na e-mail, 40/h łącznie (`access_log`).\nTeksty maili: `n8n/maile.py`. Źródło: `~/Work/oboe/n8n/build_access.py`."
    }
   },
   {
-   "id": "8f8694b9-f83e-4f75-8f79-a6e5c541bb20",
+   "id": "bbf246db-4e45-4745-ae3d-969857b14ade",
    "name": "POST access/request",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -31,10 +31,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "8e27007d-8b8e-45b6-9c16-0ca6a19d6322"
+   "webhookId": "a6fd1dca-4c3a-4aef-9b6e-7b2d567ef956"
   },
   {
-   "id": "c60a1ed5-2e21-4544-aa67-0a73efb890cc",
+   "id": "4c86c250-2139-4335-8abb-32030a3f989e",
    "name": "Prośba",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -44,7 +44,7 @@
    ],
    "parameters": {
     "operation": "executeQuery",
-    "query": "WITH v AS (SELECT lower(trim($1)) AS email, nullif(left(trim($2), 80), '') AS name\n           WHERE lower(trim($1)) ~ '^[^@\\s]+@[^@\\s]+\\.[a-z]{2,}$'),\nlim AS (SELECT (SELECT count(*) FROM access_log WHERE email = (SELECT email FROM v) AND at > now() - interval '1 hour') AS per_email,\n               (SELECT count(*) FROM access_log WHERE at > now() - interval '1 hour') AS total),\nok AS (SELECT v.* FROM v, lim WHERE lim.per_email < 3 AND lim.total < 40),\nlog AS (INSERT INTO access_log (email) SELECT email FROM ok RETURNING 1),\nu AS (SELECT id, email, name FROM users WHERE email = (SELECT email FROM ok)),\ntok AS (SELECT encode(gen_random_bytes(32), 'hex') AS t),\ns AS (INSERT INTO sessions (token_hash, user_id)\n      SELECT encode(digest((SELECT t FROM tok), 'sha256'), 'hex'), id FROM u RETURNING 1),\nrej AS (SELECT 1 FROM access_requests WHERE email = (SELECT email FROM ok) AND status = 'rejected'\n        AND decided_at > now() - interval '30 days' AND NOT EXISTS (SELECT 1 FROM u)),\nprev AS (SELECT 1 FROM access_requests WHERE email = (SELECT email FROM ok) AND status = 'pending'),\nreq AS (INSERT INTO access_requests (email, name) SELECT email, name FROM ok\n        WHERE NOT EXISTS (SELECT 1 FROM u) AND NOT EXISTS (SELECT 1 FROM rej) AND NOT EXISTS (SELECT 1 FROM prev)\n        RETURNING id, email, name),\nnt AS (INSERT INTO notifications (item_id, user_id, due_at, channels, title, body)\n       SELECT NULL, a.id, now(), '{push}', 'Prośba o dostęp do Luny',\n              coalesce(r.name, r.email) || ' (' || r.email || ') chce korzystać z Luny. Otwórz, żeby zaakceptować albo odrzucić.'\n       FROM req r CROSS JOIN users a WHERE a.is_admin RETURNING 1)\nSELECT CASE\n  WHEN NOT EXISTS (SELECT 1 FROM v) THEN json_build_object('status', 400, 'error', 'To nie wygląda na adres e-mail.')\n  WHEN NOT EXISTS (SELECT 1 FROM ok) THEN json_build_object('status', 429, 'error', 'Za dużo próśb naraz — spróbuj za godzinę.')\n  WHEN EXISTS (SELECT 1 FROM u) THEN json_build_object('status', 200, 'action', 'token', 'email', (SELECT email FROM u),\n       'name', coalesce((SELECT name FROM u), ''), 'token', (SELECT t FROM tok), 'issued', (SELECT count(*) FROM s))\n  WHEN EXISTS (SELECT 1 FROM rej) THEN json_build_object('status', 200, 'action', 'rejected', 'name', (SELECT name FROM ok))\n  ELSE json_build_object('status', 200, 'action', 'pending', 'name', (SELECT name FROM ok), 'notified', (SELECT count(*) FROM nt))\nEND AS result",
+    "query": "WITH v AS (SELECT lower(trim($1)) AS email, nullif(left(trim($2), 80), '') AS name\n           WHERE lower(trim($1)) ~ '^[^@\\s]+@[^@\\s]+\\.[a-z]{2,}$'),\nlim AS (SELECT (SELECT count(*) FROM access_log WHERE email = (SELECT email FROM v) AND at > now() - interval '1 hour') AS per_email,\n               (SELECT count(*) FROM access_log WHERE at > now() - interval '1 hour') AS total),\nok AS (SELECT v.* FROM v, lim WHERE lim.per_email < 3 AND lim.total < 40),\nlog AS (INSERT INTO access_log (email) SELECT email FROM ok RETURNING 1),\nu AS (SELECT id, email, name FROM users WHERE email = (SELECT email FROM ok)),\ntok AS (SELECT encode(gen_random_bytes(32), 'hex') AS t),\ns AS (INSERT INTO sessions (token_hash, user_id)\n      SELECT encode(digest((SELECT t FROM tok), 'sha256'), 'hex'), id FROM u RETURNING 1),\nrej AS (SELECT 1 FROM access_requests WHERE email = (SELECT email FROM ok) AND status = 'rejected'\n        AND decided_at > now() - interval '30 days' AND NOT EXISTS (SELECT 1 FROM u)),\nprev AS (SELECT 1 FROM access_requests WHERE email = (SELECT email FROM ok) AND status = 'pending'),\nreq AS (INSERT INTO access_requests (email, name) SELECT email, name FROM ok\n        WHERE NOT EXISTS (SELECT 1 FROM u) AND NOT EXISTS (SELECT 1 FROM rej) AND NOT EXISTS (SELECT 1 FROM prev)\n        RETURNING id, email, name),\nnt AS (INSERT INTO notifications (item_id, user_id, due_at, channels, title, body)\n       SELECT NULL, a.id, now(), '{push,email}', 'Prośba o dostęp do Luny',\n              coalesce(r.name, r.email) || ' (' || r.email || ') chce korzystać z Luny. Otwórz, żeby zaakceptować albo odrzucić.'\n       FROM req r CROSS JOIN users a WHERE a.is_admin RETURNING 1)\nSELECT CASE\n  WHEN NOT EXISTS (SELECT 1 FROM v) THEN json_build_object('status', 400, 'error', 'To nie wygląda na adres e-mail.')\n  WHEN NOT EXISTS (SELECT 1 FROM ok) THEN json_build_object('status', 429, 'error', 'Za dużo próśb naraz — spróbuj za godzinę.')\n  WHEN EXISTS (SELECT 1 FROM u) THEN json_build_object('status', 200, 'action', 'token', 'email', (SELECT email FROM u),\n       'name', coalesce((SELECT name FROM u), ''), 'token', (SELECT t FROM tok), 'issued', (SELECT count(*) FROM s))\n  WHEN EXISTS (SELECT 1 FROM rej) THEN json_build_object('status', 200, 'action', 'rejected', 'name', (SELECT name FROM ok))\n  ELSE json_build_object('status', 200, 'action', 'pending', 'name', (SELECT name FROM ok), 'notified', (SELECT count(*) FROM nt))\nEND AS result",
     "options": {
      "queryReplacement": "={{ [ String($json.body.email || '').slice(0, 200), String($json.body.name || '').slice(0, 80) ] }}"
     }
@@ -57,7 +57,7 @@
    }
   },
   {
-   "id": "e077c54d-92a0-4c51-83d7-5449f65dd009",
+   "id": "e59425e4-186c-4d57-b754-5d12057708a6",
    "name": "Istniejące konto?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -75,7 +75,7 @@
      },
      "conditions": [
       {
-       "id": "1130d5c2-8aeb-4be2-afc5-6b2b2c40731b",
+       "id": "44edb792-abb2-4b84-b42f-1ef0f57130ad",
        "leftValue": "={{ $json.result.action === 'token' }}",
        "rightValue": "",
        "operator": {
@@ -91,7 +91,7 @@
    }
   },
   {
-   "id": "eb84c4b1-79b7-4518-b1f3-2afbb594dc3c",
+   "id": "61c7029c-d623-4a68-8eab-aed9da7eab40",
    "name": "Mail: nowy klucz",
    "type": "n8n-nodes-base.emailSend",
    "typeVersion": 2.1,
@@ -118,7 +118,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "a28873cb-d377-435a-aa93-64fb308fdc60",
+   "id": "4537a5ab-c97f-4c8b-9528-7432828d5fb3",
    "name": "Odpowiedz: prośba",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -135,7 +135,7 @@
    }
   },
   {
-   "id": "6899a6fc-8822-403f-b175-10390270d2a6",
+   "id": "1e0869bf-7f37-401f-ae84-097e56502173",
    "name": "GET access/requests",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -149,10 +149,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "9d98bb48-a350-447e-b5f4-020236b709d5"
+   "webhookId": "12b1ce60-d87c-428b-b9e8-ea8465c6a907"
   },
   {
-   "id": "33f3b50f-ebc3-4037-bb05-37e275f159c0",
+   "id": "47f1e6e5-2cd9-4aa5-ad0a-1dea3b8c3426",
    "name": "Prośby czekające",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -175,7 +175,7 @@
    }
   },
   {
-   "id": "4c22ce40-6b17-4755-86cb-564ad34600e6",
+   "id": "998daca3-edc9-40b3-b4ee-51248748cd0a",
    "name": "Odpowiedz: prośby",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -192,7 +192,7 @@
    }
   },
   {
-   "id": "ab03b57c-1599-4b79-9577-36b8bd64607d",
+   "id": "bfc0d21f-871c-4133-b0f9-1ee67b5c4229",
    "name": "POST access/decide",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -206,10 +206,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "2843cff4-af29-4926-be4f-87b0f37ceea6"
+   "webhookId": "15cf4f12-ab87-4f1d-becb-6a3b24c1f6e1"
   },
   {
-   "id": "6303548c-97e8-4025-9ce4-96542dd775b0",
+   "id": "64b9c640-e028-42e0-8052-c4cf9d0b2c21",
    "name": "Decyzja",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -232,7 +232,7 @@
    }
   },
   {
-   "id": "add8379b-ca24-4933-b677-e77498c9a445",
+   "id": "02e08202-d2af-45d2-9374-503da70f1404",
    "name": "Zaakceptowana?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -250,7 +250,7 @@
      },
      "conditions": [
       {
-       "id": "d80ea6ba-9b16-4d39-8736-cb4b6be1579b",
+       "id": "d8cfea49-b061-4257-861c-cc811beb9405",
        "leftValue": "={{ $json.result.action === 'accepted' }}",
        "rightValue": "",
        "operator": {
@@ -266,7 +266,7 @@
    }
   },
   {
-   "id": "763c833e-0970-4892-8301-6f51edafe4c8",
+   "id": "267754c7-b67c-4bb0-b564-e4bed3e31ea2",
    "name": "Odrzucona?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -284,7 +284,7 @@
      },
      "conditions": [
       {
-       "id": "04215723-f7ff-4cb6-9cc3-43dee30473bb",
+       "id": "c98e80ba-4b85-4f28-9579-94ca6bfbe481",
        "leftValue": "={{ $json.result.action === 'rejected' }}",
        "rightValue": "",
        "operator": {
@@ -300,7 +300,7 @@
    }
   },
   {
-   "id": "9afe7432-ea1f-4fa6-ae5b-d62708efd156",
+   "id": "fb927c33-6774-4882-a1c7-9127308a464b",
    "name": "Mail: witaj",
    "type": "n8n-nodes-base.emailSend",
    "typeVersion": 2.1,
@@ -327,7 +327,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "bee0b93d-0e00-43b9-8c99-d3ca38f20097",
+   "id": "d7ec3f9d-75ff-4c68-8f7a-2a0754744c0e",
    "name": "Mail: przykro mi",
    "type": "n8n-nodes-base.emailSend",
    "typeVersion": 2.1,
@@ -354,7 +354,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "27f4caca-46e5-4ec4-aab0-45ffb6c92777",
+   "id": "e69fc5cc-b0ff-43d8-8a31-0eb0c526d184",
    "name": "Odpowiedz: decyzja",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,

@@ -41,7 +41,7 @@ Widgety są niezmienne: każda wersja to nowy plik `<slug>.v<N>.html` (płasko �
 Workflow „Oboe: Dostęp” (`n8n/build_access.py`, id w `n8n/.access-wf-id`), migracja `db/008-prosby-o-dostep.sql`.
 1. Ekran startowy: imię + e-mail → `POST /api/access/request`.
    - konto istnieje → nowy klucz od razu mailem (stare klucze zostają);
-   - nowa osoba → `access_requests` (pending) + powiadomienie dla adminów (`users.is_admin`) wysyłane przez „Oboe: Harmonogram”
+   - nowa osoba → `access_requests` (pending) + powiadomienie dla adminów (`users.is_admin`) — push **i** mail — wysyłane przez „Oboe: Harmonogram”
      (`notifications.item_id = NULL`; bez działającego pusha idzie mail);
    - odrzucona w ciągu 30 dni → komunikat, bez nowego powiadomienia.
 2. Admin widzi na górze listy „Prośby o dostęp” → Zaakceptuj / Odrzuć (`POST /api/access/decide`).

@@ -50,7 +50,7 @@ SAFE = "{ status: R.status, action: R.action, name: R.name, error: R.error }"
 
 node("Opis", "n8n-nodes-base.stickyNote", 1, [-420, -300], {"width": 600, "height": 260, "content":
   "## Oboe: Dostęp (Luna)\nKtoś podaje imię i e-mail → istniejące konto dostaje nowy klucz mailem od razu; "
-  "nowa osoba czeka na akceptację Łukasza (powiadomienie przez „Oboe: Harmonogram”).\n"
+  "nowa osoba czeka na akceptację Łukasza (powiadomienie push + mail przez „Oboe: Harmonogram”).\n"
   "Akceptacja → konto + klucz mailem; odrzucenie → mail „przykro mi”.\n"
   "**Klucz nigdy nie wraca w odpowiedzi HTTP.** Limit 3/h na e-mail, 40/h łącznie (`access_log`).\n"
   "Teksty maili: `n8n/maile.py`. Źródło: `~/Work/oboe/n8n/build_access.py`."})
@@ -76,7 +76,7 @@ req AS (INSERT INTO access_requests (email, name) SELECT email, name FROM ok
         WHERE NOT EXISTS (SELECT 1 FROM u) AND NOT EXISTS (SELECT 1 FROM rej) AND NOT EXISTS (SELECT 1 FROM prev)
         RETURNING id, email, name),
 nt AS (INSERT INTO notifications (item_id, user_id, due_at, channels, title, body)
-       SELECT NULL, a.id, now(), '{push}', 'Prośba o dostęp do Luny',
+       SELECT NULL, a.id, now(), '{push,email}', 'Prośba o dostęp do Luny',
               coalesce(r.name, r.email) || ' (' || r.email || ') chce korzystać z Luny. Otwórz, żeby zaakceptować albo odrzucić.'
        FROM req r CROSS JOIN users a WHERE a.is_admin RETURNING 1)
 SELECT CASE
