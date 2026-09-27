@@ -52,9 +52,12 @@ svg{display:block}
 .plus{width:44px;height:44px;border-radius:50%;background:var(--tint-pink);display:grid;place-items:center;text-decoration:none}
 
 /* --- pasek dni --- */
-.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;list-style:none;margin-bottom:26px}
+.days{display:flex;gap:6px;list-style:none;margin:0 -16px 20px;padding:6px 16px 10px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scroll-padding-inline:16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.days::-webkit-scrollbar{display:none}
+.days li{flex:0 0 calc((100% - 36px) / 7);scroll-snap-align:start}
+.days button{width:100%;display:flex;flex-direction:column;align-items:center;gap:5px;border:0;background:none;padding:0;cursor:pointer;color:inherit}
 .days a{display:flex;flex-direction:column;align-items:center;gap:5px;text-decoration:none;padding:2px 0}
-.days .d{width:100%;max-width:44px;aspect-ratio:1;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-size:14px;font-weight:500}
+.days .d{width:100%;max-width:44px;transition:box-shadow .15s;aspect-ratio:1;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-size:14px;font-weight:500}
 .days .wd{font-size:11px;color:var(--ink-2)}
 .days .mk{width:5px;height:5px;border-radius:50%;background:transparent}
 .days .has .mk{background:var(--navy)}
@@ -351,3 +354,10 @@ html.locked,html.locked body{overflow:hidden;height:100%}
 .ico.thumb{object-fit:cover;background:var(--surface-2);padding:0}
 .blob-photo{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
 .d-photo{display:block;width:100%;max-height:60vh;object-fit:cover;border-radius:var(--r-card);margin-bottom:12px;background:var(--surface-2);box-shadow:var(--shadow)}
+
+/* kalendarz: wybrany dzień i lista dnia (Hikari, 28.09) */
+.days .sel .d{box-shadow:0 0 0 3px var(--tint-pink),0 0 0 5px var(--navy)}
+.days .today.sel .d{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--dot)}
+.day-h{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:0 4px 14px}
+.day-h .sec::first-letter{text-transform:uppercase}
+.day-h .ghost-txt{margin:0;flex:none}

@@ -6,7 +6,7 @@ const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '
 const IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const STANDALONE = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
 
-const state = { user: null, items: [], openId: null, requests: [] };
+const state = { user: null, items: [], openId: null, requests: [], day: null };
 
 // ---------- daty ----------
 const DAY = 864e5;
@@ -167,6 +167,7 @@ const lateLabel = (ev) => 'Po terminie · ' + rel(ev) + ', ' + fTime.format(ev);
 function render() {
   const items = state.items;
   renderDays(items);
+  if (state.day) return renderDayList(items);
   if (!items.length) {
     $('#list').innerHTML = `<div class="empty"><h3>Jeszcze nic mi nie powierzono</h3>
       <p>Napisz na dole zwykłym zdaniem, co mam zapamiętać — resztą zajmę się sama. Na przykład:</p>
@@ -230,19 +231,56 @@ async function decide(e) {
   }
 }
 
+// ---------- kalendarz: 30 dni, przewijany w bok; dotknięcie dnia = tylko rzeczy z tego dnia ----------
+const DAYS_AHEAD = 30;
+const PSTEP = { day: [1, 0], week: [7, 0], month: [0, 1] };
+// Kiedy rzecz „przypada” w oknie [from, to): termin (albo najbliższe przypomnienie, gdy terminu nie ma);
+// cykliczne — każde wystąpienie w oknie.
+function occurrences(it, from, to) {
+  const ev = eventOf(it); if (!ev) return [];
+  const r = it.spec?.recurrence;
+  if (!r || !PSTEP[r.unit]) return ev >= from && ev < to ? [ev] : [];
+  const out = []; const [d, m] = PSTEP[r.unit];
+  for (let x = new Date(ev), i = 0; x < to && i < 400; i++) {
+    if (x >= from) out.push(new Date(x));
+    x = new Date(x); x.setDate(x.getDate() + d * r.every); x.setMonth(x.getMonth() + m * r.every);
+  }
+  return out;
+}
+function dayKey(d) { return startOfDay(d).getTime(); }
+function itemsOnDay(items, dayMs) {
+  const from = new Date(dayMs); const to = new Date(dayMs + DAY + 3600e3); to.setHours(0, 0, 0, 0);   // +1h: zmiana czasu
+  return items.map((it) => ({ it, at: occurrences(it, from, to)[0] })).filter((x) => x.at).sort((a, b) => a.at - b.at);
+}
 function renderDays(items) {
-  const marks = new Set();
-  for (const it of items) for (const d of [it.spec?.event_at, ...(it.notify_at || [])]) if (d) marks.add(startOfDay(d).getTime());
   const today = startOfDay(new Date());
+  const end = new Date(today); end.setDate(end.getDate() + DAYS_AHEAD);
+  const count = new Map();
+  for (const it of items) for (const o of occurrences(it, today, end)) count.set(dayKey(o), (count.get(dayKey(o)) || 0) + 1);
   let out = '';
-  for (let k = 0; k < 7; k++) {
-    const d = new Date(today.getTime() + k * DAY);
-    const has = marks.has(d.getTime());
-    out += `<li class="${k === 0 ? 'today ' : ''}${has ? 'has' : ''}"><span style="display:flex;flex-direction:column;align-items:center;gap:5px">
-      <span class="wd">${esc(fWd.format(d).replace('.', ''))}</span><span class="d">${d.getDate()}</span><span class="mk"></span>
-      ${has ? '<span class="sr">są przypomnienia</span>' : ''}</span></li>`;
+  for (let k = 0; k < DAYS_AHEAD; k++) {
+    const d = new Date(today); d.setDate(d.getDate() + k);
+    const n = count.get(d.getTime()) || 0; const sel = state.day === d.getTime();
+    out += `<li class="${k === 0 ? 'today ' : ''}${n ? 'has ' : ''}${sel ? 'sel' : ''}">
+      <button type="button" data-day="${d.getTime()}" aria-pressed="${sel}" aria-label="${esc(fDay.format(d))}${n ? `, rzeczy: ${n}` : ''}">
+        <span class="wd">${esc(fWd.format(d).replace('.', ''))}</span><span class="d">${d.getDate()}</span><span class="mk"></span>
+      </button></li>`;
   }
   $('#days').innerHTML = out;
+}
+function pickDay(ms) {
+  state.day = state.day === ms ? null : ms;
+  render();
+  if (state.day) $('#list').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function renderDayList(items) {
+  const list = itemsOnDay(items, state.day);
+  const head = `<div class="day-h"><div><h2 class="sec" style="margin:0">${esc(fDay.format(new Date(state.day)))}</h2>
+    <p class="kind">${list.length ? `${list.length} ${list.length === 1 ? 'rzecz' : 'rzeczy'}` : 'Nic zaplanowanego'}</p></div>
+    <button type="button" class="ghost-txt" data-day-clear>Pokaż wszystko</button></div>`;
+  $('#list').innerHTML = head + (list.length ? list.map((x) => card(x.it)).join('')
+    : `<div class="empty"><h3>Na ten dzień nic nie masz</h3><p>Napisz na dole, co zaplanować — np. „${esc(fWd.format(new Date(state.day)).replace('.', ''))} o 10 dentysta”.</p></div>`);
+  loadPhotos($('#list'));
 }
 
 function remindLine(it) {
@@ -701,6 +739,8 @@ function bind() {
     catch { $('#tok').focus(); $('#tok-err').textContent = 'Przytrzymaj pole i wybierz „Wklej”.'; }
   });
   $('#wpisz').addEventListener('submit', add);
+  $('#days').addEventListener('click', (e) => { const b = e.target.closest('[data-day]'); if (b) pickDay(Number(b.dataset.day)); });
+  $('#list').addEventListener('click', (e) => { if (e.target.closest('[data-day-clear]')) { state.day = null; render(); } });
   $('#q-photo').addEventListener('click', () => $('#q-file').click());
   $('#q-file').addEventListener('change', async (e) => {
     const f = e.target.files?.[0]; e.target.value = ''; if (!f) return;
