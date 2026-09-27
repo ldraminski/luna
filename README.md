@@ -72,7 +72,7 @@ Wynik: `items.data.research = {query, answer, sources[{url,title,host}], checked
   listy: dopisz/usuń/zmień nazwę/nowa lista/usuń listę, szczegóły, wygląd, usunięcie widgetu). Widget na zamówienie przebudowuje się w tle.
 - **Nie dublujemy:** Luna rozszerza istniejącą listę; nową dodaje na wyraźną prośbę i mówi to wprost. Blokada w kodzie: widget AI wyglądający na listę jest odrzucany.
   Widgety-listy `lista-zakupow` i `obowiazki-do-zrobienia` wycofane z biblioteki (`active_version = NULL`).
-- **Zdjęcie w rozmowie:** przeglądarka zmniejsza je do 1600 px JPEG → `xiaomi/mimo-v2.5` odczytuje treść → do rozmowy trafia TYLKO tekst
+- **Zdjęcie w rozmowie:** przeglądarka zmniejsza je do 1600 px JPEG → `deepseek/deepseek-v4.1-flash` (obsługuje obrazy) odczytuje treść → do rozmowy trafia TYLKO tekst
   (`[ZDJĘCIE] …`), samo zdjęcie nie jest zapisywane. nginx: limit 4 MB tylko dla `/api/items/widget-chat` (reszta API 64 KB).
 
 ## Wdrożenie

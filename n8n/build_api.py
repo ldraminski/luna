@@ -313,10 +313,10 @@ link(code, need); link(need, web, 0); link(need, save, 1); link(web, facts); lin
 
 # ---- Czat „Popraw” (27.09, decyzja Łukasza): rozmowa z Luną o JEDNEJ rzeczy → plan zmian → „Zrób to”.
 # Zmienia tytuł, termin, przypomnienia, listy (też nowe z nazwą), szczegóły, wygląd; widget na zamówienie tylko, gdy gotowe części nie wystarczą.
-# Zdjęcie w rozmowie: odczyt modelem vision (mimo), do rozmowy trafia TYLKO odczytany tekst — samo zdjęcie nie jest zapisywane.
+# Zdjęcie w rozmowie: odczyt DeepSeekiem 4.1 Flash (obsługuje obrazy), do rozmowy trafia TYLKO odczytany tekst — samo zdjęcie nie jest zapisywane.
 CHAT_SYSTEM = open("prompt-popraw.txt").read()
 assert "{{" not in CHAT_SYSTEM and "}}" not in CHAT_SYSTEM
-VISION_MODEL = "xiaomi/mimo-v2.5"
+VISION_MODEL = MODEL   # deepseek-v4.1-flash przyjmuje obrazy (Łukasz, 28.09) — jeden model do wszystkiego
 OR_CRED = {"openRouterApi": {"id": "ZGSl0yv59gDWZKJG", "name": "OpenRouter - Luna"}}
 y3 = y + 800
 def iff2(name, pos, expr):
