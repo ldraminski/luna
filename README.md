@@ -81,7 +81,8 @@ Przycisk aparatu w głównym polu (miniatura z ✕ nad polem). `POST /api/items`
 DeepSeek 4.1 Flash robi analizę „jak analyzer.draminski.dev” (krótki tytuł, opis 2–3 zdania) + odczytany tekst — BEZ `response_format`
 (z nim DeepSeek potrafił oddać samo `{"type":"json_object"}`), z drugą próbą. Potem ZWYKŁE rozumienie: termin na zdjęciu → przypomnienie,
 lista → lista, miejsce/rzecz → zwykła notatka z polami (adres, godziny, cena). Z tekstem użytkownika — tekst decyduje. `data.photo` = opis + tekst;
-samego zdjęcia nie zapisujemy. Nieczytelne zdjęcie bez tekstu → 422 „Nie udało mi się obejrzeć tego zdjęcia” (Luna nic nie wymyśla).
+zapisujemy tylko **miniaturę** (≤800 px JPEG ~30–100 KB, robi ją przeglądarka) w tabeli `item_photos` (migracja 010) —
+pobierana osobno `GET /api/items/photo?id=` wyłącznie z kluczem właściciela; lista rzeczy ma tylko `has_photo`. Usunięcie rzeczy kasuje zdjęcie. Nieczytelne zdjęcie bez tekstu → 422 „Nie udało mi się obejrzeć tego zdjęcia” (Luna nic nie wymyśla).
 
 ## Wdrożenie
 

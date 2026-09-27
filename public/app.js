@@ -194,6 +194,7 @@ function render() {
   if (saved.length) html += '<h2 class="sec">Zapisane</h2>' + saved.map((i) => card(i)).join('');
   $('#list').innerHTML = html;
   renderRequests();
+  loadPhotos($('#list'));
 }
 
 // ---------- prośby o dostęp (tylko admin) ----------
@@ -330,6 +331,17 @@ function partPage(it, full = false) {
         <a class="chev" href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="Otwórz stronę">${svg('ext')}</a></span></div>
     ${checked ? `<p class="dom" style="margin-top:6px">${esc(checked)}${d.summary_status === 'error' && sm ? ' · ostatnia próba: ' + esc(d.summary_error || 'błąd') : ''}</p>` : ''}`;
 }
+// Miniatury zdjęć: lista ich nie zawiera (tylko has_photo) — dociągamy osobno i trzymamy w pamięci.
+const photoCache = new Map();
+function loadPhotos(root = document) {
+  root.querySelectorAll('img[data-photo]:not([src])').forEach(async (img) => {
+    const id = img.dataset.photo;
+    try {
+      if (!photoCache.has(id)) photoCache.set(id, api.photo(id));
+      img.src = await photoCache.get(id);
+    } catch { photoCache.delete(id); img.remove(); }
+  });
+}
 // Ze zdjęcia: opis (jak analyzer) i — w szczególe — odczytany tekst.
 function partPhoto(it, full = false) {
   const p = it.data?.photo; if (!p || (!p.description && !p.text)) return '';
@@ -377,13 +389,13 @@ function card(it, hero = false) {
       <p class="kind">${svg('clock', 'width:16px;height:16px')} ${esc(kindLabel(it).replace(/^Jednorazowe · /, 'Jednorazowe · ') )}</p>
       <p class="big">${esc(rel(ev))}</p>
       <h3>${esc(it.title)}</h3>
-      <div class="blob" aria-hidden="true"><svg class="i" viewBox="0 0 24 24" style="width:64px;height:64px;stroke-width:1.4;margin:-10px 18px 0 0">${I[icon]}</svg></div>
+      <div class="blob" aria-hidden="true">${it.has_photo ? `<img class="blob-photo" data-photo="${it.id}" alt="">` : `<svg class="i" viewBox="0 0 24 24" style="width:64px;height:64px;stroke-width:1.4;margin:-10px 18px 0 0">${I[icon]}</svg>`}</div>
       ${partFields(it)}${partPhoto(it)}${partResearch(it)}${partWidget(it)}${partList(it)}${partFoot(it)}
     </article>`;
   }
   const late = isLate(it);
   return `<article class="w${late ? ' w--late' : ''}" data-id="${it.id}" data-widget="${esc(it.kind)}" tabindex="0" role="button">
-    <div class="w-h"><div class="ico" style="background:var(${late ? '--late-bg' : TINT[tint]})" aria-hidden="true">${svg(icon)}</div>
+    <div class="w-h">${it.has_photo ? `<img class="ico thumb" data-photo="${it.id}" alt="">` : `<div class="ico" style="background:var(${late ? '--late-bg' : TINT[tint]})" aria-hidden="true">${svg(icon)}</div>`}
       <div style="min-width:0"><p class="kind">${esc(kindLabel(it))}</p><h3>${esc(it.title)}</h3></div></div>
     ${partCycle(it)}${partFields(it)}${partPhoto(it)}${partResearch(it)}${partPage(it)}${partWidget(it)}${partList(it)}${it.data?.widget ? '' : noteText}${partFoot(it)}
   </article>`;
@@ -419,6 +431,7 @@ function openDetail(id) {
       <span class="pill">${late ? svg('clock', 'width:14px;height:14px') : ''}${esc(kindLabel(it))}</span>
     </div>
     <div class="d-body">
+      ${it.has_photo ? `<img class="d-photo" data-photo="${it.id}" alt="Zdjęcie dodane do tej rzeczy">` : ''}
       <div class="quote">Wpisane ${esc(rel(dt(it.created_at)))}, ${esc(fTime.format(dt(it.created_at)))}:<q>${esc(it.source_text)}</q></div>
       ${it.data?.photo ? `<div class="w" style="margin-top:12px;cursor:default">${partPhoto(it, true)}</div>` : ''}
       ${it.data?.research ? `<div class="w" style="margin-top:12px;cursor:default">${partResearch(it, true)}</div>` : ''}
@@ -436,6 +449,7 @@ function openDetail(id) {
       </div>
     </div></div>`;
   $('#detail').classList.add('open');
+  loadPhotos($('#detail'));
   document.body.style.overflow = 'hidden';
   if (!history.state?.detail) history.pushState({ detail: id }, '');
 }
@@ -486,7 +500,7 @@ async function add(e) {
   const form = $('#wpisz'); form.classList.add('busy');
   const slow = setTimeout(() => toast(image ? 'Chwilkę — oglądam zdjęcie…' : 'Chwilkę — sprawdzam w sieci…'), 3500);   // zdjęcie / sieć trwają kilka–kilkanaście sekund
   try {
-    const r = await api.add(text, image);
+    const r = await api.add(text, image, image ? state.thumb || '' : '');
     q.value = ''; fitQ(); q.blur(); setPhoto(null);
     toast(r.item?.spec?.understood || 'Zapisałam.');
     await load();
@@ -497,8 +511,8 @@ async function add(e) {
 }
 
 // Zdjęcie do nowej rzeczy: miniatura nad polem; samo zdjęcie też można wysłać (Luna sama zdecyduje: przypomnienie / lista / notatka).
-function setPhoto(url) {
-  state.photo = url || null;
+function setPhoto(url, thumb = null) {
+  state.photo = url || null; state.thumb = url ? thumb : null;
   $('#q-pic').hidden = !url;
   if (url) $('#q-pic img').src = url;
 }
@@ -615,13 +629,13 @@ async function chatAction(act) {
 }
 
 // Zdjęcie do rozmowy: zmniejszamy w przeglądarce (dłuższy bok 1600 px, JPEG) — do Luny idzie kilkaset KB, nie 5 MB.
-async function photoToDataUrl(file) {
+async function photoToDataUrl(file, max = 1600, quality = 0.82) {
   const img = await createImageBitmap(file).catch(() => null);
   if (!img) throw new Error('Nie umiem otworzyć tego zdjęcia.');
-  const k = Math.min(1, 1600 / Math.max(img.width, img.height));
+  const k = Math.min(1, max / Math.max(img.width, img.height));
   const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
   c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-  return c.toDataURL('image/jpeg', 0.82);
+  return c.toDataURL('image/jpeg', quality);
 }
 async function sendPhoto(file) {
   if (!file || chat.busy) return;
@@ -690,7 +704,8 @@ function bind() {
   $('#q-photo').addEventListener('click', () => $('#q-file').click());
   $('#q-file').addEventListener('change', async (e) => {
     const f = e.target.files?.[0]; e.target.value = ''; if (!f) return;
-    try { setPhoto(await photoToDataUrl(f)); $('#q').focus(); } catch (err) { toast(err.message); }
+    // do analizy 1600 px; na serwerze zostaje tylko miniatura 800 px (kafelek i szczegół)
+    try { setPhoto(await photoToDataUrl(f), await photoToDataUrl(f, 800, 0.75)); $('#q').focus(); } catch (err) { toast(err.message); }
   });
   $('#q-pic-x').addEventListener('click', () => setPhoto(null));
   $('#q').addEventListener('input', fitQ);

@@ -25,11 +25,21 @@ WITH {ME}
 SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
   ELSE json_build_object('status', 200, 'items', coalesce((SELECT json_agg(t ORDER BY t.next_at NULLS LAST, t.created_at DESC) FROM (
     SELECT i.id, i.kind, i.title, i.source_text, i.spec, i.data, i.widget_slug, i.status, i.created_at,
+      EXISTS (SELECT 1 FROM item_photos p WHERE p.item_id = i.id) AS has_photo,
       (SELECT min(n.due_at) FROM notifications n WHERE n.item_id = i.id AND n.sent_at IS NULL) AS next_at,
       coalesce((SELECT json_agg(n.due_at ORDER BY n.due_at) FROM notifications n
                 WHERE n.item_id = i.id AND n.sent_at IS NULL), '[]'::json) AS notify_at
     FROM items i WHERE i.user_id = (SELECT user_id FROM me) AND i.status = 'active') t), '[]'::json)) END AS result""",
    "={{ [ " + TOKEN + " ] }}"),
+
+  # Miniatura zdjęcia rzeczy — tylko właściciel (klucz), osobno od listy, żeby lista nie ciągnęła obrazów.
+  ("GET", "items/photo", "Zdjęcie rzeczy", f"""
+WITH {ME},
+p AS (SELECT image FROM item_photos WHERE item_id = $2::uuid AND user_id = (SELECT user_id FROM me))
+SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
+  WHEN NOT EXISTS (SELECT 1 FROM p) THEN json_build_object('status', 404, 'error', 'Nie ma zdjęcia')
+  ELSE json_build_object('status', 200, 'image', (SELECT image FROM p)) END AS result""",
+   "={{ [ " + TOKEN + ", /^[0-9a-f-]{36}$/i.test($json.query.id || '') ? $json.query.id : '00000000-0000-0000-0000-000000000000' ] }}"),
 
   ("GET", "pending", "Do pokazania", f"""
 WITH {ME},
@@ -204,11 +214,14 @@ nt AS (
   INSERT INTO notifications (item_id, user_id, due_at, channels, title, body)
   SELECT it.id, it.user_id, x.at, coalesce(x.channels, '{push}'), x.title, x.body
   FROM it, jsonb_to_recordset($9::jsonb) AS x(at timestamptz, title text, body text, channels text[])
-  RETURNING due_at)
+  RETURNING due_at),
+ph AS (
+  INSERT INTO item_photos (item_id, user_id, image)
+  SELECT it.id, it.user_id, $11 FROM it WHERE $11 <> '' RETURNING 1)
 SELECT CASE WHEN NOT $8::boolean THEN json_build_object('status', 422, 'error', $10::text)
-  ELSE json_build_object('status', 200, 'item', (SELECT row_to_json(it) FROM it),
+  ELSE json_build_object('status', 200, 'item', (SELECT row_to_json(it) FROM it), 'has_photo', EXISTS (SELECT 1 FROM ph),
        'notifications', coalesce((SELECT json_agg(due_at ORDER BY due_at) FROM nt), '[]'::json)) END AS result""".strip(),
-  "options": {"queryReplacement": "={{ [ $('Sesja').item.json.user_id, $json.kind, $json.source_text, $json.title, JSON.stringify($json.spec), $json.widget_slug, JSON.stringify($json.data), $json.ok, JSON.stringify($json.notify), $json.error || '' ] }}"}},
+  "options": {"queryReplacement": "={{ [ $('Sesja').item.json.user_id, $json.kind, $json.source_text, $json.title, JSON.stringify($json.spec), $json.widget_slug, JSON.stringify($json.data), $json.ok, JSON.stringify($json.notify), $json.error || '', (t => /^data:image\\/jpeg;base64,[A-Za-z0-9+\\/=]+$/.test(t) && t.length < 400000 ? t : '')(String($('POST items').item.json.body.thumb || '')) ] }}"}},
   credentials=PG)
 resp = node("Odpowiedz: dodano", "n8n-nodes-base.respondToWebhook", 1.1, [1540, y],
   {"respondWith": "json", "responseBody": "={{ $json.result }}", "options": {"responseCode": "={{ $json.result.status || 200 }}"}})
