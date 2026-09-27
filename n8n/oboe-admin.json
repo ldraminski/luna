@@ -1,0 +1,217 @@
+{
+ "name": "Oboe: Wydaj token",
+ "nodes": [
+  {
+   "id": "66890366-2bde-4d16-bbd0-28aa9bcc893e",
+   "name": "Opis",
+   "type": "n8n-nodes-base.stickyNote",
+   "typeVersion": 1,
+   "position": [
+    -380,
+    -260
+   ],
+   "parameters": {
+    "width": 560,
+    "height": 240,
+    "content": "## Oboe: Wydaj token\nAdmin (Łukasz) dodaje osobę albo wydaje nowy token zgubionemu.\nBody: `email`, `name` (opcjonalnie), `send_email` (domyślnie true).\nStare tokeny tej osoby są **unieważniane** — w bazie jest tylko sha256, więc tokenu nie da się odczytać, tylko wydać nowy.\nOdpowiedź zawiera token (tryb ręczny). Wołać tylko z serwera — nginx blokuje `/api/admin/`.\nŹródło: `~/Work/oboe/n8n/build_admin.py`."
+   }
+  },
+  {
+   "id": "f23546a1-55c8-4b18-b396-06c7f8ae19d0",
+   "name": "POST admin/token",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    0
+   ],
+   "parameters": {
+    "httpMethod": "POST",
+    "path": "oboe/admin/token",
+    "authentication": "headerAuth",
+    "responseMode": "responseNode",
+    "options": {}
+   },
+   "credentials": {
+    "httpHeaderAuth": {
+     "id": "9Rd7Zl7NxIcEvPtL",
+     "name": "Oboe - admin (X-Admin-Token)"
+    }
+   },
+   "webhookId": "a6aca990-54bd-4a9a-a52c-fc2b2f8784cc"
+  },
+  {
+   "id": "fde2c0a8-04d2-4fc0-a6c3-66129915db2d",
+   "name": "Wydaj token",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    220,
+    0
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "WITH valid AS (SELECT lower(trim($1)) AS email WHERE lower(trim($1)) ~ '^[^@\\s]+@[^@\\s]+\\.[a-z]{2,}$'),\nu AS (\n  INSERT INTO users (email, name) SELECT email, nullif(trim($2), '') FROM valid\n  ON CONFLICT (email) DO UPDATE SET name = coalesce(nullif(trim($2), ''), users.name)\n  RETURNING id, email, name),\nold AS (DELETE FROM sessions WHERE user_id IN (SELECT id FROM u) RETURNING 1),\ntok AS (SELECT encode(gen_random_bytes(32), 'hex') AS t),\ns AS (INSERT INTO sessions (token_hash, user_id)\n      SELECT encode(digest((SELECT t FROM tok), 'sha256'), 'hex'), id FROM u RETURNING user_id)\nSELECT CASE WHEN NOT EXISTS (SELECT 1 FROM s) THEN json_build_object('status', 400, 'error', 'Zły e-mail')\n  ELSE json_build_object('status', 200, 'email', (SELECT email FROM u), 'name', (SELECT name FROM u),\n       'token', (SELECT t FROM tok), 'revoked', (SELECT count(*) FROM old)) END AS result",
+    "options": {
+     "queryReplacement": "={{ [ String($json.body.email || '').slice(0, 200), String($json.body.name || '').slice(0, 80) ] }}"
+    }
+   },
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   }
+  },
+  {
+   "id": "30a121ee-610b-4b67-b833-4d0a1c054bc2",
+   "name": "Wysłać mail?",
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2.2,
+   "position": [
+    440,
+    0
+   ],
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "loose",
+      "version": 2
+     },
+     "conditions": [
+      {
+       "id": "77ec6e06-ba51-49ba-acd1-12604ad1cd72",
+       "leftValue": "={{ $json.result.status === 200 && $('POST admin/token').item.json.body.send_email !== false }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "e3695d0e-c87d-4f1d-a75c-dbcb78339cad",
+   "name": "Wyślij token mailem",
+   "type": "n8n-nodes-base.emailSend",
+   "typeVersion": 2.1,
+   "position": [
+    660,
+    -100
+   ],
+   "parameters": {
+    "fromEmail": "Oboe <n8n@renlab.ovh>",
+    "toEmail": "={{ $json.result.email }}",
+    "subject": "Twój klucz do Oboe",
+    "emailFormat": "text",
+    "text": "={{ 'Cześć' + ($json.result.name ? ' ' + $json.result.name : '') + '!\\n\\nOto Twój klucz do Oboe — aplikacji, która pamięta za Ciebie:\\n\\n' + $json.result.token + '\\n\\nJak zacząć:\\n1. Otwórz na telefonie: https://fusion-thomson-arrow-coordinated.trycloudflare.com\\n2. iPhone: Udostępnij → „Do ekranu początkowego”. Android: menu → „Zainstaluj aplikację”.\\n3. Uruchom Oboe Z EKRANU POCZĄTKOWEGO i dopiero tam wklej klucz. (Na iPhonie aplikacja z ekranu początkowego nie widzi tego, co wpiszesz w Safari.)\\n\\nKlucz działa bez końca. Nie przesyłaj go nikomu — kto go ma, widzi Twoje przypomnienia.\\nZgubisz go? Napisz do Łukasza, dostaniesz nowy, a ten przestanie działać.\\n\\n— Oboe' }}",
+    "options": {
+     "appendAttribution": false
+    }
+   },
+   "credentials": {
+    "smtp": {
+     "id": "DY5t4HkHVBfxB2gY",
+     "name": "SMTP n8n renlab"
+    }
+   },
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "5b5db3e4-a6d5-4961-acf3-fa2ce17c6357",
+   "name": "Odpowiedz: wysłano",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    880,
+    -100
+   ],
+   "parameters": {
+    "respondWith": "json",
+    "options": {},
+    "responseBody": "={{ Object.assign({}, $('Wydaj token').item.json.result, { emailed: !$json.error, email_error: $json.error ? String($json.error.message || $json.error) : undefined }) }}"
+   }
+  },
+  {
+   "id": "b6db9ea8-c6bb-46e7-a593-4db7a47ad038",
+   "name": "Odpowiedz",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    660,
+    120
+   ],
+   "parameters": {
+    "respondWith": "json",
+    "responseBody": "={{ Object.assign({}, $json.result, { emailed: false }) }}",
+    "options": {
+     "responseCode": "={{ $json.result.status || 200 }}"
+    }
+   }
+  }
+ ],
+ "connections": {
+  "POST admin/token": {
+   "main": [
+    [
+     {
+      "node": "Wydaj token",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Wydaj token": {
+   "main": [
+    [
+     {
+      "node": "Wysłać mail?",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Wysłać mail?": {
+   "main": [
+    [
+     {
+      "node": "Wyślij token mailem",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Odpowiedz",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Wyślij token mailem": {
+   "main": [
+    [
+     {
+      "node": "Odpowiedz: wysłano",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1",
+  "timezone": "Europe/Warsaw"
+ }
+}
