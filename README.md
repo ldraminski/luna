@@ -98,6 +98,19 @@ Zapis bez pytania o zgodę — transkrypcja jest dokładna, a „Cofnij” ratuj
 - Test bez telefonu: Chromium z `--use-fake-device-for-media-stream --use-file-for-fake-audio-capture=plik.wav` (WAV z `say -v Zosia` + `afconvert`),
   na tymczasowym koncie testowym (nie na koncie Łukasza — rozumienie ustawia prawdziwe przypomnienia).
 
+## Biurko — wersja na komputer (28.09.2026)
+
+`luna.draminski.dev/biurko` — osobna strona (`public/biurko.html|js|css`) do DŁUŻSZYCH materiałów; wspólne z telefonem: klucz w przeglądarce, API, dane.
+Decyzja: osobny interfejs, NIE osobna aplikacja (inna domena = osobne logowanie i rozjazd funkcji) i NIE responsywny `app.js` (ryzyko dla telefonu).
+1. Wklej materiał (do 20 000 znaków; szkic w `localStorage` `luna-biurko-szkic`) → `POST /api/items/split {text}` →
+   „Oboe: Biurko” (`n8n/build_desk.py`, id w `n8n/.desk-wf-id`, prompt `n8n/prompt-rozbij.txt`): DeepSeek 4.1 Flash dzieli materiał na
+   samodzielne zdania z konkretnymi datami (kalendarz 120 dni), zakupy w jedną listę, pomija podpisy. **Nic nie zapisuje.** ~5–10 s.
+2. Przegląd: popraw / usuń / dopisz. 3. Każde zdanie zwykłym `POST /api/items` (po 2 naraz, ~2–4 s na rzecz) → „co z tym zrobiłam” + Cofnij (`items/delete`).
+- Boczna kolumna: najbliższe 30 dni (`spec.event_at || next_at`), nowe z tej sesji oznaczone „nowe”.
+- nginx: `location = /biurko` → `biurko.html`; `/api/items/split` z limitem 256 KB. Dockerfile: pliki biurka w skrócie wersji i podmianie `__V__`.
+- W widoku z telefonu na ekranie ≥1000 px (po zalogowaniu) link „Biurko — wklej dłuższy materiał →”.
+- Test: Playwright na koncie testowym (mail ze żłobka + plan tygodnia → 8 rzeczy, 0 błędów).
+
 ## Raport dnia / tygodnia i przypomnienie o zaległych (28.09.2026, Łukasz)
 
 Workflow „Oboe: Raport” (`n8n/build_report.py`, id w `n8n/.report-wf-id`), migracja `db/011-raporty.sql`.
