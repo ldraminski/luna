@@ -6,10 +6,8 @@ Wołany tylko z serwera (nginx blokuje /api/admin/):
      -d "{\\"email\\":\\"...\\",\\"name\\":\\"...\\",\\"send_email\\":true}"'
 """
 import json, uuid
+from config import PG, SMTP, ADMIN
 import maile
-PG = {"postgres": {"id": "IAfnl61Lb7KbTeZi", "name": "Oboe - Postgres (oboe-db)"}}
-SMTP = {"smtp": {"id": "DY5t4HkHVBfxB2gY", "name": "SMTP n8n renlab"}}
-ADMIN = {"httpHeaderAuth": {"id": "9Rd7Zl7NxIcEvPtL", "name": "Oboe - admin (X-Admin-Token)"}}
 
 nodes, conns = [], {}
 def node(name, typ, ver, pos, params, **kw):

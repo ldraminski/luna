@@ -6,10 +6,8 @@ Test / ręcznie: POST /webhook/oboe/admin/backup (X-Admin-Token, tylko z serwera
 Odtworzenie: README repo, sekcja „Kopia zapasowa”.
 """
 import json, uuid
-PG = {"postgres": {"id": "IAfnl61Lb7KbTeZi", "name": "Oboe - Postgres (oboe-db)"}}
-ADMIN = {"httpHeaderAuth": {"id": "9Rd7Zl7NxIcEvPtL", "name": "Oboe - admin (X-Admin-Token)"}}
-R2 = json.load(open(".backup-r2.json")) if __import__("os").path.exists(".backup-r2.json") else None   # {"id","name"} po założeniu przez Łukasza
-BUCKET = "luna-kopie"
+from config import PG, ADMIN, R2, BACKUP_BUCKET
+BUCKET = BACKUP_BUCKET
 TABLES = ["users", "sessions", "items", "notifications", "push_subscriptions", "widget_chats", "widgets", "widget_versions",
           "access_requests", "access_log", "item_photos", "reports"]
 nodes, conns = [], {}
@@ -52,7 +50,7 @@ gz = node("Gzip", "n8n-nodes-base.compression", 1.1, [880, 100], {"operation": "
   "binaryPropertyOutput": "data"})
 up_params = {"operation": "upload", "bucketName": BUCKET, "fileName": "={{ $('Złóż kopię').first().json.file }}.gz", "additionalFields": {}}
 up = node("Wyślij do R2", "n8n-nodes-base.s3", 1, [1100, 100], up_params, onError="continueRegularOutput",
-  **({"credentials": {"s3": R2}} if R2 else {"disabled": True}))
+  **({"credentials": R2} if R2 else {"disabled": True}))
 res = node("Wynik", "n8n-nodes-base.code", 2, [1320, 100], {"jsCode": r"""const k = $('Złóż kopię').first().json;
 const gz = $('Gzip').first().binary?.data;
 const sent = __R2__ && !$json.error && !$('Wyślij do R2').first()?.json?.error;   // bez credentialu R2 węzeł jest wyłączony i tylko przepuszcza dane

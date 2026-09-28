@@ -1,7 +1,8 @@
 -- 27.09.2026 (decyzja Łukasza): ktoś sam podaje imię i e-mail, Łukasz akceptuje prośbę o dostęp, klucz idzie mailem.
 -- Istniejące konto dostaje nowy klucz od razu (stare klucze na innych urządzeniach zostają).
 ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin boolean NOT NULL DEFAULT false;
-UPDATE users SET is_admin = true WHERE email = 'admin@example.com';
+-- Administrator (akceptuje prośby o dostęp) — ustaw swój e-mail przed uruchomieniem:
+-- UPDATE users SET is_admin = true WHERE email = 'admin@example.com';
 
 CREATE TABLE IF NOT EXISTS access_requests (
   id          bigserial PRIMARY KEY,

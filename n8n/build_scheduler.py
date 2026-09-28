@@ -5,11 +5,9 @@ Klucz VAPID wspólny z Alertami (credential „Alerty VAPID”) — front Oboe s
 Mail: gdy powiadomienie ma kanał 'email' ALBO osoba nie ma żadnego działającego urządzenia z pushem.
 """
 import json, uuid
+from config import APP_URL, PG, SMTP, VAPID, SENDER, VAPID_PUB, VAPID_SUB, workflow_id
 
-PG = {"postgres": {"id": "IAfnl61Lb7KbTeZi", "name": "Oboe - Postgres (oboe-db)"}}
-SMTP = {"smtp": {"id": "DY5t4HkHVBfxB2gY", "name": "SMTP n8n renlab"}}
-VAPID_CRED = {"crypto": {"id": "INg6KASgJTytqlBu", "name": "Alerty VAPID (klucz podpisu Web Push)"}}
-VAPID_PUB = "BCsLF3E2-p-L9Cpw_smlVGOtpdBEXgDJKEyexxG28crg4SiZkqoFbAuJAlEKOS5YyMVpdw_ISLaWMtbBTqwpYA4"
+VAPID_CRED = VAPID
 
 nodes, conns = [], {}
 def node(name, typ, ver, pos, params, **kw):
@@ -108,8 +106,8 @@ fm = node("Tylko mail", "n8n-nodes-base.filter", 2.2, [460, -140], {
     "conditions": [{"id": str(uuid.uuid4()), "leftValue": "={{ $json.send_email }}", "rightValue": "",
                     "operator": {"type": "boolean", "operation": "true", "singleValue": True}}], "combinator": "and"}, "options": {}})
 mail = node("Wyślij mail", "n8n-nodes-base.emailSend", 2.1, [680, -140], {
-  "fromEmail": "Luna <n8n@renlab.ovh>", "toEmail": "={{ $json.email }}", "subject": "={{ ($json.item_id ? '⏰ ' : '') + $json.title }}",
-  "emailFormat": "text", "text": "={{ ($json.body ? $json.body + '\\n\\n' : '') + 'Otwórz Lunę: https://luna.draminski.dev' + ($json.item_id ? '/?open=' + $json.item_id : '') + '\\n\\n— Luna' }}",
+  "fromEmail": SENDER, "toEmail": "={{ $json.email }}", "subject": "={{ ($json.item_id ? '⏰ ' : '') + $json.title }}",
+  "emailFormat": "text", "text": "={{ ($json.body ? $json.body + '\\n\\n' : '') + 'Otwórz Lunę: " + APP_URL + "' + ($json.item_id ? '/?open=' + $json.item_id : '') + '\\n\\n— Luna' }}",
   "options": {"appendAttribution": False}}, credentials=SMTP, onError="continueRegularOutput")
 mark = node("Oznacz wysłane mailem", "n8n-nodes-base.postgres", 2.6, [900, -140], {"operation": "executeQuery",
   "query": "UPDATE notifications SET emailed = true, error = CASE WHEN $2 = '' THEN error ELSE left($2, 300) END WHERE id = $1",
@@ -127,7 +125,7 @@ jwt = node("Podpisz JWT", "n8n-nodes-base.code", 2, [680, 140], {"jsCode":
   "return $input.all().filter((it) => it.json.endpoint).map((it) => {\n"
   "  const aud = (it.json.endpoint.match(/^https:\\/\\/[^/]+/) || [''])[0];\n"
   "  const header = b64u(JSON.stringify({ typ: 'JWT', alg: 'ES256' }));\n"
-  "  const payload = b64u(JSON.stringify({ aud, exp: Math.floor(Date.now() / 1000) + 3600, sub: 'https://push.draminski.dev' }));\n"
+  "  const payload = b64u(JSON.stringify({ aud, exp: Math.floor(Date.now() / 1000) + 3600, sub: '" + VAPID_SUB + "' }));\n"
   "  return { json: { endpoint: it.json.endpoint, unsigned: header + '.' + payload } };\n"
   "});"})
 sign = node("Podpis ES256", "n8n-nodes-base.crypto", 2, [900, 140],
@@ -161,7 +159,7 @@ upd = node("Aktualizuj urządzenia", "n8n-nodes-base.postgres", 2.6, [1780, 140]
   "WHERE endpoint = $1 AND $2 NOT IN (404, 410)",
   "options": {"queryReplacement": "={{ [ $json.endpoint, $json.status ] }}"}}, credentials=PG)
 
-SUMMARY_WF = open(".summary-wf-id").read().strip()
+SUMMARY_WF = workflow_id("summary")
 fs = node("Tylko strony do streszczenia", "n8n-nodes-base.filter", 2.2, [460, -320], {
   "conditions": {"options": {"caseSensitive": True, "leftValue": "", "typeValidation": "loose", "version": 2},
     "conditions": [{"id": str(uuid.uuid4()), "leftValue": "={{ $json.summarize }}", "rightValue": "",

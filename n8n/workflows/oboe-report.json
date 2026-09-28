@@ -2,7 +2,7 @@
  "name": "Oboe: Raport",
  "nodes": [
   {
-   "id": "5a6e1c66-2d9a-4860-98e5-4ac7594db129",
+   "id": "6c5ab1d4-4c78-412e-a5f4-38d843b4e2bf",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "3f781bbf-1736-47f7-b1ab-73bb0daa2b5b",
+   "id": "fcf5a262-345a-4348-a65a-f5f742ffda23",
    "name": "Co 5 minut",
    "type": "n8n-nodes-base.scheduleTrigger",
    "typeVersion": 1.2,
@@ -37,7 +37,7 @@
    }
   },
   {
-   "id": "13a5bae6-e3a6-4fee-af9d-f011637e0b1e",
+   "id": "17dd1b8c-b3a0-470e-b6f5-208d12289cc9",
    "name": "POST admin/report",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -54,14 +54,14 @@
    },
    "credentials": {
     "httpHeaderAuth": {
-     "id": "9Rd7Zl7NxIcEvPtL",
+     "id": "REPLACE_ME",
      "name": "Oboe - admin (X-Admin-Token)"
     }
    },
-   "webhookId": "b59f52e2-5e26-4b77-8ef1-1259452afc38"
+   "webhookId": "7801d595-1ea2-4a59-ba71-b2da6f5d5667"
   },
   {
-   "id": "9ff245d2-82c5-4841-ac41-c7f05874c7d9",
+   "id": "8463f8d8-2cce-44c1-a1f3-a0bd0bb7f1cc",
    "name": "Parametry",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -74,7 +74,7 @@
    }
   },
   {
-   "id": "683e53a2-e7f1-484c-a716-76aa90760c3d",
+   "id": "eb75cc39-6ccd-47b7-b5dd-93c5fb0a7dd2",
    "name": "Komu raport",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -91,13 +91,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "a706a5ab-d8a8-460b-b48c-bbb23914d305",
+   "id": "8f2babc6-779c-4f77-a32f-e12d28cceb20",
    "name": "Ułóż plan",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -110,7 +110,7 @@
    }
   },
   {
-   "id": "a1c1dc73-85b9-457d-a499-5e7040755b01",
+   "id": "b2228327-0ddc-48f0-a01b-61224d148cd6",
    "name": "DeepSeek: wstęp",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -128,7 +128,7 @@
      "parameters": [
       {
        "name": "HTTP-Referer",
-       "value": "https://draminski.dev"
+       "value": "https://luna.example.com"
       },
       {
        "name": "X-Title",
@@ -145,7 +145,7 @@
    },
    "credentials": {
     "openRouterApi": {
-     "id": "ZGSl0yv59gDWZKJG",
+     "id": "REPLACE_ME",
      "name": "OpenRouter - Luna"
     }
    },
@@ -154,7 +154,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "17c601ac-da99-46f6-ade5-51df71637804",
+   "id": "a43baefe-de44-4e99-bad2-c47e2f0e82b0",
    "name": "Dołącz wstęp",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -167,7 +167,7 @@
    }
   },
   {
-   "id": "802dc0c8-2e6e-42fe-b38b-c06ed8a9607b",
+   "id": "a49f97f1-b628-491f-97aa-93140b01976a",
    "name": "Zapisz raport",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -184,7 +184,7 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }

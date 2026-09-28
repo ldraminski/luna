@@ -6,10 +6,8 @@ Dwa wejścia:
 Ręcznie z serwera: POST http://127.0.0.1:5678/webhook/oboe/admin/widget {"item_id": ...} + X-Admin-Token.
 """
 import json, uuid
+from config import PG, OR, ADMIN, REFERER
 
-PG = {"postgres": {"id": "IAfnl61Lb7KbTeZi", "name": "Oboe - Postgres (oboe-db)"}}
-OR = {"openRouterApi": {"id": "ZGSl0yv59gDWZKJG", "name": "OpenRouter - Luna"}}
-ADMIN = {"httpHeaderAuth": {"id": "9Rd7Zl7NxIcEvPtL", "name": "Oboe - admin (X-Admin-Token)"}}
 TEXT_MODEL = "deepseek/deepseek-v4.1-flash"
 # Decyzja Łukasza 27.09: na razie GLM 5.3 Flash (tańszy output, mocny w Image-to-WebDev). DO PRZETESTOWANIA na większej
 # próbie vs DeepSeek 4.1 — w pierwszym teście DeepSeek lepiej trzymał kontrakt (GLM rysował własną kartę i tytuł).
@@ -37,7 +35,7 @@ def llm(name, pos, model, system, user_expr, max_tokens, json_mode=True, reasoni
       "method": "POST", "url": "https://openrouter.ai/api/v1/chat/completions",
       "authentication": "predefinedCredentialType", "nodeCredentialType": "openRouterApi",
       "sendHeaders": True, "headerParameters": {"parameters": [
-        {"name": "HTTP-Referer", "value": "https://draminski.dev"}, {"name": "X-Title", "value": "Oboe widgety (n8n)"}]},
+        {"name": "HTTP-Referer", "value": REFERER}, {"name": "X-Title", "value": "Oboe widgety (n8n)"}]},
       "sendBody": True, "specifyBody": "json", "jsonBody": body, "options": {"timeout": timeout}},
       credentials=OR, retryOnFail=True, maxTries=2, onError="continueRegularOutput")
 def pg(name, pos, sql, params):

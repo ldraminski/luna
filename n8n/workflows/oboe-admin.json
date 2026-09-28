@@ -2,7 +2,7 @@
  "name": "Oboe: Wydaj token",
  "nodes": [
   {
-   "id": "a8e87ee7-9cc9-41ff-b677-afef560a275c",
+   "id": "852a3943-f3a8-4dc8-8486-281fe0837c76",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "eb02da47-b139-4e6b-bc96-fa36c48d9524",
+   "id": "9839208a-11cd-443d-8814-9cf461e14a8e",
    "name": "POST admin/token",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -34,14 +34,14 @@
    },
    "credentials": {
     "httpHeaderAuth": {
-     "id": "9Rd7Zl7NxIcEvPtL",
+     "id": "REPLACE_ME",
      "name": "Oboe - admin (X-Admin-Token)"
     }
    },
-   "webhookId": "4d6b5aef-bb67-428d-8986-429ee7d4798c"
+   "webhookId": "10706b29-9f33-4599-8904-7d3105dca243"
   },
   {
-   "id": "8bc3d979-4716-45e1-9539-05e0c4a54eb9",
+   "id": "885958a4-753e-4696-b124-a6fbdf344fdc",
    "name": "Wydaj token",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -58,13 +58,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "d9ca8859-920f-49be-a5f7-3a3e981c2f62",
+   "id": "7e52d5b5-90ae-43c5-8a37-959d3be0c2d1",
    "name": "Wysłać mail?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -82,7 +82,7 @@
      },
      "conditions": [
       {
-       "id": "93b217a1-4b20-475e-a505-09a314bac21f",
+       "id": "40fec215-cb3a-41f2-85fe-ad7ec98ed6e0",
        "leftValue": "={{ $json.result.status === 200 && $('POST admin/token').item.json.body.send_email !== false }}",
        "rightValue": "",
        "operator": {
@@ -98,7 +98,7 @@
    }
   },
   {
-   "id": "08e16c04-c1bc-4a9d-9757-3a9ce9326f70",
+   "id": "321a41a9-5052-4f89-81ec-64ddd5cc798a",
    "name": "Wyślij token mailem",
    "type": "n8n-nodes-base.emailSend",
    "typeVersion": 2.1,
@@ -107,25 +107,25 @@
     -100
    ],
    "parameters": {
-    "fromEmail": "Luna <n8n@renlab.ovh>",
+    "fromEmail": "Luna <luna@example.com>",
     "toEmail": "={{ $json.result.email }}",
     "subject": "Cześć, tu Luna — Twój klucz",
     "emailFormat": "text",
-    "text": "={{ 'Cześć' + ($json.result.name ? ' ' + $json.result.name : '') + '!\\n\\nJestem Luna — Twoja prywatna asystentka w telefonie. Piszesz mi zwykłym zdaniem (albo wysyłasz zdjęcie), co masz na głowie, a ja to zapisuję i pilnuję za Ciebie:\\n• przypominam o terminach — dzień wcześniej i tuż przed wydarzeniem,\\n• pilnuję rzeczy, które się powtarzają (opłaty, przeglądy, cotygodniowe obowiązki),\\n• robię listy do odhaczania i notatki — także ze zdjęć,\\n• sprawdzam informacje w internecie i streszczam strony,\\n• co rano wysyłam krótki plan dnia, a w poniedziałki plan całego tygodnia.\\n\\nLuna działa w przeglądarce — dodajesz ją do ekranu początkowego jak zwykłą aplikację, niczego nie pobierasz ze sklepu. Twoje sprawy widzisz tylko Ty.\\n\\nOto Twój klucz:\\n\\n' + $json.result.token + '\\n\\nJak zacząć:\\n1. Otwórz na telefonie: https://luna.draminski.dev\\n2. iPhone: Udostępnij → „Do ekranu początkowego”. Android: menu → „Zainstaluj aplikację”.\\n3. Uruchom Lunę Z EKRANU POCZĄTKOWEGO i dopiero tam wklej klucz. (Na iPhonie aplikacja z ekranu początkowego nie widzi tego, co wpiszesz w Safari.)\\n\\nKlucz działa bez końca. Nie przesyłaj go nikomu — kto go ma, widzi Twoje sprawy.\\nZgubisz go? Wejdź na https://luna.draminski.dev, wpisz swój e-mail, a wyślę Ci nowy.\\n\\nDo usłyszenia!\\n— Luna' }}",
+    "text": "={{ 'Cześć' + ($json.result.name ? ' ' + $json.result.name : '') + '!\\n\\nJestem Luna — Twoja prywatna asystentka w telefonie. Piszesz mi zwykłym zdaniem (albo wysyłasz zdjęcie), co masz na głowie, a ja to zapisuję i pilnuję za Ciebie:\\n• przypominam o terminach — dzień wcześniej i tuż przed wydarzeniem,\\n• pilnuję rzeczy, które się powtarzają (opłaty, przeglądy, cotygodniowe obowiązki),\\n• robię listy do odhaczania i notatki — także ze zdjęć,\\n• sprawdzam informacje w internecie i streszczam strony,\\n• co rano wysyłam krótki plan dnia, a w poniedziałki plan całego tygodnia.\\n\\nLuna działa w przeglądarce — dodajesz ją do ekranu początkowego jak zwykłą aplikację, niczego nie pobierasz ze sklepu. Twoje sprawy widzisz tylko Ty.\\n\\nOto Twój klucz:\\n\\n' + $json.result.token + '\\n\\nJak zacząć:\\n1. Otwórz na telefonie: https://luna.example.com\\n2. iPhone: Udostępnij → „Do ekranu początkowego”. Android: menu → „Zainstaluj aplikację”.\\n3. Uruchom Lunę Z EKRANU POCZĄTKOWEGO i dopiero tam wklej klucz. (Na iPhonie aplikacja z ekranu początkowego nie widzi tego, co wpiszesz w Safari.)\\n\\nKlucz działa bez końca. Nie przesyłaj go nikomu — kto go ma, widzi Twoje sprawy.\\nZgubisz go? Wejdź na https://luna.example.com, wpisz swój e-mail, a wyślę Ci nowy.\\n\\nDo usłyszenia!\\n— Luna' }}",
     "options": {
      "appendAttribution": false
     }
    },
    "credentials": {
     "smtp": {
-     "id": "DY5t4HkHVBfxB2gY",
-     "name": "SMTP n8n renlab"
+     "id": "REPLACE_ME",
+     "name": "SMTP"
     }
    },
    "onError": "continueRegularOutput"
   },
   {
-   "id": "eb66723a-1c52-4996-9935-0615efd5c29f",
+   "id": "76e8e9b3-a3f2-4d9a-908d-6a105d5bd7d2",
    "name": "Odpowiedz: wysłano",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -140,7 +140,7 @@
    }
   },
   {
-   "id": "d85af380-4d2c-469f-b38f-b4abbee7ccd4",
+   "id": "dbf27357-ff35-4ed3-b324-f0d02ef8600f",
    "name": "Odpowiedz",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,

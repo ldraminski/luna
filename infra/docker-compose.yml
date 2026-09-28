@@ -1,0 +1,68 @@
+# Luna — przykładowy stos do uruchomienia u siebie (na produkcji te usługi są częścią większego compose).
+# Skopiuj .env.example → .env, uzupełnij, potem: docker compose up -d
+# Publicznie wystaw TYLKO `luna` (np. przez Cloudflare Tunnel albo reverse proxy z TLS).
+# n8n, Postgres i Whisper nie potrzebują portów na zewnątrz — `luna` (nginx) rozmawia z n8n po sieci Dockera.
+name: luna
+
+services:
+  luna:
+    build: ..                        # Dockerfile w katalogu głównym: nginx + statyczna PWA
+    restart: unless-stopped
+    depends_on: [n8n]
+    volumes:
+      - widgets:/srv/widgets:ro      # widgety generowane przez AI (zapisuje n8n, nginx serwuje z CSP sandbox)
+    ports:
+      - "127.0.0.1:3320:80"
+
+  n8n:                               # cały backend: API (webhooki), harmonogram, modele, maile, push
+    image: n8nio/n8n:latest
+    restart: unless-stopped
+    environment:
+      - GENERIC_TIMEZONE=Europe/Warsaw
+      - TZ=Europe/Warsaw
+      - N8N_HOST=${N8N_HOST}
+      - WEBHOOK_URL=https://${N8N_HOST}/
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_RESTRICT_FILE_ACCESS_TO=/data/oboe-widgets
+      - EXECUTIONS_DATA_PRUNE=true
+      - EXECUTIONS_DATA_MAX_AGE=336
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - widgets:/data/oboe-widgets
+    ports:
+      - "127.0.0.1:5678:5678"        # panel n8n tylko lokalnie / przez tunel z uwierzytelnieniem
+
+  oboe-db:                           # dane Luny (nazwa techniczna: oboe)
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=oboe
+      - POSTGRES_USER=oboe
+      - POSTGRES_PASSWORD=${OBOE_DB_PASSWORD}
+    volumes:
+      - oboe_db:/var/lib/postgresql/data
+      - ../db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U oboe -d oboe"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  whisper:                           # dyktowanie: faster-whisper (speaches) na CPU, API zgodne z OpenAI
+    image: ghcr.io/speaches-ai/speaches:latest-cpu
+    restart: unless-stopped
+    environment:
+      - WHISPER__COMPUTE_TYPE=int8
+      - WHISPER__CPU_THREADS=4
+      - STT_MODEL_TTL=600            # model zwalnia RAM 10 min po ostatnim użyciu
+    volumes:
+      - whisper_hf_cache:/home/ubuntu/.cache/huggingface/hub
+    cpus: 4
+    mem_limit: 4g
+    # model pobierz raz: docker compose exec whisper curl -X POST localhost:8000/v1/models/deepdml/faster-whisper-large-v3-turbo-ct2
+
+volumes:
+  widgets:
+  n8n_data:
+  oboe_db:
+  whisper_hf_cache:

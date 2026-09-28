@@ -2,7 +2,7 @@
  "name": "Oboe: Biurko",
  "nodes": [
   {
-   "id": "50923d2c-d5cb-4a6f-b366-93575b82b3cb",
+   "id": "a5c62891-cc76-4679-8b9c-5f249b28081a",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -13,11 +13,11 @@
    "parameters": {
     "width": 520,
     "height": 240,
-    "content": "## Oboe: Biurko\n`luna.draminski.dev/biurko` — wersja na komputer do dłuższych materiałów.\n`POST /api/items/split {text}` → DeepSeek dzieli materiał na samodzielne zdania → `{parts, skipped}`. **Nic nie zapisuje** — po przejrzeniu biurko wysyła każde zdanie zwykłym `POST /api/items`.\nŹródło: `~/Work/oboe/n8n/build_desk.py`, prompt `prompt-rozbij.txt`."
+    "content": "## Oboe: Biurko\n`/biurko` — wersja na komputer do dłuższych materiałów.\n`POST /api/items/split {text}` → DeepSeek dzieli materiał na samodzielne zdania → `{parts, skipped}`. **Nic nie zapisuje** — po przejrzeniu biurko wysyła każde zdanie zwykłym `POST /api/items`.\nŹródło: `~/Work/oboe/n8n/build_desk.py`, prompt `prompt-rozbij.txt`."
    }
   },
   {
-   "id": "4d637628-75dd-44f1-93cf-6d66443ccc32",
+   "id": "c5ec4f1d-e0b6-44fc-9ecf-c155d73552a6",
    "name": "POST items/split",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -31,10 +31,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "259d0c69-bd82-47dc-83af-5e2695ebfcf9"
+   "webhookId": "df91abd0-1b3d-4272-86a5-9722ea49db9e"
   },
   {
-   "id": "e1d14dcf-5786-4651-91c3-a03eed7d860b",
+   "id": "8f92cc5b-51ca-472f-9fd8-b4a0f2bd9a7b",
    "name": "Sesja",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -51,13 +51,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "066bcce0-2217-4113-b31c-4375ac4dcd9e",
+   "id": "bf467951-100b-443a-b594-5c184d845035",
    "name": "Zalogowany i jest tekst?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -75,7 +75,7 @@
      },
      "conditions": [
       {
-       "id": "e53c154c-f512-4970-a1e6-6df13a05d28e",
+       "id": "f183aeca-2d9f-40c6-897d-bdcb46e4bd7a",
        "leftValue": "={{ $json.user_id }}",
        "rightValue": "",
        "operator": {
@@ -85,7 +85,7 @@
        }
       },
       {
-       "id": "ef6ecdb1-01e7-48a7-a733-90d92d35a81c",
+       "id": "289b4c18-7190-47af-abe9-fabda635c5fc",
        "leftValue": "={{ String($('POST items/split').item.json.body.text || '').trim().length >= 3 && String($('POST items/split').item.json.body.text || '').trim().length <= 20000 }}",
        "rightValue": "",
        "operator": {
@@ -101,7 +101,7 @@
    }
   },
   {
-   "id": "a8042410-7d9e-4b52-8aea-fc65af663a30",
+   "id": "e8a10e70-5586-44b1-9994-c1c039c4aa36",
    "name": "Odmów",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -118,7 +118,7 @@
    }
   },
   {
-   "id": "a977845b-c734-4cc8-bedf-223ab97e4fdd",
+   "id": "030c41a4-d385-42f0-a1fe-28fd3c755db3",
    "name": "Kalendarz",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -131,7 +131,7 @@
    }
   },
   {
-   "id": "a57f40b4-e35f-406f-89ac-3e36413e869c",
+   "id": "160a997d-97fa-4c69-abdf-a3d8a103214b",
    "name": "DeepSeek: rozbij",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -149,7 +149,7 @@
      "parameters": [
       {
        "name": "HTTP-Referer",
-       "value": "https://draminski.dev"
+       "value": "https://luna.example.com"
       },
       {
        "name": "X-Title",
@@ -166,7 +166,7 @@
    },
    "credentials": {
     "openRouterApi": {
-     "id": "ZGSl0yv59gDWZKJG",
+     "id": "REPLACE_ME",
      "name": "OpenRouter - Luna"
     }
    },
@@ -175,7 +175,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "b58053c4-e402-4de6-8ca7-0943d1a48886",
+   "id": "4eb4ead9-f06d-4485-9857-603ad4b0ba4c",
    "name": "Sprawdź propozycję",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -188,7 +188,7 @@
    }
   },
   {
-   "id": "f489f9cb-9338-41e0-8d0b-ed5af56fd2d6",
+   "id": "54534408-76cc-448c-a221-389954f1b905",
    "name": "Odpowiedz: propozycja",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,

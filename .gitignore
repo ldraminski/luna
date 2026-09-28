@@ -1,3 +1,9 @@
 .DS_Store
 .env
 *.env
+__pycache__/
+# Ustawienia instancji i lokalne buildy z prawdziwymi identyfikatorami credentiali — poza repo.
+n8n/config.local.json
+n8n/oboe-*.json
+n8n/.*-wf-id
+n8n/.backup-r2.json

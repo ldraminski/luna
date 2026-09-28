@@ -1,200 +1,139 @@
-# Luna — prywatna asystentka (wewnętrznie: `oboe`)
+# Luna — a private assistant you talk to in plain Polish
 
-Zapisuje sprawy, terminy, listy i notatki z języka naturalnego i odzywa się, kiedy trzeba; ekran złożony z widgetów (część generuje AI).
+> **PL:** Luna to prywatna asystentka (PWA): piszesz, mówisz albo wklejasz zwykłym zdaniem, co masz zapamiętać, a ona sama
+> ustawia terminy, przypomnienia, listy i notatki, i odzywa się pushem, kiedy trzeba. Cały backend to workflowy n8n
+> generowane z kodu (Python), modele przez OpenRouter, a rozpoznawanie mowy działa na naszym serwerze (Whisper).
+> Interfejs i prompty są po polsku. Szczegółowy dziennik decyzji: [`docs/NOTATKI.md`](docs/NOTATKI.md).
 
-## Nazwy: Luna na zewnątrz, `oboe` w środku (decyzja Łukasza 27.09.2026)
+Luna turns sentences like *"on Friday at 3 pm I have a client meeting in Poznań, remind me an hour and a half before so I can
+get there, and tell me to take the contract"* into a scheduled item with sensible reminders, a checklist and a push
+notification — no forms, no fields. It runs in production for a small group of users at
+[luna.draminski.dev](https://luna.draminski.dev) (access on request).
 
-Produkt nazywał się roboczo Oboe (覚え). Od 27.09.2026 **dla użytkownika to wyłącznie „Luna”**, a `oboe` zostaje
-**tylko jako identyfikator techniczny** — zmiana nazw w środku to ryzyko bez żadnego zysku.
+<p>
+  <img src="docs/img/mobile-home.webp" width="240" alt="Home screen: nearest deadline card and upcoming items">
+  <img src="docs/img/mobile-voice-recording.webp" width="240" alt="Dictation sheet while recording">
+  <img src="docs/img/mobile-voice-summary.webp" width="240" alt="Dictation summary: what Luna heard and what she did">
+</p>
 
-| Widzi użytkownik → **Luna** | Techniczne → zostaje **oboe** (nie zmieniać) |
-|---|---|
-| tytuł, manifest PWA, ikona, teksty w aplikacji | repo `~/Work/oboe`, katalog `/opt/oboe`, obraz `oboe:latest` |
-| głos modeli: `understood`, powiadomienia, czat widgetu | kontenery `oboe`, `oboe-db`, baza i użytkownik `oboe` |
-| nadawca i treść maili („Luna <n8n@renlab.ovh>”) | workflow n8n „Oboe: …”, webhooki `/webhook/oboe/…`, credentiale „Oboe - …” |
-| adres `luna.draminski.dev` (`oboe.draminski.dev` usunięty 27.09) | protokół widgetów `oboe:data/ready/resize/save` (zmiana zepsuje gotowe widgety) |
-| | `localStorage` `oboe-token`, IndexedDB `oboe`, cache SW `oboe-shell-*` (zmiana wyloguje ludzi) |
+## What it does
 
-Zasady: nowy tekst dla ludzi → „Luna”, w 1. osobie, forma żeńska, na „ty” („Zapisałam. Przypomnę ci…”).
-Nowy identyfikator w kodzie → dalej `oboe`. W komentarzach wolno „Luna (wewn. oboe)”.
-**Przed każdym wdrożeniem:** `tools/sprawdz-nazwy.sh` — wyłapuje „Oboe” w tekstach widocznych dla użytkownika.
-Założenia: `~/Work/agents/hikari/memory/project-app-powiadomienia.md`.
-Design system: wariant A (pastel) — `~/Work/agents/hikari/sekkei/oboe/wariant-a.html`.
+- **Natural-language capture** — one text field. An LLM decides what the sentence is (one-off reminder, recurring task,
+  list, note, page to watch) and fills a structured spec; code, not the model, computes dates and occurrences.
+- **Reminders that think about your day** — if you have to travel somewhere, Luna reminds you 1.5 h and 5 min before;
+  for a phone call 10 min before; for tomorrow's events also the evening before. At the moment of the event an
+  **alarm** re-sends a push every 20 s until you snooze, dismiss or tick it off (with a 60-minute safety stop).
+- **Dictation** — tap the mic, speak, tap *Done*. Audio goes to a self-hosted Whisper (`large-v3-turbo`, CPU), is never
+  stored, and the sheet shows *what I heard* and *what I did with it* with a one-tap **Undo**.
+- **Desk** (`/biurko`) — a desktop page for long material: paste an e-mail from the nursery or a weekly plan, Luna
+  splits it into self-contained items with absolute dates, you review and edit, then everything is saved in one go.
+- **Photos** — snap a poster or a receipt; a vision model reads it and the regular pipeline decides whether it is an
+  event, a list or a note. Only a thumbnail is kept.
+- **Looks things up** — "what time is the match on TV, remind me 10 minutes before" triggers a web search and a second
+  pass of understanding with the facts found (sources shown on the card).
+- **Watches web pages** — summarises a page on a schedule and pushes only when something important changed.
+- **Generative widgets** — every card is a widget; built-in parts cover most needs, and when they don't, a model writes
+  a new widget from the design tokens. Widgets run in a sandboxed iframe (see *Security*).
+- **"Fix it" chat** — talk to Luna about one item; she proposes a plan of changes and applies them all at once.
+- **Daily / weekly report**, nudges about overdue items, soft delete with a 30-day bin and *Undo*.
+- **Works offline** — last state is cached, new entries queue up and send themselves when the connection returns.
 
-## Układ na VPS (`/opt/oboe`)
+<p>
+  <img src="docs/img/desk-review.webp" width="720" alt="Desk: pasted material split into items for review">
+</p>
 
-| Ścieżka | Co |
-|---|---|
-| `/opt/oboe/app` | kopia tego repo (rsync), z niej `docker build -t oboe:latest .` |
-| `/opt/oboe/widgets` | **osobne repo git** z widgetami generowanymi przez AI — n8n zapisuje i commituje, nginx serwuje read-only pod `/widgets/` |
-| `/opt/oboe/db.env` | hasło do `oboe-db` (0600, nie w git) |
+## Architecture
 
-Widgety są niezmienne: każda wersja to nowy plik `<slug>.v<N>.html` (płasko — węzeł zapisu n8n nie tworzy katalogów); aktywną wersję wskazuje Postgres.
-
-## Kontenery (w `/opt/infra/docker-compose.yml`)
-
-- `oboe` — nginx: statyczna PWA + proxy `/api/*` → `http://n8n:5678/webhook/oboe/*` + `/widgets/` z CSP sandbox. `127.0.0.1:3320`.
-- `oboe-db` — Postgres 16, bez `ports:`, n8n łączy się po nazwie `oboe-db:5432`.
-
-## Dostęp: prośba → akceptacja Łukasza → klucz mailem (27.09.2026)
-
-Workflow „Oboe: Dostęp” (`n8n/build_access.py`, id w `n8n/.access-wf-id`), migracja `db/008-prosby-o-dostep.sql`.
-1. Ekran startowy: imię + e-mail → `POST /api/access/request`.
-   - konto istnieje → nowy klucz od razu mailem (stare klucze zostają);
-   - nowa osoba → `access_requests` (pending) + powiadomienie dla adminów (`users.is_admin`) — push **i** mail — wysyłane przez „Oboe: Harmonogram”
-     (`notifications.item_id = NULL`; bez działającego pusha idzie mail);
-   - odrzucona w ciągu 30 dni → komunikat, bez nowego powiadomienia.
-2. Admin widzi na górze listy „Prośby o dostęp” → Zaakceptuj / Odrzuć (`POST /api/access/decide`).
-   Akceptacja = konto + klucz mailem; odrzucenie = mail „Przykro mi — Łukasz odrzucił Twoją prośbę”.
-- **Klucz nigdy nie wraca w odpowiedzi HTTP** — tylko mailem. Limit: 3 prośby/h na e-mail, 40/h łącznie (`access_log`).
-- Teksty wszystkich maili: `n8n/maile.py` (wspólne dla „Dostęp” i „Wydaj token”).
-- „Oboe: Wydaj token” (ręcznie z serwera) zostaje jako awaryjne.
-
-## Luna sprawdza w sieci (27.09.2026)
-
-**Klucz:** Luna ma własny klucz OpenRoutera z limitem ustawionym przez Łukasza (27.09: 2 USD) — credential n8n „OpenRouter - Luna” (ZGSl0yv59gDWZKJG), używany w „Oboe: API”, „Streść stronę”, „Generuj widget”. Po wyczerpaniu limitu OpenRouter odpowiada 402 → Luna pokazuje „Model nie odpowiedział”.
-
-W „Oboe: API” → POST items: gdy model rozumienia ustawi `research.query` (pytanie albo termin zależny od informacji z internetu),
-DeepSeek 4.1 Flash szuka przez **wtyczkę web OpenRoutera** (`plugins: [{id: 'web', max_results: 5}]`, prompt `n8n/prompt-sieci.txt`),
-a potem rozumie zdanie **drugi raz** ze znalezionymi faktami → termin i przypomnienia z wyniku („o której X na TVP 1, przypomnij 10 min przed”).
-Wynik: `items.data.research = {query, answer, sources[{url,title,host}], checked_at}`; karta „Sprawdziłam w sieci” ze źródłami.
-- Samo pytanie → notatka z odpowiedzią, bez przypomnienia. Brak pewnej informacji → Luna mówi to wprost i nie ustawia terminu.
-- Koszt ok. 3 gr za sprawdzenie (0,0076 USD w teście), czas 6–9 s; zwykłe wpisy bez zmian (~2 s).
-- Link + „zrób notatkę / co ważne” → jednorazowe streszczenie („Oboe: Streść stronę”), bez pilnowania.
-- Wyniki wyszukiwania to dane, nie polecenia (prompt) — model niczego nie wykonuje, tekst na karcie escapowany.
-
-## Widget = kafelek; „Popraw” = rozmowa z Luną (28.09.2026, decyzja Łukasza)
-
-- **Każdy kafelek to widget.** Wbudowane części: termin, powtarzanie, przypomnienia, **listy z nazwami** (`data.lists = [{name, items:[{text,done}], reset}]`,
-  migracja `db/009-wiele-list.sql`), szczegóły, wygląd, odpowiedź z sieci, strona. Widget na zamówienie (kod AI) — tylko gdy tych części nie wystarcza.
-- **Czat „Popraw”** (`n8n/prompt-popraw.txt`, trasy `items/widget-chat` i `items/widget-regenerate`): Luna rozmawia o jednej rzeczy,
-  pokazuje plan („Tak to zrobię: • …”), a po „Zrób to” `n8n/zastosuj.js` wprowadza wszystkie zmiany naraz (tytuł, termin i przypomnienia,
-  listy: dopisz/usuń/zmień nazwę/nowa lista/usuń listę, szczegóły, wygląd, usunięcie widgetu). Widget na zamówienie przebudowuje się w tle.
-- **Nie dublujemy:** Luna rozszerza istniejącą listę; nową dodaje na wyraźną prośbę i mówi to wprost. Blokada w kodzie: widget AI wyglądający na listę jest odrzucany.
-  Widgety-listy `lista-zakupow` i `obowiazki-do-zrobienia` wycofane z biblioteki (`active_version = NULL`).
-- **Zdjęcie w rozmowie:** przeglądarka zmniejsza je do 1600 px JPEG → `deepseek/deepseek-v4.1-flash` (obsługuje obrazy) odczytuje treść → do rozmowy trafia TYLKO tekst
-  (`[ZDJĘCIE] …`), samo zdjęcie nie jest zapisywane. nginx: limit 4 MB tylko dla `/api/items/widget-chat` (reszta API 64 KB).
-
-## Zdjęcie przy dodawaniu (28.09.2026, Łukasz)
-
-Przycisk aparatu w głównym polu (miniatura z ✕ nad polem). `POST /api/items` przyjmuje `image` (JPEG ≤1600 px, nginx 4 MB tylko dla tej trasy).
-DeepSeek 4.1 Flash robi analizę „jak analyzer.draminski.dev” (krótki tytuł, opis 2–3 zdania) + odczytany tekst — BEZ `response_format`
-(z nim DeepSeek potrafił oddać samo `{"type":"json_object"}`), z drugą próbą. Potem ZWYKŁE rozumienie: termin na zdjęciu → przypomnienie,
-lista → lista, miejsce/rzecz → zwykła notatka z polami (adres, godziny, cena). Z tekstem użytkownika — tekst decyduje. `data.photo` = opis + tekst;
-zapisujemy tylko **miniaturę** (≤800 px JPEG ~30–100 KB, robi ją przeglądarka) w tabeli `item_photos` (migracja 010) —
-pobierana osobno `GET /api/items/photo?id=` wyłącznie z kluczem właściciela; lista rzeczy ma tylko `has_photo`. Usunięcie rzeczy kasuje zdjęcie. Nieczytelne zdjęcie bez tekstu → 422 „Nie udało mi się obejrzeć tego zdjęcia” (Luna nic nie wymyśla).
-
-## Dyktowanie (28.09.2026, Łukasz)
-
-Mikrofon w głównym polu otwiera okno **„Słucham”** (instrukcja z przykładem, licznik, Anuluj / Gotowe; limit 2 min) →
-**„Odsłuchuję…”** → **„Zapisuję…”** → **podsumowanie**: „Usłyszałam: …” + „Co z tym zrobiłam” (`spec.understood`) z **Cofnij** (miękkie usunięcie) / Super.
-Zapis bez pytania o zgodę — transkrypcja jest dokładna, a „Cofnij” ratuje pomyłki. Nieudany zapis → „Wstaw do pola” (tam działa kolejka offline).
-- `POST /api/transcribe {audio: dataURL}` → workflow „Oboe: Dyktowanie” (`n8n/build_transcribe.py`, id w `n8n/.transcribe-wf-id`) →
-  kontener **`whisper`** (speaches, `deepdml/faster-whisper-large-v3-turbo-ct2` int8, CPU, `cpus: 4`, `mem_limit: 4g`) w `/opt/infra`, bez portu publicznego.
-  nginx: 4 MB tylko dla tej trasy. **Nagranie nie jest nigdzie zapisywane.**
-- **`vad_filter=true` obowiązkowo** — bez niego Whisper na ciszy/szumie zmyśla „Dziękuję za uwagę.” / „Dzięki za oglądanie!”. Cisza → 422 „Nic nie usłyszałam”.
-- Czas: ~6–8 s na transkrypcję (Whisper zawsze liczy okno 30 s, więc krótka notatka nie jest dużo szybsza) + ~2 s rozumienie. Test E2E: 9,4 s od „Gotowe” do zapisu.
-- Format: Android/Chrome `audio/webm;codecs=opus`, iPhone `audio/mp4`. Aplikacja zeszła w tło w trakcie nagrywania → nagranie przepada, nic nie idzie.
-- Test bez telefonu: Chromium z `--use-fake-device-for-media-stream --use-file-for-fake-audio-capture=plik.wav` (WAV z `say -v Zosia` + `afconvert`),
-  na tymczasowym koncie testowym (nie na koncie Łukasza — rozumienie ustawia prawdziwe przypomnienia).
-
-## Biurko — wersja na komputer (28.09.2026)
-
-`luna.draminski.dev/biurko` — osobna strona (`public/biurko.html|js|css`) do DŁUŻSZYCH materiałów; wspólne z telefonem: klucz w przeglądarce, API, dane.
-Decyzja: osobny interfejs, NIE osobna aplikacja (inna domena = osobne logowanie i rozjazd funkcji) i NIE responsywny `app.js` (ryzyko dla telefonu).
-1. Wklej materiał (do 20 000 znaków; szkic w `localStorage` `luna-biurko-szkic`) → `POST /api/items/split {text}` →
-   „Oboe: Biurko” (`n8n/build_desk.py`, id w `n8n/.desk-wf-id`, prompt `n8n/prompt-rozbij.txt`): DeepSeek 4.1 Flash dzieli materiał na
-   samodzielne zdania z konkretnymi datami (kalendarz 120 dni), zakupy w jedną listę, pomija podpisy. **Nic nie zapisuje.** ~5–10 s.
-2. Przegląd: popraw / usuń / dopisz. 3. Każde zdanie zwykłym `POST /api/items` (po 2 naraz, ~2–4 s na rzecz) → „co z tym zrobiłam” + Cofnij (`items/delete`).
-- Boczna kolumna: najbliższe 30 dni (`spec.event_at || next_at`), nowe z tej sesji oznaczone „nowe”.
-- nginx: `location = /biurko` → `biurko.html`; `/api/items/split` z limitem 256 KB. Dockerfile: pliki biurka w skrócie wersji i podmianie `__V__`.
-- W widoku z telefonu na ekranie ≥1000 px (po zalogowaniu) link „Biurko — wklej dłuższy materiał →”.
-- Test: Playwright na koncie testowym (mail ze żłobka + plan tygodnia → 8 rzeczy, 0 błędów).
-
-## Raport dnia / tygodnia i przypomnienie o zaległych (28.09.2026, Łukasz)
-
-Workflow „Oboe: Raport” (`n8n/build_report.py`, id w `n8n/.report-wf-id`), migracja `db/011-raporty.sql`.
-- Co 5 min: komu wypadła godzina (`users.report_time`, domyślnie **9:00**, okno 4 h; `report_enabled`) i nie ma raportu na dziś (`reports`, jeden na dzień).
-- **Pon = raport tygodnia** (7 dni), inne dni = **dziś + jutro**. Plan liczy KOD (`n8n/raport-plan.js`, cykliczne jak w aplikacji);
-  DeepSeek (`n8n/prompt-raport.txt`) pisze tylko wstęp, rady „przygotuj się wcześniej”, pytanie o zaległe i treść pusha.
-- Powiadomienia (przez Harmonogram, `item_id NULL`): „Twój plan na dziś / Twój tydzień z Luną” + gdy są zaległe osobne
-  „Masz N przeterminowane rzeczy — wykonaj je albo oznacz jako zakończone — inaczej będę ci ciągle przypominać.”
-- Aplikacja: raport otwiera się sam raz dziennie (`seen_at`), potem ikona raportu w nagłówku; na dole wybór godziny / wyłączenie (`POST /api/settings`).
-  **Zaległe:** karta od dołu przy otwarciu / powrocie do aplikacji (najwyżej co 3 h, localStorage) z „Zrobione” / „Nieaktualne — zamknij”.
-- Ręcznie (test): `POST /webhook/oboe/admin/report {email, weekly}` z X-Admin-Token, tylko z serwera.
-
-## Kopia zapasowa i pilnowanie limitu (28.09.2026)
-
-**Kopia — „Oboe: Kopia zapasowa”** (`n8n/build_backup.py`, id w `n8n/.backup-wf-id`): codziennie 3:30 eksport WSZYSTKICH tabel oboe-db
-+ pliki widgetów (`/data/oboe-widgets/*.html`) → JSON → gzip → **prywatny** bucket R2 `luna-kopie`, klucz `oboe/RRRR-MM-DD.json.gz` (~180 KB).
-Nic nie zostaje na serwerze (n8n nie ma trwałego katalogu na pliki). Błąd wysyłki → push + mail dla adminów.
-**Stan 28.09: eksport działa, wysyłka CZEKA** na bucket + credential od Łukasza (credential analyzera ma dostęp tylko do publicznego
-`analyzer-images` — tam kopii NIE wrzucamy). Po założeniu: `n8n/.backup-r2.json` = `{"id": "...", "name": "..."}` credentialu,
-`python3 build_backup.py`, PUT, aktywacja, test `POST 127.0.0.1:5678/webhook/oboe/admin/backup` (X-Admin-Token). Retencja: reguła cyklu życia w R2 (30 dni).
-
-Odtworzenie (na pustej bazie po `db/schema.sql` + migracjach, w tej kolejności tabel):
-```bash
-gunzip -c 2026-09-28.json.gz > kopia.json
-for t in users widgets widget_versions items sessions notifications push_subscriptions widget_chats access_requests access_log item_photos reports; do
-  python3 -c "import json,sys; print(json.dumps(json.load(open('kopia.json'))['tables']['$t']))" > /tmp/t.json
-  docker exec -i oboe-db psql -U oboe -d oboe -v j="$(cat /tmp/t.json)" -c "INSERT INTO $t SELECT * FROM json_populate_recordset(NULL::$t, :'j'::json)"
-done
-# pliki widgetów: klucz widget_files w kopii → /opt/oboe/widgets/<nazwa> (+ git commit)
+```mermaid
+flowchart LR
+  subgraph Client
+    PWA["PWA (vanilla JS, no build step)<br/>service worker · offline queue"]
+  end
+  subgraph Server["Docker on a single VPS"]
+    NGX["nginx<br/>static files · /api proxy<br/>CSP sandbox for widgets"]
+    N8N["n8n<br/>11 workflows = the whole backend"]
+    PG[("Postgres")]
+    WH["Whisper (speaches)<br/>faster-whisper, CPU"]
+  end
+  OR["OpenRouter<br/>DeepSeek v4.1 Flash · GLM"]
+  PUSH["Web Push<br/>(FCM / Apple)"]
+  PWA -- "/api/*" --> NGX --> N8N
+  N8N --> PG
+  N8N --> WH
+  N8N --> OR
+  N8N -- "VAPID-signed push" --> PUSH --> PWA
 ```
 
-**Limit — „Oboe: Limit klucza”** (`n8n/build_limit.py`, id w `n8n/.limit-wf-id`): co godzinę `GET /api/v1/key` kluczem Luny;
-progi 80/95/100% → push + mail dla adminów, każdy raz (static data), <50% zeruje. Kwoty w zł wg kursu NBP.
-W aplikacji przy wyczerpanym limicie (402): „Mam chwilową przerwę — skończył się limit… Łukasz już o tym wie.”
+**Backend without a backend.** Every API route is an n8n webhook; scheduling, e-mail, push, model calls and backups are
+n8n workflows too. nginx only serves the static app and proxies `/api/*` to n8n over the internal Docker network.
 
-## Offline i niedziałający serwer (28.09.2026)
+**Workflows as code.** The workflows are not clicked together in the editor — each one is generated by a Python builder
+in [`n8n/`](n8n/) (`build_*.py`), with prompts as `.txt` files and the JavaScript of Code nodes as `.js` files. That gives
+readable diffs, reviewable prompts and reproducible deployments. `python3 n8n/build_all.py --public` produces the
+importable JSON in [`n8n/workflows/`](n8n/workflows/).
 
-- **Czcionka Lexend hostowana u nas** (`public/fonts/`, SIL OFL, jeden plik zmienny na podzbiór latin/latin-ext). Wcześniej arkusz z Google
-  blokował rysowanie strony → biały ekran bez sieci. NIE wracać do fonts.googleapis.com.
-- **Service worker:** po 4 s bez odpowiedzi serwera bierze wersję z pamięci (wiszące połączenie ≠ brak sieci); czcionki w `SHELL_FILES`.
-- **API:** limit czasu (15 s; dodawanie 90 s, czat 120 s); brak sieci / 5xx bez JSON-a → `ApiError(0)` = tryb offline.
-- **Aplikacja:** ostatni stan w `localStorage` (`luna-stan`) — bez połączenia pokazuje go z paskiem „Brak połączenia z Luną — stan z 8:17”,
-  NIE wylogowuje. Wpisy bez połączenia → kolejka `luna-kolejka` („Czeka na wysłanie”), wysyłają się same po powrocie (`online`, co 30 s, powrót do aplikacji).
-  Zdjęć offline nie kolejkujemy (za duże na localStorage).
-- **Przypomnienia przy padzie serwera:** harmonogram jest na tym samym serwerze — w czasie awarii nic nie wychodzi; po powrocie wysyła
-  wszystkie zaległe (`due_at <= now()`, jeszcze niewysłane) za jednym razem.
+**Models do language, code does arithmetic.** The model gets a pre-computed calendar (dates, weekdays, DST offsets) and
+may only use those dates; its JSON output is validated and normalised in code (`n8n/walidacja.js`) before anything is
+written. Recurrences, reminder times in the UI and reports are computed deterministically.
 
-## Przypomnienia i alarm w chwili terminu (28.09.2026, Łukasz)
+| Workflow | Role |
+|---|---|
+| `Oboe: API` | all app routes: items, lists, photos, research, "fix it" chat |
+| `Oboe: Harmonogram` | every 20 s: due reminders and alarms → Web Push (VAPID JWT signed in n8n), e-mail fallback |
+| `Oboe: Dyktowanie` | audio → self-hosted Whisper with VAD → text |
+| `Oboe: Biurko` | long material → list of self-contained items (nothing saved until reviewed) |
+| `Oboe: Generuj widget` | pick from library → write code → static scan → guardian model → versioned file |
+| `Oboe: Streść stronę` | fetch & summarise watched pages, SSRF-safe |
+| `Oboe: Raport` | daily / weekly plan and overdue nudges |
+| `Oboe: Dostęp`, `Oboe: Wydaj token` | request access → admin approval → key by e-mail |
+| `Oboe: Limit klucza`, `Oboe: Kopia zapasowa` | model spend alerts; nightly export to private object storage |
 
-- **Czas przypomnień** (`prompt-rozumienie.txt`): trzeba dojechać (umowa, żłobek, lekarz, urząd…) → **1:30 h i 5 min przed**; bez dojazdu (telefon, lek, TV)
-  → 10 min przed; wydarzenie jutro lub później → też 20:00 dzień wcześniej. Nie wcześniej niż 6:00, nigdy „na dokładną godzinę” (wtedy alarm).
-- **Alarm:** „Oboe: Harmonogram” chodzi **co 20 s**; krok „Alarmy” — jednorazowa rzecz z minionym terminem (start tylko dla ostatniej godziny)
-  dostaje powiadomienie `kind='alarm'` co 20 s, dopóki `data.alarm.state` nie jest `off`, przełożona (`snoozed`, +5 min) ani odhaczona.
-  Bezpiecznik 60 min (Apple może zablokować zasypujące pushe) → `off` + ostatni push. Alarm NIGDY mailem (fallback wyłączony dla `kind='alarm'`).
-- Push alarmu: jeden na rzecz (`tag` + `renotify`), na Androidzie przyciski „Przełóż o 5 min” / „Wyłącz” (`POST /api/items/alarm` z SW).
-  W aplikacji czerwona karta (`#alarm`) ma pierwszeństwo przed kartą zaległych. Migracja `db/012-alarm.sql` (`notifications.kind`).
-- Udanych przebiegów Harmonogramu n8n nie zapisuje (`saveDataSuccessExecution: none`) — 4320/dobę.
+## Security notes
 
-## Wdrożenie
+- **Passwordless, hashed tokens.** Access keys are sent by e-mail only and never returned over HTTP; the database stores
+  `sha256` of each token. New accounts need admin approval; requests are rate-limited.
+- **AI-generated code is untrusted.** Widgets are served from a path with `Content-Security-Policy: sandbox allow-scripts;
+  connect-src 'none'` and rendered in `<iframe sandbox="allow-scripts">`: an opaque origin with no cookies, storage, network
+  or access to the app. Before a widget is published it passes a static scan and a separate "guardian" model review.
+- **Prompt injection.** Web pages, search results, photos and pasted material are passed to models explicitly as *data*;
+  the models have no tools that could act on instructions found there, and rendered text is escaped.
+- **SSRF.** The page fetcher resolves DNS itself (DoH, A + AAAA), allows only public IPs and ports 80/443, and follows at
+  most one redirect after re-checking it.
+- **Minimal exposure.** Postgres and Whisper are reachable only on the internal Docker network, and the app talks to n8n
+  over that network too — so Luna's webhooks are blocked on n8n's public hostname and exist only behind the app's proxy.
+  Admin routes are blocked at the proxy and additionally require a header secret. Voice recordings and full-size photos
+  are never stored.
 
-**Pamięć podręczna (27.09):** Cloudflare dokleja `max-age=14400` do CSS/JS mimo `no-cache` z nginx — telefon brał nowy HTML ze starym CSS.
-Dlatego adresy mają `?v=__V__` (index.html, import w app.js, lista w sw.js), a Dockerfile podmienia `__V__` na skrót treści plików.
-**Nie usuwać `__V__`** i nie dodawać nowych plików JS/CSS bez tego znacznika. Service worker pobiera zasoby z `cache: 'no-cache'`.
+## Repository layout
 
-```bash
-tools/sprawdz-nazwy.sh || exit 1
-rsync -av --delete --exclude .git ~/Work/oboe/ vps.draminski.dev:/opt/oboe/app/
-ssh vps.draminski.dev "cd /opt/oboe/app && docker build -t oboe:latest . && cd /opt/infra && docker compose up -d oboe"
+```
+public/        PWA: index.html, app.js, api.js, sw.js, biurko.* (desk page), fonts & icons
+n8n/           workflow builders (build_*.py), prompts (prompt-*.txt), Code-node JS, config
+n8n/workflows/ generated, importable n8n workflow JSON (placeholder credentials)
+db/            Postgres schema and migrations
+infra/         example docker-compose (app, n8n, Postgres, Whisper) and .env.example
+docs/          development notes (Polish) and screenshots
+nginx.conf     static files, /api proxy, per-route body limits, widget CSP
 ```
 
-## Widgety od AI („Oboe: Generuj widget”, `n8n/build_widgets.py`)
-Dobór z biblioteki (DeepSeek 4.1) → nowy kod (DeepSeek 4.1, kontrakt `n8n/prompt-widget.txt`) → skan (`n8n/skan.js`) →
-guardian (`n8n/prompt-guardian.txt`) → plik + commit w `/opt/oboe/widgets` → `widgets`/`widget_versions`.
-Front: `<iframe sandbox="allow-scripts">` + CSP sandbox z nginx; rozmowa `oboe:data` / `oboe:ready` / `oboe:resize` / `oboe:save`.
-Ręczne ponowienie: `POST http://127.0.0.1:5678/webhook/oboe/admin/widget {"item_id": ...}` + X-Admin-Token (z serwera).
+## Running it yourself
 
-## Streszczanie stron („Oboe: Streść stronę”, `n8n/build_summary.py`)
-Po dodaniu (created), „Sprawdź teraz” (manual, max co 2 min) i w terminie cyklicznym (scheduled — push tylko przy istotnej zmianie).
-SSRF: DNS przez DoH (A+AAAA) → tylko publiczne IP, porty 80/443, przekierowania nie automatycznie — jedno ręczne z ponownym DNS.
-Tekst bez zmian (odcisk FNV) = bez pytania modelu. Treść strony dla modelu to dane, nie polecenia.
+1. `cp infra/.env.example infra/.env`, fill it in, then `docker compose -f infra/docker-compose.yml up -d`.
+2. Apply `db/*.sql` migrations in order and mark yourself as admin (see `db/008-prosby-o-dostep.sql`).
+3. In n8n create credentials: Postgres (`oboe-db`), OpenRouter, SMTP, Header Auth (`X-Admin-Token`) and a Crypto
+   credential holding your VAPID private key. Put their IDs and your URLs into `n8n/config.local.json`
+   (copy of `config.example.json`), then `cd n8n && python3 build_all.py` and import the generated `oboe-*.json`
+   (or import `n8n/workflows/*.json` and pick the credentials in the editor).
+4. Put your VAPID public key in `public/api.js`, pull the Whisper model once (command in the compose file), expose only
+   the `luna` service over HTTPS.
 
-## Czat „Popraw / Zrób widget”
-`POST /api/items/widget-chat {id, message}` — rozmowa z projektantem (DeepSeek 4.1, `n8n/prompt-czat-widgetu.txt`) w `widget_chats`;
-gdy AI jest pewne, zwraca `proposal` (plan + nowy schemat + stan przeniesiony z obecnego). `POST /api/items/widget-regenerate {id}`
-dopiero po `proposal` → „Oboe: Generuj widget” mode=revise: stary kod z pliku + plan → programista → skan → guardian.
-Widget tylko tej rzeczy → nowa wersja tego samego sluga (v2…); współdzielony → kopia z nowym slugiem. Odrzucona poprawka
-zostawia stary widget (`revision_error`). Stan użytkownika zawsze przechodzi (bezpiecznik w „Projekt z czatu”).
+## Stack
+
+Vanilla JavaScript PWA (no framework, no bundler) · nginx · n8n · PostgreSQL 16 · OpenRouter (DeepSeek v4.1 Flash for
+understanding, vision and web search; GLM for widget code) · faster-whisper via speaches · Web Push with VAPID ·
+Docker · Cloudflare Tunnel.
+
+---
+
+The user-facing name is **Luna**; technical identifiers (`oboe`, workflow names, DB) keep the original working name on
+purpose — renaming the internals would be risk without benefit.

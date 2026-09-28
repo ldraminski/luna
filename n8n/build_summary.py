@@ -5,12 +5,10 @@ z „Oboe: Harmonogram” w terminie cyklicznym (reason=scheduled — wtedy push
 ręcznie z serwera: POST http://127.0.0.1:5678/webhook/oboe/admin/summarize {"item_id": ...} + X-Admin-Token.
 """
 import json, uuid
+from config import PG, OR, ADMIN, REFERER
 
-PG = {"postgres": {"id": "IAfnl61Lb7KbTeZi", "name": "Oboe - Postgres (oboe-db)"}}
-OR = {"openRouterApi": {"id": "ZGSl0yv59gDWZKJG", "name": "OpenRouter - Luna"}}
-ADMIN = {"httpHeaderAuth": {"id": "9Rd7Zl7NxIcEvPtL", "name": "Oboe - admin (X-Admin-Token)"}}
 TEXT_MODEL = "deepseek/deepseek-v4.1-flash"
-UA = "Mozilla/5.0 (compatible; OboeBot/1.0; +https://draminski.dev)"
+UA = "Mozilla/5.0 (compatible; OboeBot/1.0; +" + REFERER + ")"
 
 nodes, conns = [], {}
 def node(name, typ, ver, pos, params, **kw):
@@ -97,7 +95,7 @@ SYSTEM = open("prompt-streszczenie.txt").read(); assert "{{" not in SYSTEM and "
 llm = node("DeepSeek: streść", "n8n-nodes-base.httpRequest", 4.2, [4300, 60], {
   "method": "POST", "url": "https://openrouter.ai/api/v1/chat/completions",
   "authentication": "predefinedCredentialType", "nodeCredentialType": "openRouterApi",
-  "sendHeaders": True, "headerParameters": {"parameters": [{"name": "HTTP-Referer", "value": "https://draminski.dev"}, {"name": "X-Title", "value": "Oboe streszczenia (n8n)"}]},
+  "sendHeaders": True, "headerParameters": {"parameters": [{"name": "HTTP-Referer", "value": REFERER}, {"name": "X-Title", "value": "Oboe streszczenia (n8n)"}]},
   "sendBody": True, "specifyBody": "json",
   "jsonBody": "={{ JSON.stringify({ model: '" + TEXT_MODEL + "', temperature: 0.2, max_tokens: 1200, reasoning: { enabled: false }, response_format: { type: 'json_object' }, messages: [ { role: 'system', content: "
     + json.dumps(SYSTEM, ensure_ascii=False) + " }, { role: 'user', content: 'Adres: ' + $('Wczytaj').first().json.url + '\\\\nTytuł: ' + $json.title + '\\\\nOpis: ' + $json.desc + '\\\\n\\\\nPoprzednie streszczenie: ' + ($('Wczytaj').first().json.prev ? JSON.stringify({ headline: $('Wczytaj').first().json.prev.headline, bullets: $('Wczytaj').first().json.prev.bullets }) : 'brak') + '\\\\n\\\\n<<<TEKST STRONY>>>\\\\n' + $json.text + '\\\\n<<<KONIEC TEKSTU>>>' } ] }) }}",

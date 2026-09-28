@@ -2,7 +2,7 @@
  "name": "Oboe: Dostęp",
  "nodes": [
   {
-   "id": "41f4cb2b-a200-4def-83f9-4a2e3d6b6159",
+   "id": "4f60ddc8-e97f-4f2c-9d3f-eb9997d2fd51",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "68bf8ef7-47b2-4d0c-966c-1dfe37f9207f",
+   "id": "d1556bb0-8fec-4657-ab21-7f346877a0a3",
    "name": "POST access/request",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -31,10 +31,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "216156ec-9a17-446a-84e4-67da05ce6478"
+   "webhookId": "ac80d94b-2056-450f-8b48-738dfd68b828"
   },
   {
-   "id": "260c5bb6-11ff-418b-b5ec-5d294b4a3d5c",
+   "id": "b2934b6f-2b2c-44d9-bf4a-a6cf1c9a133a",
    "name": "Prośba",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -51,13 +51,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "287cfd7c-2920-401b-854f-5f856aa217b3",
+   "id": "0c40004c-b5fc-4710-833f-c91b9f7fc47f",
    "name": "Istniejące konto?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -75,7 +75,7 @@
      },
      "conditions": [
       {
-       "id": "a9361aa5-a6da-441f-97ff-60716bef0470",
+       "id": "42014408-5637-4df9-8a71-ecd7d3563b44",
        "leftValue": "={{ $json.result.action === 'token' }}",
        "rightValue": "",
        "operator": {
@@ -91,7 +91,7 @@
    }
   },
   {
-   "id": "ffc6a4f7-db0c-4e20-a478-d347e49f5fe9",
+   "id": "6a197fdb-aa98-498b-9a00-195d37548c00",
    "name": "Mail: nowy klucz",
    "type": "n8n-nodes-base.emailSend",
    "typeVersion": 2.1,
@@ -100,7 +100,7 @@
     -120
    ],
    "parameters": {
-    "fromEmail": "Luna <n8n@renlab.ovh>",
+    "fromEmail": "Luna <luna@example.com>",
     "toEmail": "={{ $json.result.email }}",
     "subject": "Twój nowy klucz do Luny",
     "emailFormat": "text",
@@ -111,14 +111,14 @@
    },
    "credentials": {
     "smtp": {
-     "id": "DY5t4HkHVBfxB2gY",
-     "name": "SMTP n8n renlab"
+     "id": "REPLACE_ME",
+     "name": "SMTP"
     }
    },
    "onError": "continueRegularOutput"
   },
   {
-   "id": "33d9d717-b0d4-47a5-bd4b-c437102612c4",
+   "id": "e6561283-f649-441c-a52b-2ed586d27dd0",
    "name": "Odpowiedz: prośba",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -135,7 +135,7 @@
    }
   },
   {
-   "id": "b048590a-e8d0-46f9-9660-09ad91851fe9",
+   "id": "ee7ec92b-fb6a-4778-8bd3-d92517030635",
    "name": "GET access/requests",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -149,10 +149,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "f7ecebec-14b1-49c1-bfb5-d0e594bd468d"
+   "webhookId": "43346129-e6c5-4e9e-aefb-b7f8ed9d33e1"
   },
   {
-   "id": "8afda05d-e562-4dee-84e6-0bed18b06fd8",
+   "id": "e3c75e8a-0fc7-4585-8811-e0ff1598231b",
    "name": "Prośby czekające",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -169,13 +169,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "d37465b7-70f6-4a6b-b44a-ea6eedfcc62b",
+   "id": "8a0b0af9-b08e-44fa-a221-db0ec92c1a7a",
    "name": "Odpowiedz: prośby",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -192,7 +192,7 @@
    }
   },
   {
-   "id": "279906a7-9504-4b8f-aa0e-0083af06ce95",
+   "id": "20b7c0d5-c353-4549-8732-74c0a037397e",
    "name": "POST access/decide",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -206,10 +206,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "fa192f7e-ec34-4531-8c69-b30e0e32a450"
+   "webhookId": "f0116970-4d18-4540-8d26-6fc05d9b1bc4"
   },
   {
-   "id": "b15bc639-b84d-463f-9b1c-26be712f21dd",
+   "id": "7deb3b45-34c9-48e0-924b-45e17d69f819",
    "name": "Decyzja",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -226,13 +226,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "897a3c04-c987-4b79-be7d-73ccfa40d8e3",
+   "id": "d46201f3-9ccf-4861-92d2-879dacf5b586",
    "name": "Zaakceptowana?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -250,7 +250,7 @@
      },
      "conditions": [
       {
-       "id": "53263f60-1484-4b8c-919f-3972b05c8022",
+       "id": "2d560c85-ff7d-4372-a333-de253f0cecc0",
        "leftValue": "={{ $json.result.action === 'accepted' }}",
        "rightValue": "",
        "operator": {
@@ -266,7 +266,7 @@
    }
   },
   {
-   "id": "952794cd-046b-4e4e-9aa5-5658cb8e1ba3",
+   "id": "8a73b846-535a-4dc2-9f3b-13a3fb05f203",
    "name": "Odrzucona?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -284,7 +284,7 @@
      },
      "conditions": [
       {
-       "id": "8856092a-4450-41be-9d2b-241d081e044d",
+       "id": "68ea6efa-c5c8-4367-b72a-fea415dd309b",
        "leftValue": "={{ $json.result.action === 'rejected' }}",
        "rightValue": "",
        "operator": {
@@ -300,7 +300,7 @@
    }
   },
   {
-   "id": "2ce25578-d537-4a40-9ae1-b2289f0daea6",
+   "id": "d8f2d0c4-032f-4c7e-9bb6-f8730e20565b",
    "name": "Mail: witaj",
    "type": "n8n-nodes-base.emailSend",
    "typeVersion": 2.1,
@@ -309,25 +309,25 @@
     560
    ],
    "parameters": {
-    "fromEmail": "Luna <n8n@renlab.ovh>",
+    "fromEmail": "Luna <luna@example.com>",
     "toEmail": "={{ $json.result.email }}",
     "subject": "Łukasz zaakceptował Twoją prośbę — tu Luna",
     "emailFormat": "text",
-    "text": "={{ 'Cześć' + ($json.result.name ? ' ' + $json.result.name : '') + '!\\n\\nŁukasz zaakceptował Twoją prośbę o dostęp — witaj!\\n\\nJestem Luna — Twoja prywatna asystentka w telefonie. Piszesz mi zwykłym zdaniem (albo wysyłasz zdjęcie), co masz na głowie, a ja to zapisuję i pilnuję za Ciebie:\\n• przypominam o terminach — dzień wcześniej i tuż przed wydarzeniem,\\n• pilnuję rzeczy, które się powtarzają (opłaty, przeglądy, cotygodniowe obowiązki),\\n• robię listy do odhaczania i notatki — także ze zdjęć,\\n• sprawdzam informacje w internecie i streszczam strony,\\n• co rano wysyłam krótki plan dnia, a w poniedziałki plan całego tygodnia.\\n\\nLuna działa w przeglądarce — dodajesz ją do ekranu początkowego jak zwykłą aplikację, niczego nie pobierasz ze sklepu. Twoje sprawy widzisz tylko Ty.\\n\\nOto Twój klucz:\\n\\n' + $json.result.token + '\\n\\nJak zacząć:\\n1. Otwórz na telefonie: https://luna.draminski.dev\\n2. iPhone: Udostępnij → „Do ekranu początkowego”. Android: menu → „Zainstaluj aplikację”.\\n3. Uruchom Lunę Z EKRANU POCZĄTKOWEGO i dopiero tam wklej klucz. (Na iPhonie aplikacja z ekranu początkowego nie widzi tego, co wpiszesz w Safari.)\\n\\nKlucz działa bez końca. Nie przesyłaj go nikomu — kto go ma, widzi Twoje sprawy.\\nZgubisz go? Wejdź na https://luna.draminski.dev, wpisz swój e-mail, a wyślę Ci nowy.\\n\\nDo usłyszenia!\\n— Luna' }}",
+    "text": "={{ 'Cześć' + ($json.result.name ? ' ' + $json.result.name : '') + '!\\n\\nŁukasz zaakceptował Twoją prośbę o dostęp — witaj!\\n\\nJestem Luna — Twoja prywatna asystentka w telefonie. Piszesz mi zwykłym zdaniem (albo wysyłasz zdjęcie), co masz na głowie, a ja to zapisuję i pilnuję za Ciebie:\\n• przypominam o terminach — dzień wcześniej i tuż przed wydarzeniem,\\n• pilnuję rzeczy, które się powtarzają (opłaty, przeglądy, cotygodniowe obowiązki),\\n• robię listy do odhaczania i notatki — także ze zdjęć,\\n• sprawdzam informacje w internecie i streszczam strony,\\n• co rano wysyłam krótki plan dnia, a w poniedziałki plan całego tygodnia.\\n\\nLuna działa w przeglądarce — dodajesz ją do ekranu początkowego jak zwykłą aplikację, niczego nie pobierasz ze sklepu. Twoje sprawy widzisz tylko Ty.\\n\\nOto Twój klucz:\\n\\n' + $json.result.token + '\\n\\nJak zacząć:\\n1. Otwórz na telefonie: https://luna.example.com\\n2. iPhone: Udostępnij → „Do ekranu początkowego”. Android: menu → „Zainstaluj aplikację”.\\n3. Uruchom Lunę Z EKRANU POCZĄTKOWEGO i dopiero tam wklej klucz. (Na iPhonie aplikacja z ekranu początkowego nie widzi tego, co wpiszesz w Safari.)\\n\\nKlucz działa bez końca. Nie przesyłaj go nikomu — kto go ma, widzi Twoje sprawy.\\nZgubisz go? Wejdź na https://luna.example.com, wpisz swój e-mail, a wyślę Ci nowy.\\n\\nDo usłyszenia!\\n— Luna' }}",
     "options": {
      "appendAttribution": false
     }
    },
    "credentials": {
     "smtp": {
-     "id": "DY5t4HkHVBfxB2gY",
-     "name": "SMTP n8n renlab"
+     "id": "REPLACE_ME",
+     "name": "SMTP"
     }
    },
    "onError": "continueRegularOutput"
   },
   {
-   "id": "d2fa28ce-2eb8-4fdc-850a-99cc347d63bc",
+   "id": "2da200e5-2370-43d3-bcbc-5ceb92e3b73f",
    "name": "Mail: przykro mi",
    "type": "n8n-nodes-base.emailSend",
    "typeVersion": 2.1,
@@ -336,7 +336,7 @@
     760
    ],
    "parameters": {
-    "fromEmail": "Luna <n8n@renlab.ovh>",
+    "fromEmail": "Luna <luna@example.com>",
     "toEmail": "={{ $json.result.email }}",
     "subject": "Twoja prośba o dostęp do Luny",
     "emailFormat": "text",
@@ -347,14 +347,14 @@
    },
    "credentials": {
     "smtp": {
-     "id": "DY5t4HkHVBfxB2gY",
-     "name": "SMTP n8n renlab"
+     "id": "REPLACE_ME",
+     "name": "SMTP"
     }
    },
    "onError": "continueRegularOutput"
   },
   {
-   "id": "7f8f9045-9b40-496b-a1f1-37dfaac96495",
+   "id": "9a6af9d5-9d0c-4f34-8b7b-5a77c7380566",
    "name": "Odpowiedz: decyzja",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,

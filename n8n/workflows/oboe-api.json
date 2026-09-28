@@ -2,7 +2,7 @@
  "name": "Oboe: API",
  "nodes": [
   {
-   "id": "a8d2f066-ede8-4358-8543-6c57303f20c1",
+   "id": "1e9748f7-2f23-4f78-8130-65d293d13651",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "adab7051-6e73-413f-9dfd-8caf6540ac68",
+   "id": "f7e5e778-37e8-42ef-939c-65fcac339777",
    "name": "GET me",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -25,7 +25,7 @@
     0,
     0
    ],
-   "webhookId": "e694fc75-d8cd-454b-a1ec-616671597290",
+   "webhookId": "ddd1e9ed-8859-4ff3-acd0-9e5b55f97796",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/me",
@@ -34,7 +34,7 @@
    }
   },
   {
-   "id": "bd2f57f5-4091-44d8-a30a-6825d4e9f43c",
+   "id": "314d0cdb-957e-49ef-971b-c0bb83689ce3",
    "name": "Kim jestem",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -44,7 +44,7 @@
    ],
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    },
@@ -58,7 +58,7 @@
    }
   },
   {
-   "id": "1f66de89-e471-4996-8625-c19a5a2f3f70",
+   "id": "ff657fa5-9451-4f48-a98b-b345c8462c10",
    "name": "Odpowiedz: Kim jestem",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -75,7 +75,7 @@
    }
   },
   {
-   "id": "1ab239c3-d6dd-4e99-824b-dc6b66579f5b",
+   "id": "0a92511f-7f55-4504-85ba-043627b10a7b",
    "name": "GET items",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -83,7 +83,7 @@
     0,
     200
    ],
-   "webhookId": "21aaea72-7a7b-4729-82fd-347cb70a3d0b",
+   "webhookId": "c01b1c60-a96c-4396-8c01-73d9b8584141",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/items",
@@ -92,7 +92,7 @@
    }
   },
   {
-   "id": "93f9ac7c-e4c3-4ce4-9f75-c8f1434bf124",
+   "id": "1983333a-ed6b-4e6f-98b1-923e76f34966",
    "name": "Lista rzeczy",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -102,7 +102,7 @@
    ],
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    },
@@ -116,7 +116,7 @@
    }
   },
   {
-   "id": "9efe5bf4-3aa5-454e-a242-8c018f5609dd",
+   "id": "de9a85af-efe2-4dc6-b176-a78d8cb60b37",
    "name": "Odpowiedz: Lista rzeczy",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -133,7 +133,7 @@
    }
   },
   {
-   "id": "836b8e70-276a-417d-8938-51069717b2fc",
+   "id": "d7376e36-e02f-4443-a0ce-368cd60e176d",
    "name": "GET items/photo",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -141,7 +141,7 @@
     0,
     400
    ],
-   "webhookId": "f8338beb-7c9b-45e9-bf9a-77b7d5dee49f",
+   "webhookId": "a1349ea6-b5a5-4580-aaf3-09b4abc75109",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/items/photo",
@@ -150,7 +150,7 @@
    }
   },
   {
-   "id": "a2fbbd16-ac6a-4453-9373-ac82fbb65f00",
+   "id": "55dafda4-e7c7-4b65-ad5c-36319715fcc4",
    "name": "Zdjęcie rzeczy",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -160,7 +160,7 @@
    ],
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    },
@@ -174,7 +174,7 @@
    }
   },
   {
-   "id": "839245f2-e014-43fa-83de-05cd940a16f1",
+   "id": "932ad208-ff30-437f-bd07-372f68298b40",
    "name": "Odpowiedz: Zdjęcie rzeczy",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -191,7 +191,7 @@
    }
   },
   {
-   "id": "a1aa2dff-6985-4a77-b5ad-200d983371f5",
+   "id": "52f87e3e-172d-4a50-a8ea-d95943a7ad29",
    "name": "GET report",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -199,7 +199,7 @@
     0,
     600
    ],
-   "webhookId": "47b83560-1b57-4e03-a67a-9c114f562514",
+   "webhookId": "919ffb94-c919-40c4-907e-d84bdfba6129",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/report",
@@ -208,7 +208,7 @@
    }
   },
   {
-   "id": "f358ded7-fb66-4118-9d56-ba3d64e492dd",
+   "id": "df6436e4-5ce0-4e3d-aacc-b6b1f96dee98",
    "name": "Raport",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -218,7 +218,7 @@
    ],
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    },
@@ -232,7 +232,7 @@
    }
   },
   {
-   "id": "a319af0c-a51b-4df8-a936-2bef32ebb6de",
+   "id": "790331b4-a7ca-4068-be7c-c4a6d91ce08d",
    "name": "Odpowiedz: Raport",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -249,7 +249,7 @@
    }
   },
   {
-   "id": "501fcc27-155c-46f3-9f7b-df60e25c8ec8",
+   "id": "cc593ffa-95ea-4cc4-9033-0b085887377f",
    "name": "POST report/seen",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -257,7 +257,7 @@
     0,
     800
    ],
-   "webhookId": "d1e293a5-5225-4aea-986e-c9af1c5f9fe3",
+   "webhookId": "8be25bbd-6040-49f4-a893-5fe0fa325f7a",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/report/seen",
@@ -266,7 +266,7 @@
    }
   },
   {
-   "id": "c4e5e43a-9d1d-4962-af0d-ae690990c400",
+   "id": "7e427e54-5a41-4d26-817d-a4857660a4cf",
    "name": "Raport obejrzany",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -276,7 +276,7 @@
    ],
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    },
@@ -290,7 +290,7 @@
    }
   },
   {
-   "id": "ee37d894-f722-4a1d-894e-1f2c8034a37f",
+   "id": "ebde4028-5ecc-487d-9ceb-257c29a04165",
    "name": "Odpowiedz: Raport obejrzany",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -307,7 +307,7 @@
    }
   },
   {
-   "id": "edb56a56-27e2-468e-a0a6-4536e7951735",
+   "id": "449b37c0-bef6-4da1-be0d-2a557cb24efc",
    "name": "POST settings",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -315,7 +315,7 @@
     0,
     1000
    ],
-   "webhookId": "82eeab8d-1f45-43c6-8e29-64e09fd2d7cb",
+   "webhookId": "d00c757b-8623-428a-a3fd-0c2752e31628",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/settings",
@@ -324,7 +324,7 @@
    }
   },
   {
-   "id": "796c0c3b-3fde-4452-b1fd-4a77ecc313bc",
+   "id": "835c1d5e-8fd4-4e9e-9df4-242800e85af4",
    "name": "Ustawienia raportu",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -334,7 +334,7 @@
    ],
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    },
@@ -348,7 +348,7 @@
    }
   },
   {
-   "id": "9b29f066-2237-407d-8466-ad337b97a750",
+   "id": "489b1b71-7c0e-452b-966e-646e8ed4be70",
    "name": "Odpowiedz: Ustawienia raportu",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -365,7 +365,7 @@
    }
   },
   {
-   "id": "ef0ce9ba-d459-4dcd-9d6a-5397f7779c62",
+   "id": "a025cf1f-dd0d-43a3-bf37-13483d215b25",
    "name": "POST items/alarm",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -373,7 +373,7 @@
     0,
     1200
    ],
-   "webhookId": "b45389f6-affe-4abb-b2a7-505e85fcd87a",
+   "webhookId": "7d116de1-3083-4654-b18b-ba0ffb0f2b2f",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/alarm",
@@ -382,7 +382,7 @@
    }
   },
   {
-   "id": "8946cfb0-4e5a-4165-b6a9-5c0b2f306957",
+   "id": "32b4ba69-9d3e-4563-9beb-ffca1af636c3",
    "name": "Alarm",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -392,7 +392,7 @@
    ],
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    },
@@ -406,7 +406,7 @@
    }
   },
   {
-   "id": "cced1dc2-e71c-4f8b-b3aa-915472b0956b",
+   "id": "789d870b-634f-4ff5-b908-8367ead74f33",
    "name": "Odpowiedz: Alarm",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -423,7 +423,7 @@
    }
   },
   {
-   "id": "faa831e2-d861-418f-a150-adf075b89a0c",
+   "id": "14e7a9d6-3e9f-44e8-a9a0-d62582e2e83a",
    "name": "GET pending",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -431,7 +431,7 @@
     0,
     1400
    ],
-   "webhookId": "6d22c82c-15fe-4ef6-950d-e587c1fabfaa",
+   "webhookId": "01b2aa7f-c109-48c7-b809-98b4202078c6",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/pending",
@@ -440,7 +440,7 @@
    }
   },
   {
-   "id": "bf92a118-22bd-471a-be40-5a58698b557f",
+   "id": "76a3df20-a0fb-4b79-8e89-3b475cc9bb20",
    "name": "Do pokazania",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -450,7 +450,7 @@
    ],
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    },
@@ -464,7 +464,7 @@
    }
   },
   {
-   "id": "6ef87850-6d15-456c-a6c1-13b03c96e09c",
+   "id": "8e971c7f-68be-492e-9e2b-1004f2df9d46",
    "name": "Odpowiedz: Do pokazania",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -481,7 +481,7 @@
    }
   },
   {
-   "id": "68c272ad-0da5-4129-9cb7-920e2eceedc3",
+   "id": "1255906e-b0d9-45f7-b40e-a03082751817",
    "name": "POST push/subscribe",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -489,7 +489,7 @@
     0,
     1600
    ],
-   "webhookId": "684d3a7d-61d9-4a04-b4ca-429dd2fe9450",
+   "webhookId": "c584dbd1-16e3-4576-989f-6fb1a3e0ef53",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/push/subscribe",
@@ -498,7 +498,7 @@
    }
   },
   {
-   "id": "ee9a8baa-6582-461b-8e12-0d4e76601cb3",
+   "id": "7fafb22c-db6b-4ed9-b96b-dbb0d4419556",
    "name": "Zapisz urządzenie",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -508,7 +508,7 @@
    ],
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    },
@@ -522,7 +522,7 @@
    }
   },
   {
-   "id": "7aef662e-7de3-4123-8f36-c0a818de658b",
+   "id": "7bbe01bf-2ee0-4746-b1fe-aba16d09cc60",
    "name": "Odpowiedz: Zapisz urządzenie",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -539,7 +539,7 @@
    }
   },
   {
-   "id": "98f1d9ac-62b3-4259-9a7c-f1825bfe3f58",
+   "id": "bc401900-b484-4d04-a1f4-bc6b94e0f8e9",
    "name": "POST push/unsubscribe",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -547,7 +547,7 @@
     0,
     1800
    ],
-   "webhookId": "7a5a9c1b-de8f-4b3c-8883-7f67a85bed83",
+   "webhookId": "83e0647f-0553-43e3-a327-b34890d63b16",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/push/unsubscribe",
@@ -556,7 +556,7 @@
    }
   },
   {
-   "id": "5e71531d-2871-40e3-ba96-14d2695084e9",
+   "id": "3492c535-b4f9-4573-9eed-723d3f67cefb",
    "name": "Usuń urządzenie",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -566,7 +566,7 @@
    ],
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    },
@@ -580,7 +580,7 @@
    }
   },
   {
-   "id": "1b0c897b-c009-45fc-a258-b68298c32b99",
+   "id": "8597bfb9-ef60-4ebe-a012-e3fc07b991ba",
    "name": "Odpowiedz: Usuń urządzenie",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -597,7 +597,7 @@
    }
   },
   {
-   "id": "9683a137-9f96-4060-8a15-eaab19816ee8",
+   "id": "3deae97c-4d09-41c6-8264-c5d2b4dfad43",
    "name": "POST items/done",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -605,7 +605,7 @@
     0,
     2000
    ],
-   "webhookId": "d0770ec7-9cf1-48bf-9cdd-b14e862272f3",
+   "webhookId": "d297b811-146c-4f87-bd0f-7ced2652b0a3",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/done",
@@ -614,7 +614,7 @@
    }
   },
   {
-   "id": "83b09b2f-25dd-4b68-9107-70f935ad6951",
+   "id": "d645859b-0097-4ca3-9eeb-fb3d9ff3bf2f",
    "name": "Odhacz",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -624,7 +624,7 @@
    ],
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    },
@@ -638,7 +638,7 @@
    }
   },
   {
-   "id": "10fc1f1a-6351-451e-8a7e-86bd11b8e83c",
+   "id": "882166f4-0c3a-4f5a-bcb8-621c18fd0c89",
    "name": "Odpowiedz: Odhacz",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -655,7 +655,7 @@
    }
   },
   {
-   "id": "86bb85d0-111e-44fb-bbcf-acc7cdff3b51",
+   "id": "dde90d45-90c0-4310-aa84-4bf63fed7f02",
    "name": "POST items/check",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -663,7 +663,7 @@
     0,
     2200
    ],
-   "webhookId": "78ced78c-cf45-467a-8edd-a8f84722ca26",
+   "webhookId": "1335a4aa-91e3-4bbe-81d8-a63f5bc35482",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/check",
@@ -672,7 +672,7 @@
    }
   },
   {
-   "id": "8790311e-7acf-419f-9637-d3c844d53af9",
+   "id": "7ce55019-2ec4-4a10-a4b4-5e4f5890ee32",
    "name": "Odhacz pozycję",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -682,7 +682,7 @@
    ],
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    },
@@ -696,7 +696,7 @@
    }
   },
   {
-   "id": "70eda09d-943c-4a89-aa10-214b04a6ceeb",
+   "id": "7eb4201c-69b4-4d7a-9e2e-7cb54320ba87",
    "name": "Odpowiedz: Odhacz pozycję",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -713,7 +713,7 @@
    }
   },
   {
-   "id": "02b9ec27-eb0e-42e9-8df6-14fec7085149",
+   "id": "f12387b1-4c01-498b-acdb-450b1a65ae08",
    "name": "POST items/widget-state",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -721,7 +721,7 @@
     0,
     2400
    ],
-   "webhookId": "dab0457f-96dc-480f-a5e4-1e99c4dfd753",
+   "webhookId": "ea4e19be-0e76-4f2d-af69-46670a954a06",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/widget-state",
@@ -730,7 +730,7 @@
    }
   },
   {
-   "id": "20a81c75-0d6b-4b97-b0de-07d560013dbb",
+   "id": "b45b4cb2-7ebe-49e6-a17f-67c717ed7d47",
    "name": "Stan widgetu",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -740,7 +740,7 @@
    ],
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    },
@@ -754,7 +754,7 @@
    }
   },
   {
-   "id": "85e445be-737b-44e7-af59-ff0858999dd1",
+   "id": "c25ec17c-49ee-4745-909a-54383e23cfdc",
    "name": "Odpowiedz: Stan widgetu",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -771,7 +771,7 @@
    }
   },
   {
-   "id": "294a3ca4-6098-49ee-afdc-cb27082d4f9f",
+   "id": "5d063d3a-4192-4975-87ff-7cbdc50217b2",
    "name": "POST items/widget-chat/close",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -779,7 +779,7 @@
     0,
     2600
    ],
-   "webhookId": "aa5e0b98-a4f3-4d8a-846b-bcd90b62656a",
+   "webhookId": "262fdc23-f993-4b78-8577-b5b66bb3d673",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/widget-chat/close",
@@ -788,7 +788,7 @@
    }
   },
   {
-   "id": "85ae3af8-55d0-4fda-b1bb-55a35f57462e",
+   "id": "8f495468-db78-4e56-9f40-14569830236c",
    "name": "Zamknij czat",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -798,7 +798,7 @@
    ],
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    },
@@ -812,7 +812,7 @@
    }
   },
   {
-   "id": "dafad058-ca6e-4a03-8b27-3e96bf7f3c91",
+   "id": "34ed06f6-8d45-42d0-96ee-dae639a7b9f7",
    "name": "Odpowiedz: Zamknij czat",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -829,7 +829,7 @@
    }
   },
   {
-   "id": "497f83a4-f939-49e6-8202-4a6e68e84486",
+   "id": "1e2ad761-2c82-4bb9-9121-4fb1fe5aad9f",
    "name": "POST items/undo",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -837,7 +837,7 @@
     0,
     2800
    ],
-   "webhookId": "38a6cf9c-2c30-485f-8bc1-829980cfd710",
+   "webhookId": "13124955-cd0e-4281-808b-50f75ee1c412",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/undo",
@@ -846,7 +846,7 @@
    }
   },
   {
-   "id": "2350a48e-e4b6-4690-bd64-17ed996f1227",
+   "id": "022d879b-454c-494d-9c1c-074e1f0c1e6e",
    "name": "Cofnij",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -856,7 +856,7 @@
    ],
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    },
@@ -870,7 +870,7 @@
    }
   },
   {
-   "id": "d547613c-f5fe-4acb-bffd-a0540833e4f0",
+   "id": "22630f6e-596e-4e57-999c-c175581cb5c4",
    "name": "Odpowiedz: Cofnij",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -887,7 +887,7 @@
    }
   },
   {
-   "id": "e3def23f-72ee-457d-90d5-b3f22063a1b6",
+   "id": "fda21d79-94a5-479d-91a0-38cb9cea8779",
    "name": "GET items/done",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -895,7 +895,7 @@
     0,
     3000
    ],
-   "webhookId": "fff1b93a-53ce-4755-98bf-4faee4d1521d",
+   "webhookId": "f51ca108-f7a4-41fb-96b5-4e967aada265",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/items/done",
@@ -904,7 +904,7 @@
    }
   },
   {
-   "id": "9c722471-4824-4ce3-aff1-9fed164c5567",
+   "id": "44ffe146-73be-4b63-aacd-0f49685fdee0",
    "name": "Zrobione",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -914,7 +914,7 @@
    ],
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    },
@@ -928,7 +928,7 @@
    }
   },
   {
-   "id": "304a50cd-767b-4033-94d3-f1826f5dfaff",
+   "id": "258bca08-8b77-4ae1-adf8-2573e3d861c8",
    "name": "Odpowiedz: Zrobione",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -945,7 +945,7 @@
    }
   },
   {
-   "id": "6b7357e9-412b-4761-8553-256f1976f330",
+   "id": "47d5036f-5b64-4ff5-bf61-bd5cb0f557ec",
    "name": "POST items/delete",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -953,7 +953,7 @@
     0,
     3200
    ],
-   "webhookId": "22a247f0-9597-4400-98ec-9722a57e3363",
+   "webhookId": "fed49535-038c-4ac2-a62d-776ee1baf8fd",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/delete",
@@ -962,7 +962,7 @@
    }
   },
   {
-   "id": "1d99f7a8-b167-463d-90f9-3057d0da9d7d",
+   "id": "12caa468-c582-4466-a451-81fe5d47e95e",
    "name": "Usuń",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -972,7 +972,7 @@
    ],
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    },
@@ -986,7 +986,7 @@
    }
   },
   {
-   "id": "314927fa-fc68-46d1-a5be-2a99eacc3b4e",
+   "id": "f3774f6a-a308-4a21-8235-69447da88a74",
    "name": "Odpowiedz: Usuń",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -1003,7 +1003,7 @@
    }
   },
   {
-   "id": "f274f1b3-dd40-40fd-9fec-bc685f4216c4",
+   "id": "dfeb2db6-5de6-43c5-a91e-910be1733a40",
    "name": "POST items",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -1017,10 +1017,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "ec22a849-8b99-464f-9f13-a3091e7c660d"
+   "webhookId": "cf15ca30-40aa-4c5f-a901-a5c7fad182c2"
   },
   {
-   "id": "a380aa35-19dc-4f94-99e5-4f6c9c1f1764",
+   "id": "a2aee32d-b3d9-4262-9fa3-559295992492",
    "name": "Sesja",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -1037,13 +1037,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "1ff13f42-fcc8-4818-ab72-975cb6acb8a6",
+   "id": "e00c155c-1e6f-4a27-8fa7-7359eba12a4a",
    "name": "Zalogowany i jest tekst?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -1061,7 +1061,7 @@
      },
      "conditions": [
       {
-       "id": "36d6644e-80fe-4afe-8bc3-a0024229050f",
+       "id": "65e2e424-7c44-4356-b7e6-4d34f885d981",
        "leftValue": "={{ $json.user_id }}",
        "rightValue": "",
        "operator": {
@@ -1071,7 +1071,7 @@
        }
       },
       {
-       "id": "eaf1444e-586b-414c-bead-2b2d35c6afcd",
+       "id": "b9515586-589b-45e7-b371-6d4dd902b65f",
        "leftValue": "={{ String($('POST items').item.json.body.text || '').trim() || (/^data:image\\//.test(String($('POST items').item.json.body.image || '')) ? 'zdjęcie' : '') }}",
        "rightValue": "",
        "operator": {
@@ -1087,7 +1087,7 @@
    }
   },
   {
-   "id": "24a7e3d3-96b0-4437-8d3b-bcc86d6aca30",
+   "id": "b017f683-608c-48b3-9507-8bff39739925",
    "name": "Odmów",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -1104,7 +1104,7 @@
    }
   },
   {
-   "id": "fd21c9ab-7eba-4100-8bce-93baea823e07",
+   "id": "88b3523d-e4c8-4cad-9df6-ef2b5a01480f",
    "name": "Kalendarz",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -1117,7 +1117,7 @@
    }
   },
   {
-   "id": "4911aeda-080b-4d80-887e-e378387e885f",
+   "id": "789e9a52-2117-49df-a58d-5ca02c5b562c",
    "name": "DeepSeek: zrozum",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -1135,7 +1135,7 @@
      "parameters": [
       {
        "name": "HTTP-Referer",
-       "value": "https://draminski.dev"
+       "value": "https://luna.example.com"
       },
       {
        "name": "X-Title",
@@ -1152,7 +1152,7 @@
    },
    "credentials": {
     "openRouterApi": {
-     "id": "ZGSl0yv59gDWZKJG",
+     "id": "REPLACE_ME",
      "name": "OpenRouter - Luna"
     }
    },
@@ -1161,7 +1161,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "5b86b943-a76d-42cd-ba7a-97f90099cc8f",
+   "id": "94d6c993-e3b0-446c-a137-3db3175f7d71",
    "name": "Sprawdź odpowiedź",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -1174,7 +1174,7 @@
    }
   },
   {
-   "id": "252170c8-08a1-4a3f-96f9-f715849cc91d",
+   "id": "06c480ba-5b37-4921-9513-81345117ab1b",
    "name": "Zapisz",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -1191,13 +1191,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "56d8bfa7-b5b8-486a-af04-a7c0e4a9ec3b",
+   "id": "093761a5-482d-4e4b-966f-78ef8a7b73e4",
    "name": "Odpowiedz: dodano",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -1214,7 +1214,7 @@
    }
   },
   {
-   "id": "da3cac82-d329-4c58-b384-89460a885367",
+   "id": "51ab9b4e-23ef-448f-8b05-fec35e33f8f0",
    "name": "Potrzebny widget?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -1232,7 +1232,7 @@
      },
      "conditions": [
       {
-       "id": "6c7caa95-79fe-4201-8a70-760bb4882f6d",
+       "id": "ff1580ea-7b98-42f5-af02-9c954c69b116",
        "leftValue": "={{ $json.result.status === 200 && !!(($json.result.item || {}).data || {}).widget }}",
        "rightValue": "",
        "operator": {
@@ -1248,7 +1248,7 @@
    }
   },
   {
-   "id": "bf03a6e1-67b6-49ea-80d9-131f8243fc67",
+   "id": "ab55807a-091e-4ad8-98c7-16c9758e1da3",
    "name": "Generuj widget (w tle)",
    "type": "n8n-nodes-base.executeWorkflow",
    "typeVersion": 1.2,
@@ -1260,7 +1260,7 @@
     "source": "database",
     "workflowId": {
      "__rl": true,
-     "value": "x2bvtxnOkkpIsOZK",
+     "value": "REPLACE_WITH_WIDGETS_WORKFLOW_ID",
      "mode": "id"
     },
     "options": {
@@ -1269,7 +1269,7 @@
    }
   },
   {
-   "id": "6538dec8-36ea-44f6-a079-4504bb34128c",
+   "id": "21f7273a-b836-44f9-a2dd-3671b9e8adcf",
    "name": "Id rzeczy",
    "type": "n8n-nodes-base.set",
    "typeVersion": 3.4,
@@ -1283,7 +1283,7 @@
     "assignments": {
      "assignments": [
       {
-       "id": "34c78c97-c3e6-41b3-add3-737cbc29db33",
+       "id": "eec8dc74-5921-4dcb-848b-fa747c2a1d3c",
        "name": "item_id",
        "type": "string",
        "value": "={{ $json.result.item.id }}"
@@ -1294,7 +1294,7 @@
    }
   },
   {
-   "id": "ae5ca2d9-47af-4b8b-abfe-cc911e872746",
+   "id": "e2ad7dc4-73ef-458d-a20b-233f538ede27",
    "name": "Streścić stronę?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -1312,7 +1312,7 @@
      },
      "conditions": [
       {
-       "id": "84f1f268-84cc-4e5d-8fc7-65da3868b529",
+       "id": "93e0ecf0-d3fb-414b-bb3a-c03476d581d2",
        "leftValue": "={{ $json.result.status === 200 && !!(($json.result.item || {}).spec || {}).summarize }}",
        "rightValue": "",
        "operator": {
@@ -1328,7 +1328,7 @@
    }
   },
   {
-   "id": "589472dd-ea12-4019-9a7f-eb03418b5e89",
+   "id": "dad29d13-a3b3-4790-a38b-e5d0fe8dff20",
    "name": "Id do streszczenia",
    "type": "n8n-nodes-base.set",
    "typeVersion": 3.4,
@@ -1342,13 +1342,13 @@
     "assignments": {
      "assignments": [
       {
-       "id": "140de42a-66e9-4e44-8bfd-4ef99e612b7e",
+       "id": "1143837e-4083-4d24-afe1-580dbedca085",
        "name": "item_id",
        "type": "string",
        "value": "={{ $json.result.item.id }}"
       },
       {
-       "id": "7a7ac595-82d8-431c-9376-b8ed2982d74d",
+       "id": "b59ae3eb-eff4-46a3-88fa-96e8272247c3",
        "name": "reason",
        "type": "string",
        "value": "created"
@@ -1359,7 +1359,7 @@
    }
   },
   {
-   "id": "7cc4ceca-2daa-4f47-9851-22d6deb53d70",
+   "id": "58a3424c-03be-4575-869c-5cdaa6f6c21a",
    "name": "Streść (w tle)",
    "type": "n8n-nodes-base.executeWorkflow",
    "typeVersion": 1.2,
@@ -1371,7 +1371,7 @@
     "source": "database",
     "workflowId": {
      "__rl": true,
-     "value": "hnyATiJRYfJUvdXF",
+     "value": "REPLACE_WITH_SUMMARY_WORKFLOW_ID",
      "mode": "id"
     },
     "options": {
@@ -1380,7 +1380,7 @@
    }
   },
   {
-   "id": "fedde54b-5ae0-46a0-ba73-2b7cd3784b6b",
+   "id": "75234abc-05ce-482b-a6d6-20b3e248a218",
    "name": "POST items/summarize",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -1394,10 +1394,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "116fdacc-028a-4e46-a690-4a7fde4af459"
+   "webhookId": "9e346393-8c5a-46d5-8336-be37c400639d"
   },
   {
-   "id": "55b46d13-60d7-42b3-8f75-5587c355c5f6",
+   "id": "2faa3c62-e77e-40d2-9c66-83121d853776",
    "name": "Sprawdź teraz",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -1414,13 +1414,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "788ed51b-f13f-4343-8e47-e6b5f12200a8",
+   "id": "b0eaa914-e819-400d-bf35-9d4cf4db53cc",
    "name": "Odpowiedz: sprawdzam",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -1437,7 +1437,7 @@
    }
   },
   {
-   "id": "f8694c95-9f88-4a64-8693-63d417f4e6f6",
+   "id": "c7a00996-e44f-41cc-b851-81a717e9f5da",
    "name": "Ruszać?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -1455,7 +1455,7 @@
      },
      "conditions": [
       {
-       "id": "dbd0f205-9ae0-4c19-87c6-49f72896fcaa",
+       "id": "3891bf49-3309-49bb-ad12-6a8ad329030c",
        "leftValue": "={{ $json.result.status === 202 }}",
        "rightValue": "",
        "operator": {
@@ -1471,7 +1471,7 @@
    }
   },
   {
-   "id": "c916f23f-3285-4e8c-ae1f-ef18e95e7888",
+   "id": "ab511e1c-f0c0-435f-bcb0-007d01e27d25",
    "name": "Id (sprawdź teraz)",
    "type": "n8n-nodes-base.set",
    "typeVersion": 3.4,
@@ -1485,13 +1485,13 @@
     "assignments": {
      "assignments": [
       {
-       "id": "75b1c2a0-5954-4959-85bb-c44ad659caf8",
+       "id": "235aceb3-b482-40bc-b07f-315ad127d8b1",
        "name": "item_id",
        "type": "string",
        "value": "={{ $json.result.id }}"
       },
       {
-       "id": "712033e6-122c-4381-877a-6e117043ccb9",
+       "id": "246b5c03-81d6-4c1a-9a6e-8a8399b5e895",
        "name": "reason",
        "type": "string",
        "value": "manual"
@@ -1502,7 +1502,7 @@
    }
   },
   {
-   "id": "546a22ec-d162-4ce7-8ec5-edcc3b418c9a",
+   "id": "36da9ba9-22fc-4bcd-8f39-1789793f6389",
    "name": "Streść teraz (w tle)",
    "type": "n8n-nodes-base.executeWorkflow",
    "typeVersion": 1.2,
@@ -1514,7 +1514,7 @@
     "source": "database",
     "workflowId": {
      "__rl": true,
-     "value": "hnyATiJRYfJUvdXF",
+     "value": "REPLACE_WITH_SUMMARY_WORKFLOW_ID",
      "mode": "id"
     },
     "options": {
@@ -1523,7 +1523,7 @@
    }
   },
   {
-   "id": "9423886c-a8d4-4e77-91d0-972091b9286d",
+   "id": "b73d6341-7258-4958-87d8-fe321a6597c5",
    "name": "Jest zdjęcie?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -1541,7 +1541,7 @@
      },
      "conditions": [
       {
-       "id": "4c28adb7-9e93-4d6e-91a1-d202a1139dcb",
+       "id": "6ef1f60a-808f-4367-b570-3af879deb3f3",
        "leftValue": "={{ /^data:image\\/(jpeg|png|webp);base64,[A-Za-z0-9+\\/=]+$/.test(String($('POST items').item.json.body.image || '')) && String($('POST items').item.json.body.image).length < 4000000 }}",
        "rightValue": "",
        "operator": {
@@ -1557,7 +1557,7 @@
    }
   },
   {
-   "id": "4175bdc7-a1d5-441d-a8db-bbf3826340fd",
+   "id": "4e8aa478-b3a5-4f2f-a6da-ad4f6b2857a9",
    "name": "Zdjęcie: analiza",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -1575,7 +1575,7 @@
      "parameters": [
       {
        "name": "HTTP-Referer",
-       "value": "https://draminski.dev"
+       "value": "https://luna.example.com"
       },
       {
        "name": "X-Title",
@@ -1592,7 +1592,7 @@
    },
    "credentials": {
     "openRouterApi": {
-     "id": "ZGSl0yv59gDWZKJG",
+     "id": "REPLACE_ME",
      "name": "OpenRouter - Luna"
     }
    },
@@ -1601,7 +1601,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "386700b9-f612-45ae-bab0-45cca684f137",
+   "id": "b3584460-b007-4d7e-9cad-0ddedd742770",
    "name": "Zdjęcie: wynik",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -1614,7 +1614,7 @@
    }
   },
   {
-   "id": "1f29f6f3-1b94-4460-9ac4-e5c80303f66d",
+   "id": "10005bb2-9524-4fa6-bd5c-a1bacc2b046f",
    "name": "Zdjęcie odczytane?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -1632,7 +1632,7 @@
      },
      "conditions": [
       {
-       "id": "b0196c07-f6fe-4db6-b582-eec0347954f9",
+       "id": "ae2a7f5c-3c5f-4d32-b34e-4d88e846128a",
        "leftValue": "={{ !!$json.photo }}",
        "rightValue": "",
        "operator": {
@@ -1648,7 +1648,7 @@
    }
   },
   {
-   "id": "3d280928-88cf-4283-80f7-3fc5929488ff",
+   "id": "5b11def2-9101-40e7-82eb-0fc022b4e2bb",
    "name": "Zdjęcie: analiza (2. próba)",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -1666,7 +1666,7 @@
      "parameters": [
       {
        "name": "HTTP-Referer",
-       "value": "https://draminski.dev"
+       "value": "https://luna.example.com"
       },
       {
        "name": "X-Title",
@@ -1683,7 +1683,7 @@
    },
    "credentials": {
     "openRouterApi": {
-     "id": "ZGSl0yv59gDWZKJG",
+     "id": "REPLACE_ME",
      "name": "OpenRouter - Luna"
     }
    },
@@ -1692,7 +1692,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "af0f5c54-e607-4cab-8924-a660d20bad05",
+   "id": "b580bfa5-8c7f-4c24-8600-d2b52b1d498b",
    "name": "Zdjęcie: wynik (2. próba)",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -1705,7 +1705,7 @@
    }
   },
   {
-   "id": "3937f3e0-d843-4401-95e1-3509a9ca908c",
+   "id": "a8990ac7-151b-4779-936d-cccc6f82d641",
    "name": "Zdjęcie nieczytelne?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -1723,7 +1723,7 @@
      },
      "conditions": [
       {
-       "id": "839129ac-79f9-40aa-9d0a-2f16a0d6d840",
+       "id": "3669ee94-59f2-41a4-bc19-dfc219cb9d6a",
        "leftValue": "={{ !$json.photo && !String($('POST items').item.json.body.text || '').trim() }}",
        "rightValue": "",
        "operator": {
@@ -1739,7 +1739,7 @@
    }
   },
   {
-   "id": "72851f91-b899-4fb2-ae4a-ada40b069f73",
+   "id": "592fb37f-35d4-4471-abf7-cb05325f513d",
    "name": "Odpowiedz: zdjęcie nieczytelne",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -1756,7 +1756,7 @@
    }
   },
   {
-   "id": "0b4399d8-d542-473c-94d3-a75aba935cdd",
+   "id": "7259bfd1-71d3-44bd-b93e-2deab24130e0",
    "name": "Wejście do modelu",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -1769,7 +1769,7 @@
    }
   },
   {
-   "id": "3122d821-0cdf-4a6c-bdab-62ae3b971dbb",
+   "id": "2dd79c83-4081-4a7d-ac12-e0ad3b2dfb2b",
    "name": "Szukać w sieci?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -1787,7 +1787,7 @@
      },
      "conditions": [
       {
-       "id": "4726af51-02af-4ee3-a48d-8e1f1f07d8b2",
+       "id": "188833f3-1f1e-4d51-a764-922a62f92cd6",
        "leftValue": "={{ $json.ok === true && !!$json.research }}",
        "rightValue": "",
        "operator": {
@@ -1803,7 +1803,7 @@
    }
   },
   {
-   "id": "6592964b-c3cf-40c9-af50-fe794afee695",
+   "id": "6520abc8-d153-4a95-bd47-13a502c51281",
    "name": "Szukaj w sieci",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -1821,7 +1821,7 @@
      "parameters": [
       {
        "name": "HTTP-Referer",
-       "value": "https://draminski.dev"
+       "value": "https://luna.example.com"
       },
       {
        "name": "X-Title",
@@ -1838,7 +1838,7 @@
    },
    "credentials": {
     "openRouterApi": {
-     "id": "ZGSl0yv59gDWZKJG",
+     "id": "REPLACE_ME",
      "name": "OpenRouter - Luna"
     }
    },
@@ -1847,7 +1847,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "f9a7b61c-d201-410f-8db6-92eefb6145f0",
+   "id": "f967142a-62ca-415d-8a82-ac27f1bee220",
    "name": "Wynik z sieci",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -1860,7 +1860,7 @@
    }
   },
   {
-   "id": "4a2c8cca-6702-40f5-b43d-7e182f3e405e",
+   "id": "d5e8e332-7784-4be9-baae-028268796be6",
    "name": "DeepSeek: zrozum z faktami",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -1878,7 +1878,7 @@
      "parameters": [
       {
        "name": "HTTP-Referer",
-       "value": "https://draminski.dev"
+       "value": "https://luna.example.com"
       },
       {
        "name": "X-Title",
@@ -1895,7 +1895,7 @@
    },
    "credentials": {
     "openRouterApi": {
-     "id": "ZGSl0yv59gDWZKJG",
+     "id": "REPLACE_ME",
      "name": "OpenRouter - Luna"
     }
    },
@@ -1904,7 +1904,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "55e09545-90e0-4006-a68c-0df58b34c3bd",
+   "id": "85e1eff9-2ddb-4de1-ac6e-d482e488ffdb",
    "name": "Sprawdź odpowiedź 2",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -1917,7 +1917,7 @@
    }
   },
   {
-   "id": "956a7c51-3495-4bf2-855e-18bfd329cd79",
+   "id": "40b4ca52-d38d-4851-8be0-045f8bcf7efc",
    "name": "Dołącz źródła",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -1930,7 +1930,7 @@
    }
   },
   {
-   "id": "db68ee90-724d-4e61-8160-3caf906227d4",
+   "id": "aa582958-6fcc-4a75-943e-082c274163c5",
    "name": "POST items/widget-chat",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -1944,10 +1944,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "21f7f7ca-b80c-4c31-9c33-fb4aa818ef62"
+   "webhookId": "e14fcc77-be5a-4d1b-966b-2df0f912419a"
   },
   {
-   "id": "ac6d7c7f-386c-4041-8d61-264203d74f83",
+   "id": "55e61c0b-28e6-4a79-b3bd-2c2fd8510eae",
    "name": "Czat: jest zdjęcie?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -1965,7 +1965,7 @@
      },
      "conditions": [
       {
-       "id": "6c14337d-d672-421a-9500-779337eaf5bc",
+       "id": "d3875eb6-01ea-4ed7-953a-42905d34835c",
        "leftValue": "={{ /^data:image\\/(jpeg|png|webp);base64,[A-Za-z0-9+\\/=]+$/.test(String($json.body.image || '')) && String($json.body.image).length < 4000000 }}",
        "rightValue": "",
        "operator": {
@@ -1981,7 +1981,7 @@
    }
   },
   {
-   "id": "f903f1ab-d496-4f76-8e5c-6e47aca65728",
+   "id": "082d6dc0-4b0b-40ef-ab7c-7a2896e67ed7",
    "name": "Czat: odczytaj zdjęcie",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -1999,7 +1999,7 @@
      "parameters": [
       {
        "name": "HTTP-Referer",
-       "value": "https://draminski.dev"
+       "value": "https://luna.example.com"
       },
       {
        "name": "X-Title",
@@ -2016,7 +2016,7 @@
    },
    "credentials": {
     "openRouterApi": {
-     "id": "ZGSl0yv59gDWZKJG",
+     "id": "REPLACE_ME",
      "name": "OpenRouter - Luna"
     }
    },
@@ -2025,7 +2025,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "f39b6aa0-8f80-4b65-bf30-94cb35959660",
+   "id": "6ffa912e-96c8-42b9-97cb-1abf269dcc6d",
    "name": "Czat: wiadomość",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -2038,7 +2038,7 @@
    }
   },
   {
-   "id": "9fcb84f0-40d4-4975-8afa-a7a1a349fb9c",
+   "id": "81be6a61-ae51-42c5-b235-642cf260b2c9",
    "name": "Czat: dopisz wiadomość",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -2055,13 +2055,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "5b0f7e54-8ffa-453e-a9b7-7443d1aa7e60",
+   "id": "8718eb01-6ef8-49b4-89ae-9f5bc192d5a7",
    "name": "Czat: pytać AI?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -2079,7 +2079,7 @@
      },
      "conditions": [
       {
-       "id": "50455e5a-b73f-4988-bdec-7fc3c00f55eb",
+       "id": "46b9cac9-a82e-4d14-9826-1728af6a931d",
        "leftValue": "={{ $json.result.status === 200 && $json.result.ask === true }}",
        "rightValue": "",
        "operator": {
@@ -2095,7 +2095,7 @@
    }
   },
   {
-   "id": "149e68ad-1b23-4e48-a02f-bed54beecbc9",
+   "id": "9df1fb22-43d7-4478-8305-c54e278fa375",
    "name": "Czat: odpowiedz od razu",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -2112,7 +2112,7 @@
    }
   },
   {
-   "id": "431e3f78-8dc3-45ff-bb89-d3e90b0e7275",
+   "id": "8ec75450-aadf-4dbc-b5d8-5e3e24dda400",
    "name": "Czat: kalendarz",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -2125,7 +2125,7 @@
    }
   },
   {
-   "id": "4ef1f14d-1782-434a-8de7-08de12b14a5f",
+   "id": "7f08c6a7-deb8-409c-917c-38b7b742596f",
    "name": "Czat: AI",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -2143,7 +2143,7 @@
      "parameters": [
       {
        "name": "HTTP-Referer",
-       "value": "https://draminski.dev"
+       "value": "https://luna.example.com"
       },
       {
        "name": "X-Title",
@@ -2160,7 +2160,7 @@
    },
    "credentials": {
     "openRouterApi": {
-     "id": "ZGSl0yv59gDWZKJG",
+     "id": "REPLACE_ME",
      "name": "OpenRouter - Luna"
     }
    },
@@ -2169,7 +2169,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "beae04f1-5a8e-4106-ad4e-c5913beb8db3",
+   "id": "e11410eb-f698-4abf-a9d9-82d61233276e",
    "name": "Czat: sprawdź odpowiedź",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -2182,7 +2182,7 @@
    }
   },
   {
-   "id": "13c07274-b5da-4153-a69d-d5bf6fba9c75",
+   "id": "745e4aa8-42d8-4196-9b73-7d351d13ed23",
    "name": "Czat: zapisz odpowiedź",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -2199,13 +2199,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "1241aed6-411d-44cd-a582-8036d63a0b6b",
+   "id": "cbe37261-c3a8-47b1-9bc7-6dd860a7e296",
    "name": "Czat: odpowiedz",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -2220,7 +2220,7 @@
    }
   },
   {
-   "id": "d985335b-173d-437b-9634-87c0f2cc2536",
+   "id": "d909e156-6461-4292-a7d5-1bd17a299034",
    "name": "POST items/widget-regenerate",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -2234,10 +2234,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "aaa5af94-7d96-4944-98f8-3841dd175cca"
+   "webhookId": "86fe6bea-3258-4c97-b961-811942710ffd"
   },
   {
-   "id": "2e935ea8-4905-4673-9098-53fe491f9bb9",
+   "id": "2f34d134-e23a-423b-bb5f-67f08b3aa169",
    "name": "Weź plan",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -2254,13 +2254,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "b6bcda80-3e51-46f7-91c3-35a95bf9fcb4",
+   "id": "11541b93-1905-468e-a150-82a87f8a8c2b",
    "name": "Jest plan?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -2278,7 +2278,7 @@
      },
      "conditions": [
       {
-       "id": "8b923e97-bb6c-47cd-aa88-e6be3a72e6f9",
+       "id": "d2c0fdb0-fb29-4ef0-8fa5-0309a7e7a417",
        "leftValue": "={{ $json.result.status === 200 }}",
        "rightValue": "",
        "operator": {
@@ -2294,7 +2294,7 @@
    }
   },
   {
-   "id": "27f411f2-8f9c-40a2-ae18-f169c5957884",
+   "id": "e2cd7814-5287-47b8-b5a6-ead192f88ff2",
    "name": "Odpowiedz: brak planu",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -2311,7 +2311,7 @@
    }
   },
   {
-   "id": "f85b7871-a7f1-49f1-808d-3db62c72b7e8",
+   "id": "534b88a1-0386-4760-a879-a731e8d677e0",
    "name": "Zastosuj zmiany",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -2324,7 +2324,7 @@
    }
   },
   {
-   "id": "dc829848-6e50-4ef4-994e-8d26db82f2b5",
+   "id": "94df2cf8-b827-4f11-b750-0a4bf996f90d",
    "name": "Zapisz zmiany",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -2341,13 +2341,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "f0aa825f-6564-423b-b86c-1ff0160ba40e",
+   "id": "9ec92a8e-81e9-491c-8b15-ca5b04cd570f",
    "name": "Odpowiedz: zrobione",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -2362,7 +2362,7 @@
    }
   },
   {
-   "id": "dbd3cf9f-d8ad-46f7-836d-d7b9265c874a",
+   "id": "bb034791-2a20-4e52-9aae-5139061ddd42",
    "name": "Przebudować widget?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -2380,7 +2380,7 @@
      },
      "conditions": [
       {
-       "id": "ab21a7fb-2abc-49fe-ae77-5e560213e277",
+       "id": "f25c6730-85ac-42a2-84a9-08ff70a60dc7",
        "leftValue": "={{ $json.result.widget === true }}",
        "rightValue": "",
        "operator": {
@@ -2396,7 +2396,7 @@
    }
   },
   {
-   "id": "ee96f6ef-fca0-4afc-931c-9f3d5da42a54",
+   "id": "ac4f75dc-bc6d-4fc5-a9f4-112323505e33",
    "name": "Dane przebudowy",
    "type": "n8n-nodes-base.set",
    "typeVersion": 3.4,
@@ -2410,19 +2410,19 @@
     "assignments": {
      "assignments": [
       {
-       "id": "f650e3ec-8686-450d-bf91-d287ebbedb78",
+       "id": "f5f99c22-0f6f-4e2c-a907-9bea61389378",
        "name": "item_id",
        "type": "string",
        "value": "={{ $json.result.item_id }}"
       },
       {
-       "id": "377508e2-d3a5-401a-b8cb-1bc3244dc181",
+       "id": "10919a89-5a07-4ead-b081-6b571cf2684e",
        "name": "mode",
        "type": "string",
        "value": "revise"
       },
       {
-       "id": "c9effdf9-08d6-4f1d-bee9-fe2cab41e6ff",
+       "id": "c3002007-64a4-4548-822d-92ba604bc5ca",
        "name": "chat_id",
        "type": "number",
        "value": "={{ $json.result.chat_id }}"
@@ -2433,7 +2433,7 @@
    }
   },
   {
-   "id": "241d5144-0c79-479c-8452-7f584b5c1b14",
+   "id": "2aeadc62-c6b2-4508-bc51-7a247569f948",
    "name": "Przebuduj widget (w tle)",
    "type": "n8n-nodes-base.executeWorkflow",
    "typeVersion": 1.2,
@@ -2445,7 +2445,7 @@
     "source": "database",
     "workflowId": {
      "__rl": true,
-     "value": "x2bvtxnOkkpIsOZK",
+     "value": "REPLACE_WITH_WIDGETS_WORKFLOW_ID",
      "mode": "id"
     },
     "options": {

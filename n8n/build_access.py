@@ -7,10 +7,9 @@ POST /api/access/decide {id, accept}     — admin: akceptacja = konto + klucz m
 Klucz NIGDY nie wraca w odpowiedzi HTTP — tylko mailem. Limit: 3 prośby/h na e-mail, 40/h łącznie.
 """
 import json, uuid
+from config import PG, SMTP
 import maile
 
-PG = {"postgres": {"id": "IAfnl61Lb7KbTeZi", "name": "Oboe - Postgres (oboe-db)"}}
-SMTP = {"smtp": {"id": "DY5t4HkHVBfxB2gY", "name": "SMTP n8n renlab"}}
 TOKEN = "($json.headers.authorization || '').replace(/^Bearer\\s+/i, '')"
 ME = """me AS (
   UPDATE sessions SET last_used_at = now()

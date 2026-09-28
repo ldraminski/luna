@@ -5,9 +5,7 @@ Lista rzeczy liczona KODEM z bazy (nic nie zmyśla), DeepSeek pisze tylko wstęp
 Ręcznie (test / ponowienie): POST /webhook/oboe/admin/report {email, weekly?} z X-Admin-Token — tylko z serwera.
 """
 import json, uuid
-PG = {"postgres": {"id": "IAfnl61Lb7KbTeZi", "name": "Oboe - Postgres (oboe-db)"}}
-ADMIN = {"httpHeaderAuth": {"id": "9Rd7Zl7NxIcEvPtL", "name": "Oboe - admin (X-Admin-Token)"}}
-OR = {"openRouterApi": {"id": "ZGSl0yv59gDWZKJG", "name": "OpenRouter - Luna"}}
+from config import PG, OR, ADMIN, REFERER
 MODEL = "deepseek/deepseek-v4.1-flash"
 SYSTEM = open("prompt-raport.txt").read(); assert "{{" not in SYSTEM and "}}" not in SYSTEM
 nodes, conns = [], {}
@@ -47,7 +45,7 @@ plan = node("Ułóż plan", "n8n-nodes-base.code", 2, [660, 100], {"jsCode": ope
 llm = node("DeepSeek: wstęp", "n8n-nodes-base.httpRequest", 4.2, [880, 100], {
   "method": "POST", "url": "https://openrouter.ai/api/v1/chat/completions",
   "authentication": "predefinedCredentialType", "nodeCredentialType": "openRouterApi",
-  "sendHeaders": True, "headerParameters": {"parameters": [{"name": "HTTP-Referer", "value": "https://draminski.dev"}, {"name": "X-Title", "value": "Oboe raport (n8n)"}]},
+  "sendHeaders": True, "headerParameters": {"parameters": [{"name": "HTTP-Referer", "value": REFERER}, {"name": "X-Title", "value": "Oboe raport (n8n)"}]},
   "sendBody": True, "specifyBody": "json",
   "jsonBody": "={{ JSON.stringify({ model: '" + MODEL + "', temperature: 0.3, max_tokens: 700, reasoning: { enabled: false }, response_format: { type: 'json_object' }, "
     "messages: [ { role: 'system', content: " + json.dumps(SYSTEM, ensure_ascii=False) + " }, { role: 'user', content: 'PLAN (dane):\\n' + $json.facts } ] }) }}",

@@ -2,7 +2,7 @@
  "name": "Oboe: Limit klucza",
  "nodes": [
   {
-   "id": "5667d863-c72d-41a9-ab71-767634e18e9d",
+   "id": "ff23666b-51bb-41ae-8395-f16d0f8de434",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "6220fe0c-6ee4-4ec8-b70c-11b90ba1d2c5",
+   "id": "2921f922-d58e-44f0-b034-abd65af1a2ef",
    "name": "Co godzinę",
    "type": "n8n-nodes-base.scheduleTrigger",
    "typeVersion": 1.2,
@@ -37,7 +37,7 @@
    }
   },
   {
-   "id": "a71df004-3d80-4644-ae13-2c36d02fcbd0",
+   "id": "952222f6-cd48-405d-89f0-f04c719d4761",
    "name": "Zużycie klucza",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -56,7 +56,7 @@
    },
    "credentials": {
     "openRouterApi": {
-     "id": "ZGSl0yv59gDWZKJG",
+     "id": "REPLACE_ME",
      "name": "OpenRouter - Luna"
     }
    },
@@ -64,7 +64,7 @@
    "maxTries": 3
   },
   {
-   "id": "1e7098c4-f082-47af-8083-be0b0c2b75f0",
+   "id": "414bd9a0-693d-4b5f-95a8-d80ec9b46968",
    "name": "Kurs USD (NBP)",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -82,7 +82,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "11952313-e867-45fc-ad64-02904b3e8268",
+   "id": "9333816d-9411-45fa-adf7-185e73018c60",
    "name": "Próg?",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -95,7 +95,7 @@
    }
   },
   {
-   "id": "5c3cd3d8-ccce-488d-b75c-f1dc668eb772",
+   "id": "b33af9d0-a01f-4b31-a47e-10e443d1b302",
    "name": "Powiadom adminów",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -112,7 +112,7 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }

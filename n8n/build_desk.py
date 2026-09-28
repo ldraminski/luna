@@ -5,9 +5,8 @@ Nic nie zapisuje: biurko pokazuje propozycję do poprawienia, a potem wysyła KA
 (ta sama ścieżka co telefon: termin, przypomnienia, listy, widgety).
 """
 import json, uuid
+from config import PG, OR, REFERER
 
-PG = {"postgres": {"id": "IAfnl61Lb7KbTeZi", "name": "Oboe - Postgres (oboe-db)"}}
-OR = {"openRouterApi": {"id": "ZGSl0yv59gDWZKJG", "name": "OpenRouter - Luna"}}
 TOKEN = "($json.headers.authorization || '').replace(/^Bearer\\s+/i, '')"
 ME = """me AS (
   UPDATE sessions SET last_used_at = now()
@@ -31,7 +30,7 @@ def link(a, b, out=0):
     conns[a]["main"][out].append({"node": b, "type": "main", "index": 0})
 
 node("Opis", "n8n-nodes-base.stickyNote", 1, [-400, -220], {"width": 520, "height": 240, "content":
-  "## Oboe: Biurko\n`luna.draminski.dev/biurko` — wersja na komputer do dłuższych materiałów.\n"
+  "## Oboe: Biurko\n`/biurko` — wersja na komputer do dłuższych materiałów.\n"
   "`POST /api/items/split {text}` → DeepSeek dzieli materiał na samodzielne zdania → `{parts, skipped}`. **Nic nie zapisuje** — "
   "po przejrzeniu biurko wysyła każde zdanie zwykłym `POST /api/items`.\n"
   "Źródło: `~/Work/oboe/n8n/build_desk.py`, prompt `prompt-rozbij.txt`."})
@@ -57,7 +56,7 @@ llm = node("DeepSeek: rozbij", "n8n-nodes-base.httpRequest", 4.2, [880, 0], {
   "method": "POST", "url": "https://openrouter.ai/api/v1/chat/completions",
   "authentication": "predefinedCredentialType", "nodeCredentialType": "openRouterApi",
   "sendHeaders": True, "headerParameters": {"parameters": [
-    {"name": "HTTP-Referer", "value": "https://draminski.dev"}, {"name": "X-Title", "value": "Oboe (n8n)"}]},
+    {"name": "HTTP-Referer", "value": REFERER}, {"name": "X-Title", "value": "Oboe (n8n)"}]},
   "sendBody": True, "specifyBody": "json",
   "jsonBody": ("={{ JSON.stringify({ model: '" + MODEL + "', temperature: 0.1, max_tokens: 6000, reasoning: { enabled: false }, "
                "response_format: { type: 'json_object' }, messages: [ { role: 'system', content: " + json.dumps(SYSTEM, ensure_ascii=False)

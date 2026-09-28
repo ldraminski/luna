@@ -2,7 +2,7 @@
  "name": "Oboe: Kopia zapasowa",
  "nodes": [
   {
-   "id": "5e376df1-e5ea-4ba0-8d76-14c6f5566bbc",
+   "id": "1475005d-74a7-4687-9a20-d839496d5bde",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "dc490933-2948-47cc-affb-bd94a44f5c50",
+   "id": "a510bf6f-0d0c-4a46-a83e-cf7f3fe4ef28",
    "name": "Codziennie 3:30",
    "type": "n8n-nodes-base.scheduleTrigger",
    "typeVersion": 1.2,
@@ -37,7 +37,7 @@
    }
   },
   {
-   "id": "72fb4d27-65a4-41b5-bc22-517771fd7f20",
+   "id": "85f04bb4-bc21-40f7-afe9-dfb23011611e",
    "name": "POST admin/backup",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -54,14 +54,14 @@
    },
    "credentials": {
     "httpHeaderAuth": {
-     "id": "9Rd7Zl7NxIcEvPtL",
+     "id": "REPLACE_ME",
      "name": "Oboe - admin (X-Admin-Token)"
     }
    },
-   "webhookId": "79915434-5e93-40b4-ae5a-889524ff6515"
+   "webhookId": "a8a1b9b4-e76f-403f-8c46-45b473e50c7c"
   },
   {
-   "id": "c2851133-3c8a-41bc-b71b-cc7771cf22ab",
+   "id": "55314e8e-766b-4d4f-8eb5-8abd64b98c9a",
    "name": "Eksport tabel",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -76,13 +76,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "54838467-09b8-46fe-8ebe-4ce34917de6d",
+   "id": "e92269db-7d4f-4d4f-88e4-9039367b644f",
    "name": "Pliki widgetów",
    "type": "n8n-nodes-base.readWriteFile",
    "typeVersion": 1,
@@ -99,7 +99,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "07fbdcd2-aa77-4205-9230-d593cb0ca1ad",
+   "id": "51776173-2e9e-40c2-a3f0-10be17acb116",
    "name": "Złóż kopię",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -112,7 +112,7 @@
    }
   },
   {
-   "id": "e4793e30-ac7f-4fbb-932b-b738cb970210",
+   "id": "4b5646f7-7e88-4f5a-b48a-224e1ff7a0e5",
    "name": "Gzip",
    "type": "n8n-nodes-base.compression",
    "typeVersion": 1.1,
@@ -128,7 +128,7 @@
    }
   },
   {
-   "id": "87d268b8-b0ed-4fc4-b22b-80755edd6ff3",
+   "id": "cf803e0b-e2c0-44dc-b158-04d0346e5c73",
    "name": "Wyślij do R2",
    "type": "n8n-nodes-base.s3",
    "typeVersion": 1,
@@ -146,7 +146,7 @@
    "disabled": true
   },
   {
-   "id": "1f4e55d8-826a-46f6-8d7d-278accb859e0",
+   "id": "47ec75d7-3d5a-4fb7-a94a-467123ed9bcc",
    "name": "Wynik",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -159,7 +159,7 @@
    }
   },
   {
-   "id": "31f339ab-9da1-4957-82fb-e43cd9552d7b",
+   "id": "c66b90f9-d9fc-4d1e-aaf4-d755fd018bc7",
    "name": "Błąd?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -177,7 +177,7 @@
      },
      "conditions": [
       {
-       "id": "8d9628a6-69b9-4674-9162-714c83679128",
+       "id": "260ea7bd-4b9a-4676-9f20-5150e85ef0e1",
        "leftValue": "={{ $json.ok === false }}",
        "rightValue": "",
        "operator": {
@@ -193,7 +193,7 @@
    }
   },
   {
-   "id": "481d6e21-63b3-4645-973a-cbbeaff754d0",
+   "id": "aa987545-3cc7-4548-9898-9a30ab37af47",
    "name": "Powiadom adminów",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -210,7 +210,7 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }

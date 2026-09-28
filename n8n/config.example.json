@@ -1,0 +1,17 @@
+{
+  "credentials": {
+    "postgres":   {"type": "postgres",       "id": "REPLACE_ME", "name": "Oboe - Postgres (oboe-db)"},
+    "openrouter": {"type": "openRouterApi",  "id": "REPLACE_ME", "name": "OpenRouter - Luna"},
+    "smtp":       {"type": "smtp",           "id": "REPLACE_ME", "name": "SMTP"},
+    "admin":      {"type": "httpHeaderAuth", "id": "REPLACE_ME", "name": "Oboe - admin (X-Admin-Token)"},
+    "vapid":      {"type": "crypto",         "id": "REPLACE_ME", "name": "VAPID private key"},
+    "r2":         {"type": "s3",             "id": "",           "name": "R2 - kopie Luny"}
+  },
+  "app_url": "https://luna.example.com",
+  "sender": "Luna <luna@example.com>",
+  "vapid_public": "REPLACE_WITH_VAPID_PUBLIC_KEY",
+  "vapid_subject": "mailto:admin@example.com",
+  "openrouter_referer": "https://luna.example.com",
+  "whisper_url": "http://whisper:8000/v1/audio/transcriptions",
+  "backup_bucket": "luna-kopie"
+}

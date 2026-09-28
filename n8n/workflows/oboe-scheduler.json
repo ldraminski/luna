@@ -2,7 +2,7 @@
  "name": "Oboe: Harmonogram",
  "nodes": [
   {
-   "id": "aeabaa36-1473-4572-9df1-6739d6077b62",
+   "id": "3c14735b-89d4-4b4e-829d-9b3cf89ad2db",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "a6f54be3-dc26-4e5e-b4f6-7cc6e4b8e47f",
+   "id": "f48f6b78-81b8-4100-ba0b-efda3e6948dc",
    "name": "Co 20 s",
    "type": "n8n-nodes-base.scheduleTrigger",
    "typeVersion": 1.2,
@@ -37,7 +37,7 @@
    }
   },
   {
-   "id": "b444309d-3781-4b63-88e3-3e0448a5fa18",
+   "id": "a33acd6b-1177-4a12-a36d-24a73abd9e56",
    "name": "Alarmy",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -52,13 +52,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "f36bce1a-425b-415d-9aa5-9e04dd28c8b5",
+   "id": "df04972f-9480-483f-b56a-cc13426369cc",
    "name": "Weź zaległe",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -73,13 +73,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "74e64989-9273-4565-851f-9551b2819ad4",
+   "id": "53f5fe76-288e-4f4f-86c2-0a3d52a63f91",
    "name": "Tylko mail",
    "type": "n8n-nodes-base.filter",
    "typeVersion": 2.2,
@@ -97,7 +97,7 @@
      },
      "conditions": [
       {
-       "id": "d67e1a60-246b-4fa2-8d96-33e81f1d8c0e",
+       "id": "7e8aebc7-deeb-4cdf-a16b-2e092f93e436",
        "leftValue": "={{ $json.send_email }}",
        "rightValue": "",
        "operator": {
@@ -113,7 +113,7 @@
    }
   },
   {
-   "id": "9061edd8-15a8-46ab-95c3-a1a225f5c215",
+   "id": "0d4230e1-3906-4b73-b0fa-644be7bd6690",
    "name": "Wyślij mail",
    "type": "n8n-nodes-base.emailSend",
    "typeVersion": 2.1,
@@ -122,25 +122,25 @@
     -140
    ],
    "parameters": {
-    "fromEmail": "Luna <n8n@renlab.ovh>",
+    "fromEmail": "Luna <luna@example.com>",
     "toEmail": "={{ $json.email }}",
     "subject": "={{ ($json.item_id ? '⏰ ' : '') + $json.title }}",
     "emailFormat": "text",
-    "text": "={{ ($json.body ? $json.body + '\\n\\n' : '') + 'Otwórz Lunę: https://luna.draminski.dev' + ($json.item_id ? '/?open=' + $json.item_id : '') + '\\n\\n— Luna' }}",
+    "text": "={{ ($json.body ? $json.body + '\\n\\n' : '') + 'Otwórz Lunę: https://luna.example.com' + ($json.item_id ? '/?open=' + $json.item_id : '') + '\\n\\n— Luna' }}",
     "options": {
      "appendAttribution": false
     }
    },
    "credentials": {
     "smtp": {
-     "id": "DY5t4HkHVBfxB2gY",
-     "name": "SMTP n8n renlab"
+     "id": "REPLACE_ME",
+     "name": "SMTP"
     }
    },
    "onError": "continueRegularOutput"
   },
   {
-   "id": "08ffc1a9-3d3f-43c7-9b05-9445a354274d",
+   "id": "b55510fe-0669-4503-abce-9780d7f0eb72",
    "name": "Oznacz wysłane mailem",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -157,13 +157,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "ea8639e0-23e1-416a-9f55-0fcac5261420",
+   "id": "6289a950-a514-4275-b22a-2d866ed11990",
    "name": "Urządzenia",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -180,14 +180,14 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    },
    "executeOnce": true
   },
   {
-   "id": "21c442f5-13de-422b-bb97-b83761fa3bb8",
+   "id": "96fcbe6a-7d10-4d0b-a0a8-351ac2389817",
    "name": "Podpisz JWT",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -196,11 +196,11 @@
     140
    ],
    "parameters": {
-    "jsCode": "// Nagłówek VAPID (RFC 8292): JWT ES256 z aud = origin usługi push. Podpis robi węzeł Crypto.\nconst b64u = (s) => Buffer.from(s).toString('base64').replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');\nreturn $input.all().filter((it) => it.json.endpoint).map((it) => {\n  const aud = (it.json.endpoint.match(/^https:\\/\\/[^/]+/) || [''])[0];\n  const header = b64u(JSON.stringify({ typ: 'JWT', alg: 'ES256' }));\n  const payload = b64u(JSON.stringify({ aud, exp: Math.floor(Date.now() / 1000) + 3600, sub: 'https://push.draminski.dev' }));\n  return { json: { endpoint: it.json.endpoint, unsigned: header + '.' + payload } };\n});"
+    "jsCode": "// Nagłówek VAPID (RFC 8292): JWT ES256 z aud = origin usługi push. Podpis robi węzeł Crypto.\nconst b64u = (s) => Buffer.from(s).toString('base64').replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');\nreturn $input.all().filter((it) => it.json.endpoint).map((it) => {\n  const aud = (it.json.endpoint.match(/^https:\\/\\/[^/]+/) || [''])[0];\n  const header = b64u(JSON.stringify({ typ: 'JWT', alg: 'ES256' }));\n  const payload = b64u(JSON.stringify({ aud, exp: Math.floor(Date.now() / 1000) + 3600, sub: 'mailto:admin@example.com' }));\n  return { json: { endpoint: it.json.endpoint, unsigned: header + '.' + payload } };\n});"
    }
   },
   {
-   "id": "44220d34-6e2a-4495-a444-b363db3f537b",
+   "id": "12481c77-c482-45d9-a76b-3c2a6e0f272d",
    "name": "Podpis ES256",
    "type": "n8n-nodes-base.crypto",
    "typeVersion": 2,
@@ -217,13 +217,13 @@
    },
    "credentials": {
     "crypto": {
-     "id": "INg6KASgJTytqlBu",
-     "name": "Alerty VAPID (klucz podpisu Web Push)"
+     "id": "REPLACE_ME",
+     "name": "VAPID private key"
     }
    }
   },
   {
-   "id": "6981b1f2-bb1c-4d16-825d-7783823f6830",
+   "id": "5a27f561-791e-49af-81c1-e23fcb6598ed",
    "name": "Złóż nagłówek VAPID",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -232,11 +232,11 @@
     140
    ],
    "parameters": {
-    "jsCode": "// Crypto node zwraca podpis ECDSA w DER, JWT wymaga surowego r||s (64 bajty).\nconst VAPID_PUB = 'BCsLF3E2-p-L9Cpw_smlVGOtpdBEXgDJKEyexxG28crg4SiZkqoFbAuJAlEKOS5YyMVpdw_ISLaWMtbBTqwpYA4';\nconst b64u = (buf) => buf.toString('base64').replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');\nfunction derToRaw(der) {\n  let o = 2;\n  if (der[1] & 0x80) o += der[1] & 0x7f;\n  const int = () => {\n    if (der[o] !== 0x02) throw new Error('Zły DER');\n    const len = der[o + 1];\n    let v = der.slice(o + 2, o + 2 + len);\n    o += 2 + len;\n    while (v.length > 32 && v[0] === 0) v = v.slice(1);\n    return Buffer.concat([Buffer.alloc(32 - v.length), v]);\n  };\n  return Buffer.concat([int(), int()]);\n}\nreturn $input.all().map((it) => ({ json: { endpoint: it.json.endpoint,\n  authorization: `vapid t=${it.json.unsigned + '.' + b64u(derToRaw(Buffer.from(it.json.sig, 'base64')))}, k=${VAPID_PUB}` } }));"
+    "jsCode": "// Crypto node zwraca podpis ECDSA w DER, JWT wymaga surowego r||s (64 bajty).\nconst VAPID_PUB = 'REPLACE_WITH_VAPID_PUBLIC_KEY';\nconst b64u = (buf) => buf.toString('base64').replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');\nfunction derToRaw(der) {\n  let o = 2;\n  if (der[1] & 0x80) o += der[1] & 0x7f;\n  const int = () => {\n    if (der[o] !== 0x02) throw new Error('Zły DER');\n    const len = der[o + 1];\n    let v = der.slice(o + 2, o + 2 + len);\n    o += 2 + len;\n    while (v.length > 32 && v[0] === 0) v = v.slice(1);\n    return Buffer.concat([Buffer.alloc(32 - v.length), v]);\n  };\n  return Buffer.concat([int(), int()]);\n}\nreturn $input.all().map((it) => ({ json: { endpoint: it.json.endpoint,\n  authorization: `vapid t=${it.json.unsigned + '.' + b64u(derToRaw(Buffer.from(it.json.sig, 'base64')))}, k=${VAPID_PUB}` } }));"
    }
   },
   {
-   "id": "ac3dd46e-a522-40e7-b1c7-185136211b40",
+   "id": "91c23e05-5c43-4dbe-8114-2b8b6190de1b",
    "name": "Wyślij push",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -281,7 +281,7 @@
    }
   },
   {
-   "id": "ae2c892d-b93d-4e0e-9912-f7c058f93200",
+   "id": "50362739-2325-46c9-af7d-847f55b8fde7",
    "name": "Wynik wysyłki",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -294,7 +294,7 @@
    }
   },
   {
-   "id": "70ea6b02-92c5-4135-9e06-1462d3087941",
+   "id": "0187c231-5307-4da4-a3d8-9f1f8a493490",
    "name": "Aktualizuj urządzenia",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -311,13 +311,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "d68d7824-b307-41da-ba65-0468945f5681",
+   "id": "ce9468de-5603-4ffc-abc3-8500c95d0341",
    "name": "Tylko strony do streszczenia",
    "type": "n8n-nodes-base.filter",
    "typeVersion": 2.2,
@@ -335,7 +335,7 @@
      },
      "conditions": [
       {
-       "id": "8de97aa5-1740-424d-b6c9-6e15da588835",
+       "id": "5f633eae-fa41-4aa6-84cf-e9a6226a5d3f",
        "leftValue": "={{ $json.summarize }}",
        "rightValue": "",
        "operator": {
@@ -351,7 +351,7 @@
    }
   },
   {
-   "id": "a0a50d0b-a803-412b-97e0-ac89883b9db5",
+   "id": "76422b6a-b013-4663-98c6-a3fb1a9e1fae",
    "name": "Id strony",
    "type": "n8n-nodes-base.set",
    "typeVersion": 3.4,
@@ -365,13 +365,13 @@
     "assignments": {
      "assignments": [
       {
-       "id": "9b5f1dce-7b93-47f8-964d-01f4917be36f",
+       "id": "a8126724-1dfb-47e2-ba91-0bc13e4b8a1b",
        "name": "item_id",
        "type": "string",
        "value": "={{ $json.item_id }}"
       },
       {
-       "id": "3dc20008-1f10-4d66-8931-7fd314cb67b7",
+       "id": "6cc0c3f8-5f98-4eeb-aa94-48431de669a7",
        "name": "reason",
        "type": "string",
        "value": "scheduled"
@@ -382,7 +382,7 @@
    }
   },
   {
-   "id": "bba2ec21-6490-435a-8e4c-d035e3a9a6f0",
+   "id": "9b8732f3-bb2a-4be0-858b-10c0a70098e4",
    "name": "Streść stronę (w tle)",
    "type": "n8n-nodes-base.executeWorkflow",
    "typeVersion": 1.2,
@@ -394,7 +394,7 @@
     "source": "database",
     "workflowId": {
      "__rl": true,
-     "value": "hnyATiJRYfJUvdXF",
+     "value": "REPLACE_WITH_SUMMARY_WORKFLOW_ID",
      "mode": "id"
     },
     "options": {

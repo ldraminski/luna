@@ -4,8 +4,7 @@ Progi 80 / 95 / 100% → powiadomienie dla adminów Luny (push + mail, przez „
 Stan progu w static data workflow; spadek poniżej 50% (Łukasz podniósł limit / reset) zeruje. Kwoty w zł (kurs NBP), USD w nawiasie.
 """
 import json, uuid
-PG = {"postgres": {"id": "IAfnl61Lb7KbTeZi", "name": "Oboe - Postgres (oboe-db)"}}
-OR = {"openRouterApi": {"id": "ZGSl0yv59gDWZKJG", "name": "OpenRouter - Luna"}}
+from config import PG, OR
 nodes, conns = [], {}
 def node(name, typ, ver, pos, params, **kw):
     n = {"id": str(uuid.uuid4()), "name": name, "type": typ, "typeVersion": ver, "position": pos, "parameters": params}

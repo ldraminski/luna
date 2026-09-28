@@ -1,7 +1,6 @@
 """Teksty maili Luny — JEDNO źródło dla „Oboe: Wydaj token” i „Oboe: Dostęp” (żeby się nie rozjechały).
 Funkcje zwracają wyrażenie n8n (={{ ... }}); `r` to wyrażenie JS z polami name/token, np. "$json.result"."""
-APP_URL = "https://luna.draminski.dev"
-NADAWCA = "Luna <n8n@renlab.ovh>"
+from config import APP_URL, SENDER as NADAWCA
 
 def _hej(r):
     return "'Cześć' + (" + r + ".name ? ' ' + " + r + ".name : '') + '!\\n\\n"

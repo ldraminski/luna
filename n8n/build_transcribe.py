@@ -6,14 +6,14 @@ Nagranie nie jest nigdzie zapisywane — idzie prosto do Whispera, dalej aplikac
 vad_filter=true: bez niego Whisper na ciszy/szumie zmyśla „Dziękuję za uwagę.” / „Dzięki za oglądanie!” (sprawdzone 28.09).
 """
 import json, uuid
+from config import PG, WHISPER_URL
 
-PG = {"postgres": {"id": "IAfnl61Lb7KbTeZi", "name": "Oboe - Postgres (oboe-db)"}}
 TOKEN = "($json.headers.authorization || '').replace(/^Bearer\\s+/i, '')"
 ME = """me AS (
   UPDATE sessions SET last_used_at = now()
   WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()
   RETURNING user_id)"""
-WHISPER = "http://whisper:8000/v1/audio/transcriptions"
+WHISPER = WHISPER_URL
 MODEL = "deepdml/faster-whisper-large-v3-turbo-ct2"
 AUDIO_OK = "/^data:audio\\/[a-z0-9.+-]+(;[a-z0-9=._-]+)*;base64,[A-Za-z0-9+\\/=]+$/i.test(String($('POST transcribe').item.json.body.audio || ''))"
 

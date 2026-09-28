@@ -2,7 +2,7 @@
  "name": "Oboe: Generuj widget",
  "nodes": [
   {
-   "id": "2c7a7f0c-fcea-495d-bbc8-daadc5d7c420",
+   "id": "4eda3a96-9073-4f30-b390-a3561ea74e3c",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "fea04705-4bfd-4250-a566-7a1682f9509f",
+   "id": "10d29fb8-17c2-4595-8473-508ca9a12d45",
    "name": "Z API",
    "type": "n8n-nodes-base.executeWorkflowTrigger",
    "typeVersion": 1.1,
@@ -30,7 +30,7 @@
    }
   },
   {
-   "id": "f70c4019-f1f0-4c35-a637-4e501dc3a60e",
+   "id": "caaa1738-53c7-4cba-8aac-856524c14a6f",
    "name": "POST admin/widget",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -47,14 +47,14 @@
    },
    "credentials": {
     "httpHeaderAuth": {
-     "id": "9Rd7Zl7NxIcEvPtL",
+     "id": "REPLACE_ME",
      "name": "Oboe - admin (X-Admin-Token)"
     }
    },
-   "webhookId": "43cd49af-2bb5-4b83-b7ad-715b8669a0f1"
+   "webhookId": "32ce098f-7649-4ba0-8529-14bc1f047c5c"
   },
   {
-   "id": "b4c74d6c-f390-4c9f-a819-232907b029ba",
+   "id": "295dcd3d-f959-4552-97ff-61e6ce32dbf0",
    "name": "Wejście",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -67,7 +67,7 @@
    }
   },
   {
-   "id": "8fe4c7f8-66a9-4e1b-89e5-43b2cd51aad4",
+   "id": "1c3043d7-629f-448a-9152-9de65b5ca868",
    "name": "Poprawka?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -85,7 +85,7 @@
      },
      "conditions": [
       {
-       "id": "e371cd09-1d04-47a8-8144-445ae3c33409",
+       "id": "7ea1f8c3-8460-4a8b-a0f6-4596ac4633b1",
        "leftValue": "={{ $json.mode === 'revise' }}",
        "rightValue": "",
        "operator": {
@@ -101,7 +101,7 @@
    }
   },
   {
-   "id": "64c42363-b8b4-44aa-b37a-b588dad26f01",
+   "id": "bffeef34-a653-4b59-842d-98d7855e7aa6",
    "name": "Wczytaj rzecz i bibliotekę",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -118,13 +118,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "e727aa04-0616-4cce-b727-a3f600a16036",
+   "id": "e226d3d8-c350-434a-b882-dc3b69beae40",
    "name": "Dobór",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -142,7 +142,7 @@
      "parameters": [
       {
        "name": "HTTP-Referer",
-       "value": "https://draminski.dev"
+       "value": "https://luna.example.com"
       },
       {
        "name": "X-Title",
@@ -159,7 +159,7 @@
    },
    "credentials": {
     "openRouterApi": {
-     "id": "ZGSl0yv59gDWZKJG",
+     "id": "REPLACE_ME",
      "name": "OpenRouter - Luna"
     }
    },
@@ -168,7 +168,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "86fef102-dc2b-4aea-ba42-ae2cc4725338",
+   "id": "7b1790ba-371c-428e-bd31-b087a09f22a7",
    "name": "Sprawdź dobór",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -181,7 +181,7 @@
    }
   },
   {
-   "id": "682db418-2f45-42d0-8006-d8410a686e9a",
+   "id": "ebf00b4c-2318-4f7a-92b6-ecd3ca58a0ce",
    "name": "Tryb",
    "type": "n8n-nodes-base.switch",
    "typeVersion": 3.2,
@@ -202,7 +202,7 @@
         },
         "conditions": [
          {
-          "id": "2ba21c34-67fc-47ee-9b76-6f0d8022f925",
+          "id": "9b3f7edf-115b-448f-b3ee-1129d038488c",
           "leftValue": "={{ $json.mode }}",
           "rightValue": "reuse",
           "operator": {
@@ -226,7 +226,7 @@
         },
         "conditions": [
          {
-          "id": "8dd3e75b-7cad-4826-8f22-9012e0f8a1c5",
+          "id": "bfd79a68-60c0-4ed2-a7ec-ea111b9e57e4",
           "leftValue": "={{ $json.mode }}",
           "rightValue": "new",
           "operator": {
@@ -250,7 +250,7 @@
         },
         "conditions": [
          {
-          "id": "13a8bb8c-7a95-4adb-b6c8-7e8ed9adc89a",
+          "id": "e834a56c-e807-4f62-8996-3e952d5d81cd",
           "leftValue": "={{ $json.mode }}",
           "rightValue": "fail",
           "operator": {
@@ -270,7 +270,7 @@
    }
   },
   {
-   "id": "ec01aa32-6736-45ef-a20b-6290329aeab9",
+   "id": "a0a88b76-01bc-48f6-9b17-925574881bd3",
    "name": "Użyj istniejącego",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -287,13 +287,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "59757e14-a128-4d36-b2fe-199ff2c6cf38",
+   "id": "b02c0b20-46e7-4c98-9faf-2ab4cbbd054c",
    "name": "Wczytaj poprawkę",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -310,13 +310,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "cf9ec545-4ab2-4923-aff1-03fc87b2d019",
+   "id": "a858a656-d9ca-4a5c-ad0d-99a14dce025a",
    "name": "Jest stary kod?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -334,7 +334,7 @@
      },
      "conditions": [
       {
-       "id": "c8033495-6de1-43f3-b26e-7a338f58f588",
+       "id": "0ec59cef-bba3-44d8-9cbb-128726c2d826",
        "leftValue": "={{ !!$json.file_path && /^[a-z0-9-]+\\.v\\d+\\.html$/.test($json.file_path) }}",
        "rightValue": "",
        "operator": {
@@ -350,7 +350,7 @@
    }
   },
   {
-   "id": "0822c483-6d4e-48ae-a365-ae28f51d7878",
+   "id": "709655dc-3e05-4048-a1fd-2fd57b007618",
    "name": "Czytaj stary kod",
    "type": "n8n-nodes-base.readWriteFile",
    "typeVersion": 1.1,
@@ -366,7 +366,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "fe8db3e8-3c0b-4573-b221-0acc53e21aaf",
+   "id": "77cc1f8c-455f-4f2b-9011-441088d58d12",
    "name": "Stary kod jako tekst",
    "type": "n8n-nodes-base.extractFromFile",
    "typeVersion": 1.1,
@@ -382,7 +382,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "7a5ab5c5-0030-4d29-8eca-a5c9ac27adb4",
+   "id": "10739a4e-e01a-4355-b019-947e47ccbeba",
    "name": "Projekt z czatu",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -395,7 +395,7 @@
    }
   },
   {
-   "id": "4d0a80b1-b077-4669-8e21-baf6c33925c0",
+   "id": "a6f9bed4-9925-4d6d-b5b3-b4851eeec2b6",
    "name": "Projekt",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -408,7 +408,7 @@
    }
   },
   {
-   "id": "7700b18c-d427-44ef-9a84-3adb9e256f7f",
+   "id": "068c7e0a-49a4-404a-8f53-5a11ccef36cf",
    "name": "Programista",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -426,7 +426,7 @@
      "parameters": [
       {
        "name": "HTTP-Referer",
-       "value": "https://draminski.dev"
+       "value": "https://luna.example.com"
       },
       {
        "name": "X-Title",
@@ -443,7 +443,7 @@
    },
    "credentials": {
     "openRouterApi": {
-     "id": "ZGSl0yv59gDWZKJG",
+     "id": "REPLACE_ME",
      "name": "OpenRouter - Luna"
     }
    },
@@ -452,7 +452,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "ee90db60-f726-4bb5-bf36-d4a0f52181a1",
+   "id": "7cfee38a-f5e0-4e1e-a9b9-0200b448f7bb",
    "name": "Skan",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -465,7 +465,7 @@
    }
   },
   {
-   "id": "a744c7a1-26fa-4bd8-995f-772dd3c3cc82",
+   "id": "848057be-decd-42a8-921b-dfe8dc62273f",
    "name": "Guardian",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -483,7 +483,7 @@
      "parameters": [
       {
        "name": "HTTP-Referer",
-       "value": "https://draminski.dev"
+       "value": "https://luna.example.com"
       },
       {
        "name": "X-Title",
@@ -500,7 +500,7 @@
    },
    "credentials": {
     "openRouterApi": {
-     "id": "ZGSl0yv59gDWZKJG",
+     "id": "REPLACE_ME",
      "name": "OpenRouter - Luna"
     }
    },
@@ -509,7 +509,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "2f17c9a8-f770-4088-9c21-8f2fdc6b7d8d",
+   "id": "e411b063-c61e-4c40-90f5-6df83c98c965",
    "name": "Werdykt",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -522,7 +522,7 @@
    }
   },
   {
-   "id": "1308e48f-0d89-417c-bd9b-64661524afde",
+   "id": "0b24bbcf-478b-44d3-9eeb-1d8f61197647",
    "name": "Zatwierdzony?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -540,7 +540,7 @@
      },
      "conditions": [
       {
-       "id": "b66fb832-a052-43d6-a55b-bc97ccf062e2",
+       "id": "49e77f61-3b37-43a4-addc-7890fb9dd267",
        "leftValue": "={{ $json.approved }}",
        "rightValue": "",
        "operator": {
@@ -556,7 +556,7 @@
    }
   },
   {
-   "id": "121e3efb-9f86-47e6-b81a-fe623841d442",
+   "id": "aea1f030-4206-42ce-adfa-7bab2c6711a8",
    "name": "Poprawka",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -574,7 +574,7 @@
      "parameters": [
       {
        "name": "HTTP-Referer",
-       "value": "https://draminski.dev"
+       "value": "https://luna.example.com"
       },
       {
        "name": "X-Title",
@@ -591,7 +591,7 @@
    },
    "credentials": {
     "openRouterApi": {
-     "id": "ZGSl0yv59gDWZKJG",
+     "id": "REPLACE_ME",
      "name": "OpenRouter - Luna"
     }
    },
@@ -600,7 +600,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "da5a42b4-f293-4c03-910c-d705de535d66",
+   "id": "893d7426-4f8d-4496-b613-4adaa419d02b",
    "name": "Skan 2",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -613,7 +613,7 @@
    }
   },
   {
-   "id": "53771c35-25ba-4afc-811b-c5cae0a71fc1",
+   "id": "33b9585f-8c07-4307-bd04-8436fd60013c",
    "name": "Guardian 2",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -631,7 +631,7 @@
      "parameters": [
       {
        "name": "HTTP-Referer",
-       "value": "https://draminski.dev"
+       "value": "https://luna.example.com"
       },
       {
        "name": "X-Title",
@@ -648,7 +648,7 @@
    },
    "credentials": {
     "openRouterApi": {
-     "id": "ZGSl0yv59gDWZKJG",
+     "id": "REPLACE_ME",
      "name": "OpenRouter - Luna"
     }
    },
@@ -657,7 +657,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "3c0821ca-89d9-435a-bd17-066a8aa0fd13",
+   "id": "cdc6ee3b-d5bc-4857-a906-3147be22d617",
    "name": "Werdykt 2",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -670,7 +670,7 @@
    }
   },
   {
-   "id": "158e9309-338f-409c-808f-9c4c5a32dda4",
+   "id": "4bcbd003-6069-4e5a-8b95-498d5d95d302",
    "name": "Zatwierdzony po poprawce?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -688,7 +688,7 @@
      },
      "conditions": [
       {
-       "id": "d0e50329-6927-4f16-8a0a-bc27ec724bf0",
+       "id": "07c3a93a-34e1-4c1c-a2ed-427b45f7376f",
        "leftValue": "={{ $json.approved }}",
        "rightValue": "",
        "operator": {
@@ -704,7 +704,7 @@
    }
   },
   {
-   "id": "cdb384a0-c297-4bb1-9fb0-7ce0dc36ae73",
+   "id": "0707b02d-819f-473b-b1fc-993466ae29c9",
    "name": "Wersja",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -721,13 +721,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "87b2eeb9-4be6-419f-92ac-76a54ac64642",
+   "id": "469e9526-d9fd-4536-baa2-4546a712a936",
    "name": "Złóż plik",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -740,7 +740,7 @@
    }
   },
   {
-   "id": "b5d3b22a-3733-4891-9ff9-44edf75161ba",
+   "id": "ad437641-589a-4a67-be70-998cdef3127a",
    "name": "Do pliku",
    "type": "n8n-nodes-base.convertToFile",
    "typeVersion": 1.1,
@@ -759,7 +759,7 @@
    }
   },
   {
-   "id": "24fb8ecb-fd13-467d-8529-f220f2c35ccb",
+   "id": "26860f22-b41e-4d3f-8671-5a71e336be0f",
    "name": "Zapisz plik",
    "type": "n8n-nodes-base.readWriteFile",
    "typeVersion": 1.1,
@@ -775,7 +775,7 @@
    }
   },
   {
-   "id": "1e149960-677a-4b58-bf77-d034363a9268",
+   "id": "5f0cdf34-1e13-448f-9dfc-1c37463b74ca",
    "name": "Git add",
    "type": "n8n-nodes-base.git",
    "typeVersion": 1.1,
@@ -790,7 +790,7 @@
    }
   },
   {
-   "id": "1f052f5d-6257-4edd-8e0b-e4383cd6ffc7",
+   "id": "a5f47648-77e3-4b46-ac85-50133d56af85",
    "name": "Git commit",
    "type": "n8n-nodes-base.git",
    "typeVersion": 1.1,
@@ -806,7 +806,7 @@
    }
   },
   {
-   "id": "605fb181-2881-4e4f-9bcb-9f71604d2d49",
+   "id": "4979424b-2c51-434d-b8dc-b8d99a6540b7",
    "name": "Zapisz w bibliotece",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -823,13 +823,13 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
   },
   {
-   "id": "0bca4a21-426f-4d0c-8751-0b9bd59da193",
+   "id": "ef2b4236-cf33-49e4-822d-993e1529165a",
    "name": "Dane do zapisu",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -842,7 +842,7 @@
    }
   },
   {
-   "id": "c655b71c-d04a-4fce-b318-2e10d2f41db5",
+   "id": "e0679757-48fc-4c3e-8e59-1aafe682e61f",
    "name": "Odrzucony",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -859,7 +859,7 @@
    },
    "credentials": {
     "postgres": {
-     "id": "IAfnl61Lb7KbTeZi",
+     "id": "REPLACE_ME",
      "name": "Oboe - Postgres (oboe-db)"
     }
    }
