@@ -64,9 +64,56 @@ const I = {
 };
 const svg = (k, style = '') => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true"${style ? ` style="${style}"` : ''}>${I[k]}</svg>`;
 
+// ---------- instalacja (Hikari, 28.09): telefon w przeglądarce → przewodnik „dodaj do ekranu” zamiast formularza ----------
+// iPhone: tylko Safari umie dodać do ekranu, a aplikacja z ekranu ma OSOBNĄ pamięć (klucz wkleja się dopiero w niej).
+// Wbudowane przeglądarki (Gmail, Messenger, FB…) nie mają instalacji → „otwórz w Safari/Chrome”. Android/Chrome: prawdziwy przycisk.
+const UA = navigator.userAgent;
+const ANDROID = /Android/i.test(UA);
+const INAPP = /FBAN|FBAV|FB_IAB|Instagram|Messenger|LinkedInApp|Line\/|Snapchat|musical_ly|TikTok|Twitter|GSA\/|; wv\)/i.test(UA);
+const IOS_SAFARI = IOS && !INAPP && !/CriOS|FxiOS|EdgiOS|OPiOS|YaBrowser|DuckDuckGo/i.test(UA);
+const SAFARI_VER = +(UA.match(/Version\/(\d+)/)?.[1] || 0);   // iOS 26: „Udostępnij” schowane pod •••
+let installEvt = null;
+addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvt = e; $('#i-install').hidden = false; $('#i-android-steps').hidden = true; });
+addEventListener('appinstalled', () => { $('#i-done').hidden = false; $('#i-install').hidden = true; });
+const installSkipped = () => { try { return localStorage.getItem('luna-bez-instalacji') === '1'; } catch { return false; } };
+function installMode() {
+  if (IOS) return IOS_SAFARI ? 'ios' : 'ios-other';
+  if (ANDROID) return INAPP ? 'android-other' : 'android';
+  return 'desk';
+}
+function setInstallMode(mode) {
+  const sec = $('#screen-install'); sec.dataset.mode = mode;
+  sec.querySelectorAll('[data-for]').forEach((el) => { el.hidden = !el.dataset.for.split(' ').includes(mode); });
+  sec.querySelectorAll('.i-new').forEach((el) => { el.hidden = !(SAFARI_VER >= 26); });
+  sec.querySelectorAll('.i-old').forEach((el) => { el.hidden = SAFARI_VER >= 26; });
+  sec.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === mode || (b.dataset.tab === 'ios' && mode === 'ios-other') || (b.dataset.tab === 'android' && mode === 'android-other'))));
+  if (mode === 'android') { $('#i-install').hidden = !installEvt; $('#i-android-steps').hidden = !!installEvt; }
+  // strzałka do przycisku Safari: tylko prawdziwe Safari na iPhonie (pośrodku albo pod ••• w iOS 26)
+  if (mode === 'ios' && IOS_SAFARI) sec.dataset.arrow = SAFARI_VER >= 26 ? 'right' : 'center'; else delete sec.dataset.arrow;
+}
+function showInstall(page = false) {
+  $('#screen-main').hidden = true; $('#dock').hidden = true; $('#screen-hello').hidden = true;
+  const sec = $('#screen-install'); sec.hidden = false;
+  const mode = installMode();
+  // Zakładki iPhone/Android: gdy ktoś czyta instrukcję na komputerze (/instalacja)
+  if (mode === 'desk' || page) sec.dataset.tabs = '1'; else delete sec.dataset.tabs;
+  $('.i-tabs').hidden = !(mode === 'desk' || page);
+  setInstallMode(mode === 'desk' ? 'ios' : mode);
+  if (mode === 'desk') $('[data-for=desk]').hidden = false;
+  $('#i-skip').textContent = page && mode === 'desk' ? 'Przejdź do Luny' : 'Pomiń — skorzystam w przeglądarce';
+}
+async function copyLink(btn) {
+  const url = location.origin + '/instalacja';
+  try { await navigator.clipboard.writeText(url); btn.textContent = 'Skopiowane ✓'; }
+  catch { btn.textContent = url; btn.style.userSelect = 'all'; toast('Przytrzymaj adres na przycisku i wybierz „Kopiuj”.'); }
+}
+
 // ---------- ekran powitalny (klucz) ----------
 function showHello(msg = '') {
   $('#screen-main').hidden = true; $('#dock').hidden = true;
+  // telefon w przeglądarce (nie z ekranu początkowego) → najpierw instalacja; z komunikatem (np. klucz wygasł) — od razu formularz
+  if (!msg && (IOS || ANDROID) && !STANDALONE && !installSkipped()) return showInstall();
+  $('#screen-install').hidden = true;
   $('#screen-hello').hidden = false;
   $('#ios-note').hidden = !(IOS && !STANDALONE);
   $('#tok-err').textContent = msg;
@@ -172,7 +219,7 @@ async function saveReportTime() {
   } catch (err) { toast(err.message); }
 }
 
-// ---------- alarm w chwili terminu: czerwona karta (serwer w tym czasie wysyła push co 20 s) ----------
+// ---------- alarm w chwili terminu: czerwona karta (serwer wysyła 5 pushy co 20 s, potem 5 co 2 min) ----------
 // Ta sama reguła co w „Oboe: Harmonogram”: jednorazowa rzecz, termin minął (w ciągu ostatniej godziny albo alarm już trwa / przełożony),
 // alarm nie jest wyłączony, a przełożony już „wrócił”.
 function ringing(it) {
@@ -1067,6 +1114,16 @@ function bind() {
   window.visualViewport?.addEventListener('scroll', keepDock);
   $('#plus').addEventListener('click', () => $('#q').focus());
   $('#mic').addEventListener('click', startRec);
+  $('#screen-install').addEventListener('click', async (e) => {
+    const tab = e.target.closest('[data-tab]'); if (tab) { setInstallMode(tab.dataset.tab); $('[data-for=desk]').hidden = false; return; }
+    const cp = e.target.closest('[data-copy]'); if (cp) return copyLink(cp);
+    if (e.target.closest('#i-install') && installEvt) { installEvt.prompt(); const r = await installEvt.userChoice; if (r.outcome === 'accepted') { installEvt = null; $('#i-done').hidden = false; $('#i-install').hidden = true; } return; }
+    if (e.target.closest('#i-skip')) {
+      try { localStorage.setItem('luna-bez-instalacji', '1'); } catch {}
+      if (location.pathname === '/instalacja') { location.href = '/'; return; }
+      $('#screen-install').hidden = true; showHello();
+    }
+  });
   $('#voice').addEventListener('click', (e) => { const b = e.target.closest('[data-voice]'); if (b) voiceBtn(b.dataset.voice); });
   $('#voice').addEventListener('cancel', (e) => { if ($('#voice .voice-in').dataset.state === 'work') e.preventDefault(); });   // w trakcie pracy nie zamykamy
   $('#voice').addEventListener('close', () => { if (rec.mr) stopRec(true); });
@@ -1157,6 +1214,7 @@ async function boot() {
   const params = new URLSearchParams(location.search);
   const openId = params.get('open');
   if (params.has('open')) history.replaceState(null, '', location.pathname);
+  if (location.pathname === '/instalacja') return showInstall(true);
   const t = getToken();
   if (!t) return showHello();
   try {

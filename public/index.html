@@ -18,6 +18,58 @@
 </head>
 <body>
 
+<!-- EKRAN · instalacja (Hikari, 28.09): telefon w przeglądarce → przewodnik; /instalacja → zawsze -->
+<section class="hello install" id="screen-install" data-mode="ios" hidden>
+  <img class="logo" src="/icons/icon-192.png" alt="">
+  <h1>Zainstaluj<b>Lunę na telefonie</b></h1>
+  <p class="i-lead">Luna działa jak zwykła aplikacja z ekranu początkowego — tylko wtedy może wysyłać ci przypomnienia.
+    Zajmie to pół minuty i niczego nie pobierasz ze sklepu.</p>
+
+  <div class="i-tabs" role="tablist" aria-label="Twój telefon">
+    <button type="button" role="tab" data-tab="ios">iPhone</button>
+    <button type="button" role="tab" data-tab="android">Android</button>
+  </div>
+
+  <!-- iPhone w Safari -->
+  <ol class="i-steps" data-for="ios">
+    <li class="i-new"><span class="n">1</span><span>Stuknij <b class="k"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg></b> w prawym dolnym rogu, a potem <b class="k"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11H5v10h14V11h-1"/></svg> Udostępnij</b></span></li>
+    <li class="i-old"><span class="n">1</span><span>Stuknij <b class="k"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11H5v10h14V11h-1"/></svg> Udostępnij</b> na dole ekranu, pośrodku.</span></li>
+    <li><span class="n">2</span><span>Przewiń listę (albo stuknij <b>Więcej</b>) i wybierz <b class="k"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/></svg> Do ekranu początkowego</b></span></li>
+    <li><span class="n">3</span><span>Stuknij <b>Dodaj</b> w prawym górnym rogu.</span></li>
+    <li><span class="n">4</span><span>Zamknij Safari i otwórz <b>Lunę</b> z ekranu początkowego — tam poprosisz o dostęp albo wkleisz klucz z maila.</span></li>
+  </ol>
+  <div class="note i-help" data-for="ios">Nie widzisz <b>Udostępnij</b>? Link otworzył się pewnie wewnątrz innej aplikacji (np. Gmaila).
+    Stuknij ikonę Safari w rogu ekranu albo skopiuj link i wklej go w Safari.
+    <button type="button" class="cta alt wide" data-copy>Skopiuj link</button></div>
+
+  <!-- iPhone: inna przeglądarka albo wbudowana w aplikację -->
+  <ol class="i-steps" data-for="ios-other">
+    <li><span class="n">1</span><span>Stuknij <b>Skopiuj link</b> poniżej.</span></li>
+    <li><span class="n">2</span><span>Otwórz <b>Safari</b>, stuknij pasek adresu i wklej link.</span></li>
+    <li><span class="n">3</span><span>Tam zobaczysz, jak dodać Lunę do ekranu początkowego — na iPhonie da się to zrobić tylko z Safari.</span></li>
+  </ol>
+
+  <!-- Android -->
+  <div class="i-android" data-for="android">
+    <button type="button" class="cta wide" id="i-install" hidden>Zainstaluj Lunę</button>
+    <ol class="i-steps" id="i-android-steps">
+      <li><span class="n">1</span><span>Stuknij <b class="k"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="12" cy="19" r="1.3"/></svg></b> w prawym górnym rogu Chrome.</span></li>
+      <li><span class="n">2</span><span>Wybierz <b>Zainstaluj aplikację</b> albo <b>Dodaj do ekranu głównego</b>, potem <b>Zainstaluj</b>.</span></li>
+      <li><span class="n">3</span><span>Otwórz <b>Lunę</b> z ekranu głównego.</span></li>
+    </ol>
+  </div>
+  <ol class="i-steps" data-for="android-other">
+    <li><span class="n">1</span><span>Ten link otworzył się wewnątrz innej aplikacji. Stuknij <b class="k"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="12" cy="19" r="1.3"/></svg></b> i wybierz <b>Otwórz w Chrome</b> (albo w przeglądarce).</span></li>
+    <li><span class="n">2</span><span>Albo skopiuj link poniżej i wklej go w Chrome.</span></li>
+  </ol>
+  <button type="button" class="cta alt wide" data-copy data-for="ios-other android-other">Skopiuj link</button>
+
+  <p class="i-done" id="i-done" hidden>Gotowe! Otwórz <b>Lunę</b> z ekranu głównego.</p>
+  <p class="i-desk" data-for="desk">Na komputerze niczego nie instalujesz — <a href="/">otwórz Lunę</a> albo <a href="/biurko">biurko</a> do dłuższych materiałów.</p>
+  <button type="button" class="ghost-txt" id="i-skip">Pomiń — skorzystam w przeglądarce</button>
+  <div class="i-arrow" aria-hidden="true"></div>
+</section>
+
 <!-- EKRAN 0 · wklejenie klucza -->
 <section class="hello" id="screen-hello" hidden>
   <img class="logo" src="/icons/icon-192.png" alt="">
@@ -200,13 +252,13 @@
   </div>
 </dialog>
 
-<!-- ALARM · czerwona karta w chwili terminu (dopóki nie przełożysz / nie wyłączysz — push co 20 s) -->
+<!-- ALARM · czerwona karta w chwili terminu (5 pushy co 20 s, potem 5 co 2 min — albo do przełożenia / wyłączenia) -->
 <dialog class="chat alarm" id="alarm" aria-labelledby="alarm-title">
   <div class="chat-in alarm-in">
     <div class="alarm-bell" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.3 20a1.9 1.9 0 0 0 3.4 0"/></svg></div>
     <p class="alarm-kind" id="alarm-kind">Teraz</p>
     <h2 id="alarm-title"></h2>
-    <p class="alarm-lead">Dopóki czegoś nie wybierzesz, przypominam co 20 sekund.</p>
+    <p class="alarm-lead">Przypomnę jeszcze kilka razy — najpierw co 20 sekund, potem co 2 minuty.</p>
     <button class="cta wide alarm-snooze" type="button" data-alarm="snooze">Przełóż o 5 min</button>
     <button class="cta alt wide" type="button" data-alarm="off">Wyłącz przypomnienie</button>
     <button class="ghost-txt" type="button" data-alarm="done">Już zrobione</button>

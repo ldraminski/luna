@@ -471,3 +471,29 @@ body{touch-action:manipulation}
 .legal a{color:var(--navy)}
 .ask .legal{width:100%}
 .legal.foot{margin-top:28px}
+
+/* przewodnik instalacji (Hikari, 28.09) */
+.install{justify-content:flex-start;gap:14px;padding-top:40px}
+.install[data-arrow]{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+.install .i-lead{font-size:15px}
+.i-tabs{display:flex;gap:6px;background:var(--surface-2);border-radius:var(--r-pill);padding:4px}
+.i-tabs button{flex:1;height:40px;border:0;border-radius:var(--r-pill);background:transparent;font:inherit;font-weight:500;color:var(--ink-2);cursor:pointer}
+.i-tabs button[aria-selected=true]{background:var(--surface);color:var(--navy);box-shadow:var(--shadow)}
+.i-steps{list-style:none;display:grid;gap:10px}
+.i-steps li{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border-radius:var(--r-tile);padding:14px 16px;box-shadow:var(--shadow);font-size:15px;line-height:1.45}
+.i-steps .n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--tint-lavender);display:grid;place-items:center;font-size:13px;font-weight:600}
+.i-steps .k{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;font-weight:600}
+.i-steps .k .i{width:20px;height:20px;color:var(--navy)}
+.i-help{font-size:13.5px;line-height:1.45}
+.i-help .cta{margin-top:10px;height:46px}
+.i-done{font-size:17px;text-align:center;color:var(--navy);background:var(--tint-mint);border-radius:var(--r-tile);padding:16px}
+.i-desk{text-align:center}
+.i-desk a{color:var(--navy);font-weight:500}
+.install #i-skip{margin:0 auto}
+/* strzałka do przycisku Safari (tylko iPhone w Safari) */
+.i-arrow{display:none}
+.install[data-arrow] .i-arrow{display:block;position:fixed;bottom:calc(10px + env(safe-area-inset-bottom));left:50%;width:34px;height:34px;margin-left:-17px;
+  border-right:5px solid var(--late);border-bottom:5px solid var(--late);transform:rotate(45deg);animation:i-bob 1.2s ease-in-out infinite;border-radius:3px}
+.install[data-arrow=right] .i-arrow{left:auto;right:24px}
+@keyframes i-bob{50%{translate:0 8px}}
+@media (prefers-reduced-motion:reduce){.i-arrow{animation:none!important}}

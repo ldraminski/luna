@@ -36,9 +36,9 @@ def sql(name, pos, query, params):
 def respond(name, pos, body):
     return node(name, "n8n-nodes-base.respondToWebhook", 1.1, pos, {"respondWith": "json", "responseBody": body,
       "options": {"responseCode": "={{ $('" + CUR + "').item.json.result.status || 200 }}"}})
-def mail(name, pos, subject, text):
+def mail(name, pos, subject, text, html=None):
     return node(name, "n8n-nodes-base.emailSend", 2.1, pos, {"fromEmail": maile.NADAWCA,
-      "toEmail": "={{ $json.result.email }}", "subject": subject, "emailFormat": "text", "text": text,
+      "toEmail": "={{ $json.result.email }}", "subject": subject, **({"emailFormat": "both", "text": text, "html": html} if html else {"emailFormat": "text", "text": text}),
       "options": {"appendAttribution": False}}, credentials=SMTP, onError="continueRegularOutput")
 def when(name, pos, expr):
     return node(name, "n8n-nodes-base.if", 2.2, pos, {"conditions": {"options": {"caseSensitive": True, "leftValue": "",
@@ -87,7 +87,7 @@ SELECT CASE
   ELSE json_build_object('status', 200, 'action', 'pending', 'name', (SELECT name FROM ok), 'notified', (SELECT count(*) FROM nt))
 END AS result""", "={{ [ String($json.body.email || '').slice(0, 200), String($json.body.name || '').slice(0, 80) ] }}")
 i1 = when("Istniejące konto?", [440, 0], "={{ $json.result.action === 'token' }}")
-m1 = mail("Mail: nowy klucz", [660, -120], "Twój nowy klucz do Luny", maile.klucz_nowy("$json.result"))
+m1 = mail("Mail: nowy klucz", [660, -120], "Twój nowy klucz do Luny", maile.klucz_nowy("$json.result"), maile.html_nowy("$json.result"))
 r1 = respond("Odpowiedz: prośba", [880, 0], "={{ (R => (" + SAFE + "))($('Prośba').item.json.result) }}")
 link(w1, q1); link(q1, i1); link(i1, m1, 0); link(i1, r1, 1); link(m1, r1)
 
@@ -128,7 +128,8 @@ END AS result""",
 i3 = when("Zaakceptowana?", [440, 640], "={{ $json.result.action === 'accepted' }}")
 i3b = when("Odrzucona?", [660, 800], "={{ $json.result.action === 'rejected' }}")
 m3a = mail("Mail: witaj", [660, 560], "Łukasz zaakceptował Twoją prośbę — tu Luna",
-           maile.klucz_powitalny("$json.result", "Łukasz zaakceptował Twoją prośbę o dostęp — witaj!\\n\\n" + maile.O_LUNIE))
+           maile.klucz_powitalny("$json.result", "Łukasz zaakceptował Twoją prośbę o dostęp — witaj!\\n\\n" + maile.O_LUNIE),
+           maile.html_powitalny("$json.result", "<p><b>Łukasz zaakceptował Twoją prośbę o dostęp — witaj!</b></p>" + maile.O_LUNIE_HTML))
 m3b = mail("Mail: przykro mi", [880, 760], "Twoja prośba o dostęp do Luny", maile.odrzucenie("$json.result"))
 r3 = respond("Odpowiedz: decyzja", [1100, 700],
   "={{ (R => Object.assign(" + SAFE.replace("}", ", email: R.email }") + ", { emailed: !$json.error }))($('Decyzja').item.json.result) }}")

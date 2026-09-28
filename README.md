@@ -22,7 +22,8 @@ notification — no forms, no fields. It runs in production for a small group of
   list, note, page to watch) and fills a structured spec; code, not the model, computes dates and occurrences.
 - **Reminders that think about your day** — if you have to travel somewhere, Luna reminds you 1.5 h and 5 min before;
   for a phone call 10 min before; for tomorrow's events also the evening before. At the moment of the event an
-  **alarm** re-sends a push every 20 s until you snooze, dismiss or tick it off (with a 60-minute safety stop).
+  **alarm** pushes 5 times every 20 s, then 5 times every 2 minutes (or until you snooze, dismiss or tick it off), and
+  one e-mail says the event has started.
 - **Dictation** — tap the mic, speak, tap *Done*. Audio goes to a self-hosted Whisper (`large-v3-turbo`, CPU), is never
   stored, and the sheet shows *what I heard* and *what I did with it* with a one-tap **Undo**.
 - **Desk** (`/biurko`) — a desktop page for long material: paste an e-mail from the nursery or a weekly plan, Luna

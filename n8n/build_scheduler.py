@@ -26,14 +26,16 @@ node("Opis", "n8n-nodes-base.stickyNote", 1, [-420, -320], {"width": 600, "heigh
   "Źródło: `~/Work/oboe/n8n/build_scheduler.py`."})
 t = node("Co 20 s", "n8n-nodes-base.scheduleTrigger", 1.2, [-220, 0],
   {"rule": {"interval": [{"field": "seconds", "secondsInterval": 20}]}})
-# Alarm w chwili terminu (28.09, Łukasz): jednorazowa rzecz, której termin właśnie minął, „dzwoni” — push co 20 s,
-# dopóki użytkownik nie przełoży (snoozed, +5 min), nie wyłączy (off) ani nie odhaczy. Bezpiecznik: 60 min, potem off + ostatni push.
-# Start tylko dla terminów z ostatniej godziny (stare zaległe nie zaczną dzwonić po wdrożeniu).
+# Alarm w chwili terminu (28.09, Łukasz; rytm zmieniony tego samego dnia): jednorazowa rzecz, której termin właśnie minął, „dzwoni”:
+# 5 pushy co 20 s, potem 5 co 2 min, potem koniec (state off, stopped 'done') — rzecz czeka w „Po terminie”.
+# Przy PIERWSZYM dzwonku dodatkowo jeden mail „Zaczęło się”. Przełożenie (snoozed, +5 min) zaczyna serię od nowa, bez maila.
+# Odhaczone / usunięte rzeczy nie dzwonią (status = 'active'). Start tylko dla terminów z ostatniej godziny.
 alarm = node("Alarmy", "n8n-nodes-base.postgres", 2.6, [0, 0], {"operation": "executeQuery", "query": """
 WITH purge AS (DELETE FROM items WHERE status = 'deleted' AND updated_at < now() - interval '30 days' RETURNING 1),   -- kosz: 30 dni
 ring AS (
-  SELECT i.id, i.user_id, i.title, i.data->'alarm' AS a,
-    coalesce((i.data->'alarm'->>'started_at')::timestamptz, now()) AS started
+  SELECT i.id, i.user_id, i.title, i.spec->>'event_at' AS event_at,
+    (i.data->'alarm'->>'state') IS NULL AS first,
+    CASE WHEN i.data->'alarm'->>'state' = 'snoozed' THEN 0 ELSE coalesce((i.data->'alarm'->>'count')::int, 0) END + 1 AS n
   FROM items i
   WHERE i.status = 'active' AND i.spec->>'event_at' IS NOT NULL
     AND coalesce(jsonb_typeof(i.spec->'recurrence'), 'null') = 'null'
@@ -45,20 +47,26 @@ ring AS (
   FOR UPDATE SKIP LOCKED),
 upd AS (
   UPDATE items i SET data = jsonb_set(i.data, '{alarm}', jsonb_build_object(
-      'state', CASE WHEN now() - r.started > interval '60 minutes' THEN 'off' ELSE 'ringing' END,
-      'stopped', CASE WHEN now() - r.started > interval '60 minutes' THEN 'timeout' END,
-      'started_at', r.started, 'next_at', now() + interval '19 seconds',
-      'count', coalesce((r.a->>'count')::int, 0) + 1))
+      'state', CASE WHEN r.n >= 10 THEN 'off' ELSE 'ringing' END,
+      'stopped', CASE WHEN r.n >= 10 THEN 'done' END,
+      'started_at', coalesce((i.data->'alarm'->>'started_at')::timestamptz, now()),
+      'next_at', now() + CASE WHEN r.n < 5 THEN interval '19 seconds' ELSE interval '119 seconds' END,
+      'count', r.n))
   FROM ring r WHERE i.id = r.id
-  RETURNING i.id, i.user_id, i.title, i.data->'alarm'->>'state' AS state),
+  RETURNING i.id, i.user_id, i.title, r.n, r.first, r.event_at),
 ins AS (INSERT INTO notifications (item_id, user_id, due_at, channels, title, body, kind)
-SELECT id, user_id, now(), '{push}',
-  CASE WHEN state = 'off' THEN 'Wyłączyłam alarm: ' || title ELSE '⏰ Teraz: ' || title END,
-  CASE WHEN state = 'off' THEN 'Przez godzinę nikt nie zareagował. Rzecz czeka w „Po terminie”.'
-       ELSE 'Przełóż o 5 min albo wyłącz przypomnienie — do tego czasu przypominam co 20 s.' END,
-  CASE WHEN state = 'off' THEN 'reminder' ELSE 'alarm' END
-FROM upd RETURNING id)
-SELECT count(*) AS alarms FROM ins""", "options": {}}, credentials=PG)
+SELECT id, user_id, now(), '{push}', '⏰ Teraz: ' || title,
+  CASE WHEN n >= 10 THEN 'To ostatnie przypomnienie — rzecz czeka w „Po terminie”.'
+       WHEN n >= 5 THEN 'Przypominam co 2 minuty — przełóż o 5 min albo wyłącz przypomnienie.'
+       ELSE 'Przełóż o 5 min albo wyłącz przypomnienie.' END,
+  'alarm'
+FROM upd RETURNING id),
+mail AS (INSERT INTO notifications (item_id, user_id, due_at, channels, title, body)
+SELECT id, user_id, now(), '{email}', 'Zaczęło się: ' || title,
+  'Zaplanowane zadanie właśnie się rozpoczęło (' || to_char(event_at::timestamptz AT TIME ZONE 'Europe/Warsaw', 'DD.MM, HH24:MI') || ').' ||
+  E'\\nJeśli już po wszystkim, odhacz je w Lunie — wtedy przestanę przypominać.'
+FROM upd WHERE first RETURNING id)
+SELECT (SELECT count(*) FROM ins) AS alarms, (SELECT count(*) FROM mail) AS mails""", "options": {}}, credentials=PG)
 claim = node("Weź zaległe", "n8n-nodes-base.postgres", 2.6, [220, 0], {"operation": "executeQuery", "query": """
 WITH due AS (
   SELECT id FROM notifications n WHERE sent_at IS NULL AND due_at <= now()
@@ -93,7 +101,7 @@ SELECT c.id, c.user_id, c.item_id, c.title, coalesce(c.body, '') AS body, u.emai
   ('email' = ANY(c.channels) OR NOT EXISTS (
      SELECT 1 FROM push_subscriptions s WHERE s.user_id = c.user_id AND s.failures < 3))
     AND NOT coalesce((i.spec->>'summarize')::boolean, false)
-    AND c.kind <> 'alarm' AS send_email,   -- alarm (co 20 s) NIGDY mailem — inaczej 180 maili na godzinę
+    AND c.kind <> 'alarm' AS send_email,   -- pushe alarmu NIGDY mailem; mail „Zaczęło się” to osobne powiadomienie (channels {email})
   ('push' = ANY(c.channels)) AND NOT coalesce((i.spec->>'summarize')::boolean, false) AS send_push,
   coalesce((i.spec->>'summarize')::boolean, false) AS summarize,
   (SELECT count(*) FROM ev) AS next_planned

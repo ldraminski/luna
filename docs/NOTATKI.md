@@ -177,8 +177,9 @@ W aplikacji przy wyczerpanym limicie (402): „Mam chwilową przerwę — skońc
 - **Czas przypomnień** (`prompt-rozumienie.txt`): trzeba dojechać (umowa, żłobek, lekarz, urząd…) → **1:30 h i 5 min przed**; bez dojazdu (telefon, lek, TV)
   → 10 min przed; wydarzenie jutro lub później → też 20:00 dzień wcześniej. Nie wcześniej niż 6:00, nigdy „na dokładną godzinę” (wtedy alarm).
 - **Alarm:** „Oboe: Harmonogram” chodzi **co 20 s**; krok „Alarmy” — jednorazowa rzecz z minionym terminem (start tylko dla ostatniej godziny)
-  dostaje powiadomienie `kind='alarm'` co 20 s, dopóki `data.alarm.state` nie jest `off`, przełożona (`snoozed`, +5 min) ani odhaczona.
-  Bezpiecznik 60 min (Apple może zablokować zasypujące pushe) → `off` + ostatni push. Alarm NIGDY mailem (fallback wyłączony dla `kind='alarm'`).
+  dostaje powiadomienie `kind='alarm'`: **5× co 20 s, potem 5× co 2 min, potem koniec** (`state off`, `stopped 'done'`; zmiana Łukasza 28.09,
+  wcześniej „co 20 s do skutku” z bezpiecznikiem 60 min). Przełożenie (`snoozed`, +5 min) zaczyna serię od nowa. Pushe alarmu NIGDY mailem,
+  ale przy PIERWSZYM dzwonku idzie jeden mail „Zaczęło się: …” (osobne powiadomienie `channels {email}`) — odhaczone/usunięte rzeczy nie dzwonią ani nie mailują.
 - Push alarmu: jeden na rzecz (`tag` + `renotify`), na Androidzie przyciski „Przełóż o 5 min” / „Wyłącz” (`POST /api/items/alarm` z SW).
   W aplikacji czerwona karta (`#alarm`) ma pierwszeństwo przed kartą zaległych. Migracja `db/012-alarm.sql` (`notifications.kind`).
 - Udanych przebiegów Harmonogramu n8n nie zapisuje (`saveDataSuccessExecution: none`) — 4320/dobę.

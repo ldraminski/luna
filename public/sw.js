@@ -57,7 +57,7 @@ async function handlePush() {
   }
   const shown = items.slice(0, 3);
   await Promise.all(shown.map((n) => self.registration.showNotification(n.title, n.kind === 'alarm'
-    // alarm: jedno powiadomienie na rzecz, podmieniane co 20 s i dzwoniące od nowa; przyciski działają tam, gdzie system je pokazuje (Android)
+    // alarm: jedno powiadomienie na rzecz, podmieniane przy każdym dzwonku (5× co 20 s, potem 5× co 2 min); przyciski działają tam, gdzie system je pokazuje (Android)
     ? { body: n.body || '', icon: '/icons/icon-192.png', tag: 'oboe-alarm-' + n.item_id, renotify: true, requireInteraction: true,
         actions: [{ action: 'snooze', title: 'Przełóż o 5 min' }, { action: 'off', title: 'Wyłącz' }], data: { item: n.item_id, alarm: true } }
     : { body: n.body || '', icon: '/icons/icon-192.png', tag: 'oboe-' + n.id, data: { item: n.item_id } })));
