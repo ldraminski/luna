@@ -72,8 +72,8 @@ fm = node("Tylko mail", "n8n-nodes-base.filter", 2.2, [460, -140], {
     "conditions": [{"id": str(uuid.uuid4()), "leftValue": "={{ $json.send_email }}", "rightValue": "",
                     "operator": {"type": "boolean", "operation": "true", "singleValue": True}}], "combinator": "and"}, "options": {}})
 mail = node("Wyślij mail", "n8n-nodes-base.emailSend", 2.1, [680, -140], {
-  "fromEmail": "Luna <n8n@renlab.ovh>", "toEmail": "={{ $json.email }}", "subject": "={{ '⏰ ' + $json.title }}",
-  "emailFormat": "text", "text": "={{ ($json.body ? $json.body + '\\n\\n' : '') + '— Luna' }}",
+  "fromEmail": "Luna <n8n@renlab.ovh>", "toEmail": "={{ $json.email }}", "subject": "={{ ($json.item_id ? '⏰ ' : '') + $json.title }}",
+  "emailFormat": "text", "text": "={{ ($json.body ? $json.body + '\\n\\n' : '') + 'Otwórz Lunę: https://luna.draminski.dev' + ($json.item_id ? '/?open=' + $json.item_id : '') + '\\n\\n— Luna' }}",
   "options": {"appendAttribution": False}}, credentials=SMTP, onError="continueRegularOutput")
 mark = node("Oznacz wysłane mailem", "n8n-nodes-base.postgres", 2.6, [900, -140], {"operation": "executeQuery",
   "query": "UPDATE notifications SET emailed = true, error = CASE WHEN $2 = '' THEN error ELSE left($2, 300) END WHERE id = $1",
