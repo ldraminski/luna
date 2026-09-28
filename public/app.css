@@ -461,3 +461,7 @@ body{touch-action:manipulation}
 .voice-act{display:flex;gap:10px;width:100%;margin-top:18px}
 .voice-act .cta{margin:0}
 .voice-in[data-state=work] .voice-act{display:none}
+
+/* link do biurka — tylko na szerokim ekranie, obok ramki telefonu (Hikari, 28.09) */
+.to-desk{display:none}
+@media (min-width:1000px){.to-desk:not([hidden]){display:block;position:fixed;top:32px;left:32px;background:var(--surface);color:var(--navy);text-decoration:none;font-weight:500;font-size:14px;padding:12px 18px;border-radius:var(--r-pill);box-shadow:var(--shadow)}}

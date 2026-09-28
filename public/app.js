@@ -112,6 +112,7 @@ async function submitToken(e) {
 function startMain() {
   $('#screen-hello').hidden = true;
   $('#screen-main').hidden = false; $('#dock').hidden = false;
+  $('.to-desk').hidden = false;   // link do biurka widać tylko na szerokim ekranie (CSS)
   const h = new Date().getHours();
   const hi = h < 5 ? 'Dobry wieczór' : h < 18 ? 'Dzień dobry' : 'Dobry wieczór';
   $('#hello-name').innerHTML = `${hi},<br>${esc(state.user?.name || '')}`;

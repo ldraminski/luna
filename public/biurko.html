@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Luna · biurko</title>
+<meta name="theme-color" content="#e6f0f2">
+<link rel="icon" href="/icons/favicon.png" type="image/png">
+<link rel="stylesheet" href="/fonts/lexend.css">
+<link rel="stylesheet" href="/biurko.css?v=__V__">
+<script type="module" src="/biurko.js?v=__V__"></script>
+</head>
+<body>
+<!-- Biurko Luny (wewn. oboe) — wersja na komputer do dłuższych materiałów (28.09.2026).
+     Wspólne z telefonem: logowanie (ten sam klucz w przeglądarce), API, dane. Osobny tylko interfejs. -->
+<header class="top">
+  <a class="brand" href="/"><img src="/icons/icon-192.png" alt="" width="32" height="32"><span>Luna <b>· biurko</b></span></a>
+  <span class="who" id="who"></span>
+  <a class="link" href="/">Widok z telefonu</a>
+</header>
+
+<main class="desk" id="desk" hidden>
+  <section class="col-main">
+    <!-- 1. materiał -->
+    <div class="card" id="step-in">
+      <h1>Wklej, co mam zapamiętać</h1>
+      <p class="lead">Plan tygodnia, mail ze żłobka, notatki, lista — rozbiję to na osobne rzeczy, a ty sprawdzisz, zanim cokolwiek zapiszę.</p>
+      <label for="src" class="sr">Materiał dla Luny</label>
+      <textarea id="src" spellcheck="true" placeholder="Na przykład:
+Zebranie grupy w piątek 2.10 o 15:00, sala nr 2.
+Do poniedziałku przynieść kapcie i zapasowe ubranie.
+Opłata 320 zł do 10 października.
+wt – basen z Leną, co tydzień o 17"></textarea>
+      <div class="row">
+        <span class="count" id="count">0 / 20 000</span>
+        <span class="grow"></span>
+        <button type="button" class="btn alt" id="one">Zapisz jako jedną rzecz</button>
+        <button type="button" class="btn" id="split">Rozbij na rzeczy <kbd>Ctrl ↵</kbd></button>
+      </div>
+    </div>
+
+    <!-- 2. przegląd propozycji → 3. zapis -->
+    <div class="card" id="step-review" hidden>
+      <div class="head">
+        <h2 id="rv-title">Sprawdź, co zapiszę</h2>
+        <button type="button" class="btn ghost" id="restart">Zacznij od nowa</button>
+      </div>
+      <p class="lead" id="rv-lead">Każda linijka to osobna rzecz. Popraw, co trzeba, usuń zbędne — zapiszę dopiero po „Zapisz wszystkie”.</p>
+      <p class="skipped" id="skipped" hidden></p>
+      <ol class="parts" id="parts"></ol>
+      <div class="row">
+        <button type="button" class="btn ghost" id="add-part">+ Dodaj rzecz</button>
+        <span class="grow"></span>
+        <button type="button" class="btn" id="save-all">Zapisz wszystkie</button>
+      </div>
+    </div>
+  </section>
+
+  <aside class="col-side">
+    <div class="card side">
+      <h2>Najbliższe 30 dni</h2>
+      <p class="lead small">Żeby nie dopisać czegoś drugi raz.</p>
+      <ul class="soon" id="soon"><li class="muted">Wczytuję…</li></ul>
+    </div>
+  </aside>
+</main>
+
+<main class="gate" id="gate" hidden>
+  <div class="card">
+    <h1>Najpierw się zaloguj</h1>
+    <p class="lead">Biurko korzysta z tego samego klucza co Luna. Zaloguj się na głównej stronie w tej przeglądarce i wróć tutaj.</p>
+    <a class="btn" href="/">Przejdź do logowania</a>
+  </div>
+</main>
+
+<div class="toast" id="toast" role="status" hidden></div>
+</body>
+</html>

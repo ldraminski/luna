@@ -68,6 +68,7 @@ export const api = {
   items: () => call('items').then((d) => d.items || []),
   add: (text, image = '', thumb = '') => call('items', { method: 'POST', body: { text, ...(image ? { image, thumb } : {}) }, timeout: 90000 }),
   transcribe: (audio) => call('transcribe', { method: 'POST', body: { audio }, timeout: 60000 }).then((d) => d.text || ''),
+  split: (text) => call('items/split', { method: 'POST', body: { text }, timeout: 130000 }),
   photo: (id) => call('items/photo?id=' + encodeURIComponent(id)).then((d) => d.image),
   done: (id) => call('items/done', { method: 'POST', body: { id } }),
   remove: (id) => call('items/delete', { method: 'POST', body: { id } }),
