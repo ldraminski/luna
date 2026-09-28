@@ -14,7 +14,7 @@ Produkt nazywał się roboczo Oboe (覚え). Od 27.09.2026 **dla użytkownika to
 |---|---|
 | tytuł, manifest PWA, ikona, teksty w aplikacji | repo `~/Work/oboe`, katalog `/opt/oboe`, obraz `oboe:latest` |
 | głos modeli: `understood`, powiadomienia, czat widgetu | kontenery `oboe`, `oboe-db`, baza i użytkownik `oboe` |
-| nadawca i treść maili („Luna <n8n@renlab.ovh>”) | workflow n8n „Oboe: …”, webhooki `/webhook/oboe/…`, credentiale „Oboe - …” |
+| nadawca i treść maili („Luna <luna@draminski.dev>”, przez Resend od 29.09.2026) | workflow n8n „Oboe: …”, webhooki `/webhook/oboe/…`, credentiale „Oboe - …” |
 | adres `luna.draminski.dev` (`oboe.draminski.dev` usunięty 27.09) | protokół widgetów `oboe:data/ready/resize/save` (zmiana zepsuje gotowe widgety) |
 | | `localStorage` `oboe-token`, IndexedDB `oboe`, cache SW `oboe-shell-*` (zmiana wyloguje ludzi) |
 
@@ -124,6 +124,14 @@ Kod jest publiczny (github.com/ldraminski/luna), a Luna działa na **jednym** kl
 - Zmiana limitu jednej osoby: `UPDATE users SET daily_limit = NULL WHERE email = '...'`.
 - Webhooki `/webhook/oboe/*` i `/webhook-test/oboe/*` na hoście n8n zablokowane regułą WAF Cloudflare „Luna: webhooki tylko przez aplikację”.
 - Ekran startowy: „Poproś o dostęp” (wcześniej „Poproś o klucz”).
+
+## Maile przez Resend (29.09.2026)
+
+Wcześniej `n8n@renlab.ovh` (OVH): SPF/DKIM/DMARC przechodziły, a i tak u części odbiorców Gmail dawał spam (młoda domena `.ovh`,
+nadawca z innej domeny niż linki, DKIM OVH podpisuje tylko nagłówek From). Teraz **`Luna <luna@draminski.dev>` przez Resend** (SMTP
+`smtp.resend.com:465`, user `resend`, hasło = klucz API z uprawnieniem tylko do wysyłki; credential n8n „SMTP account”).
+DNS draminski.dev w Cloudflare: `resend._domainkey` (TXT, DKIM), `send` i `rsend` (CNAME, bez proxy), `_dmarc` (`p=none`).
+Zmiana nadawcy/credentiala = `n8n/config.local.json` (`sender`, `credentials.smtp`) → `build_all.py` → PUT Harmonogram, Dostęp, Wydaj token.
 
 ## Raport dnia / tygodnia i przypomnienie o zaległych (28.09.2026, Łukasz)
 
