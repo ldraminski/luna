@@ -84,6 +84,20 @@ lista → lista, miejsce/rzecz → zwykła notatka z polami (adres, godziny, cen
 zapisujemy tylko **miniaturę** (≤800 px JPEG ~30–100 KB, robi ją przeglądarka) w tabeli `item_photos` (migracja 010) —
 pobierana osobno `GET /api/items/photo?id=` wyłącznie z kluczem właściciela; lista rzeczy ma tylko `has_photo`. Usunięcie rzeczy kasuje zdjęcie. Nieczytelne zdjęcie bez tekstu → 422 „Nie udało mi się obejrzeć tego zdjęcia” (Luna nic nie wymyśla).
 
+## Dyktowanie (28.09.2026, Łukasz)
+
+Mikrofon w głównym polu otwiera okno **„Słucham”** (instrukcja z przykładem, licznik, Anuluj / Gotowe; limit 2 min) →
+**„Odsłuchuję…”** → **„Zapisuję…”** → **podsumowanie**: „Usłyszałam: …” + „Co z tym zrobiłam” (`spec.understood`) z **Cofnij** (miękkie usunięcie) / Super.
+Zapis bez pytania o zgodę — transkrypcja jest dokładna, a „Cofnij” ratuje pomyłki. Nieudany zapis → „Wstaw do pola” (tam działa kolejka offline).
+- `POST /api/transcribe {audio: dataURL}` → workflow „Oboe: Dyktowanie” (`n8n/build_transcribe.py`, id w `n8n/.transcribe-wf-id`) →
+  kontener **`whisper`** (speaches, `deepdml/faster-whisper-large-v3-turbo-ct2` int8, CPU, `cpus: 4`, `mem_limit: 4g`) w `/opt/infra`, bez portu publicznego.
+  nginx: 4 MB tylko dla tej trasy. **Nagranie nie jest nigdzie zapisywane.**
+- **`vad_filter=true` obowiązkowo** — bez niego Whisper na ciszy/szumie zmyśla „Dziękuję za uwagę.” / „Dzięki za oglądanie!”. Cisza → 422 „Nic nie usłyszałam”.
+- Czas: ~6–8 s na transkrypcję (Whisper zawsze liczy okno 30 s, więc krótka notatka nie jest dużo szybsza) + ~2 s rozumienie. Test E2E: 9,4 s od „Gotowe” do zapisu.
+- Format: Android/Chrome `audio/webm;codecs=opus`, iPhone `audio/mp4`. Aplikacja zeszła w tło w trakcie nagrywania → nagranie przepada, nic nie idzie.
+- Test bez telefonu: Chromium z `--use-fake-device-for-media-stream --use-file-for-fake-audio-capture=plik.wav` (WAV z `say -v Zosia` + `afconvert`),
+  na tymczasowym koncie testowym (nie na koncie Łukasza — rozumienie ustawia prawdziwe przypomnienia).
+
 ## Raport dnia / tygodnia i przypomnienie o zaległych (28.09.2026, Łukasz)
 
 Workflow „Oboe: Raport” (`n8n/build_report.py`, id w `n8n/.report-wf-id`), migracja `db/011-raporty.sql`.

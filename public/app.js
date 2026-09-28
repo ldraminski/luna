@@ -744,6 +744,108 @@ async function add(e) {
   } finally { clearTimeout(slow); form.classList.remove('busy'); }
 }
 
+// ---------- dyktowanie (Hikari, 28.09): mikrofon otwiera okno „Słucham” → „Gotowe” → Whisper u nas (/api/transcribe,
+// nagranie nie jest zapisywane) → zwykłe dodanie rzeczy → podsumowanie: co usłyszałam i co z tym zrobiłam (+ „Cofnij”).
+const REC_MAX = 120;   // s — dłuższe nagranie kończy się samo
+const rec = { mr: null, stream: null, chunks: [], start: 0, tick: null, discard: false, item: null, text: '' };
+const VOICE_HINT = 'Powiedz zwykłym zdaniem, co mam zapamiętać i kiedy przypomnieć. Na przykład: „jutro o 9 przypomnij mi o telefonie do księgowej”. Kiedy skończysz, stuknij „Gotowe”.';
+// state: rec | work | sum | err;  btns: [lewy, prawy] albo null
+function voiceUi(state, title, lead = '', btns = null) {
+  const box = $('#voice .voice-in'); box.dataset.state = state;
+  $('#voice-title').textContent = title;
+  $('#voice-lead').textContent = lead; $('#voice-lead').hidden = !lead;
+  $('#voice-sum').hidden = !rec.text || state === 'rec' || state === 'work' && !rec.text;
+  $('#voice-heard').textContent = rec.text ? '„' + rec.text + '”' : '';
+  const [l, r] = btns || [];
+  const L = $('[data-voice=left]'); const R = $('[data-voice=right]');
+  L.textContent = l || ''; L.hidden = !l; R.textContent = r || ''; R.hidden = !r;
+  if (!$('#voice').open) $('#voice').showModal();
+}
+function voiceDid(label, text) {
+  $('#voice-did-lbl').textContent = label; $('#voice-did-lbl').hidden = !text;
+  $('#voice-did').textContent = text || ''; $('#voice-did').hidden = !text;
+}
+async function startRec() {
+  if ($('#wpisz').classList.contains('busy')) return;
+  if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) return toast('Ta przeglądarka nie pozwala mi nagrywać — użyj mikrofonu na klawiaturze.');
+  if (navigator.onLine === false) return toast('Bez internetu nie odsłucham nagrania — napisz, a wyślę, gdy wróci połączenie.');
+  rec.text = ''; rec.item = null; voiceDid('', '');
+  voiceUi('rec', 'Słucham', VOICE_HINT, ['Anuluj', 'Gotowe']);
+  $('#voice-time').textContent = '0:00';
+  try { rec.stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } }); }
+  catch { return voiceUi('err', 'Nie mam dostępu do mikrofonu', 'Zezwól Lunie na mikrofon w ustawieniach telefonu i spróbuj jeszcze raz.', [null, 'Zamknij']); }
+  if (!$('#voice').open) { rec.stream.getTracks().forEach((t) => t.stop()); rec.stream = null; return; }   // zamknięte, zanim telefon dał mikrofon
+  // Android/Chrome: webm/opus (mały plik); iPhone: tylko mp4/aac.
+  const type = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm'].find((t) => MediaRecorder.isTypeSupported?.(t));
+  try { rec.mr = new MediaRecorder(rec.stream, type ? { mimeType: type, audioBitsPerSecond: 32000 } : undefined); }
+  catch { rec.stream.getTracks().forEach((t) => t.stop()); return voiceUi('err', 'Nie udało mi się włączyć nagrywania', 'Użyj mikrofonu na klawiaturze telefonu.', [null, 'Zamknij']); }
+  rec.chunks = []; rec.discard = false; rec.start = Date.now();
+  rec.mr.ondataavailable = (e) => { if (e.data?.size) rec.chunks.push(e.data); };
+  rec.mr.onstop = onRecStop;
+  rec.mr.start(1000);
+  clearInterval(rec.tick);
+  rec.tick = setInterval(() => {
+    const s = Math.floor((Date.now() - rec.start) / 1000);
+    $('#voice-time').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    if (s >= REC_MAX) stopRec();
+  }, 250);
+}
+function stopRec(discard = false) {
+  clearInterval(rec.tick);
+  if (!rec.mr) return;
+  rec.discard = discard;
+  if (rec.mr.state !== 'inactive') rec.mr.stop(); else onRecStop();
+}
+async function onRecStop() {
+  const mr = rec.mr; const secs = (Date.now() - rec.start) / 1000;
+  rec.mr = null; rec.stream?.getTracks().forEach((t) => t.stop()); rec.stream = null;
+  if (rec.discard) return;
+  if (secs < 1 || !rec.chunks.length) return voiceUi('err', 'Za krótko', 'Stuknij „Nagraj jeszcze raz”, powiedz, co trzeba, i dopiero wtedy „Gotowe”.', ['Zamknij', 'Nagraj jeszcze raz']);
+  const blob = new Blob(rec.chunks, { type: (mr.mimeType || rec.chunks[0].type || 'audio/webm').split(';')[0] }); rec.chunks = [];
+  voiceUi('work', 'Odsłuchuję…');
+  try {
+    const audio = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsDataURL(blob); });
+    rec.text = await api.transcribe(audio);
+  } catch (err) {
+    if (err.status === 401) { $('#voice').close(); return logout('Klucz przestał działać — wpisz swój e-mail, a wyślę nowy.'); }
+    return voiceUi('err', err.status === 422 ? 'Nic nie usłyszałam' : 'Nie udało mi się odsłuchać',
+      err.status === 0 ? 'Brak połączenia z Luną. Spróbuj za chwilę albo napisz.' : err.status === 422 ? 'Spróbuj jeszcze raz, bliżej telefonu.' : err.message,
+      ['Zamknij', 'Nagraj jeszcze raz']);
+  }
+  voiceUi('work', 'Zapisuję…');
+  const image = state.photo || '';
+  try {
+    const r = await api.add(rec.text, image, image ? state.thumb || '' : '');
+    setPhoto(null); rec.item = r.item?.id || null;
+    voiceDid('Co z tym zrobiłam', r.item?.spec?.understood || 'Zapisałam.');
+    voiceUi('sum', 'Gotowe', '', ['Cofnij', 'Super']);
+    load();
+  } catch (err) {
+    if (err.status === 401) { $('#voice').close(); return logout('Klucz przestał działać — wpisz swój e-mail, a wyślę nowy.'); }
+    // Tekst już mamy — nie przepada: można go wstawić do pola i wysłać później (tam działa też kolejka offline).
+    voiceDid('', '');
+    voiceUi('err', 'Nie udało mi się zapisać', err.status === 0 ? 'Brak połączenia z Luną — wstaw tekst do pola, wyślę go, gdy wróci.' : err.message, ['Zamknij', 'Wstaw do pola']);
+    rec.item = 'wstaw';
+  }
+}
+async function voiceBtn(side) {
+  const st = $('#voice .voice-in').dataset.state;
+  if (st === 'rec') return side === 'right' ? stopRec() : (stopRec(true), $('#voice').close());
+  if (st === 'sum' && side === 'left' && rec.item) {   // Cofnij = rzecz znika (miękko, jak zwykłe usunięcie)
+    try { await api.remove(rec.item); toast('Cofnięte — nic nie zapisałam.'); load(); } catch (err) { toast(err.message); }
+    return $('#voice').close();
+  }
+  if (st === 'err' && side === 'right' && rec.item === 'wstaw') {
+    const q = $('#q'); q.value = (q.value.trim() + ' ' + rec.text).trim(); fitQ(); $('#voice').close(); return q.focus();
+  }
+  if (st === 'err' && side === 'right' && !rec.text) return startRec();   // „Nagraj jeszcze raz”
+  $('#voice').close();
+}
+// Aplikacja schowana w trakcie nagrywania (telefon i tak odcina mikrofon) — nagranie przepada, nic nie wysyłamy.
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && rec.mr) { stopRec(true); voiceUi('err', 'Nagranie przerwane', 'Aplikacja zeszła w tło, więc nic nie wysłałam.', ['Zamknij', 'Nagraj jeszcze raz']); }
+});
+
 // Zdjęcie do nowej rzeczy: miniatura nad polem; samo zdjęcie też można wysłać (Luna sama zdecyduje: przypomnienie / lista / notatka).
 function setPhoto(url, thumb = null) {
   state.photo = url || null; state.thumb = url ? thumb : null;
@@ -963,7 +1065,10 @@ function bind() {
   window.visualViewport?.addEventListener('resize', keepDock);
   window.visualViewport?.addEventListener('scroll', keepDock);
   $('#plus').addEventListener('click', () => $('#q').focus());
-  $('#mic').addEventListener('click', () => { $('#q').focus(); toast('Dyktowanie w Lunie dopiero się szykuje — na razie użyj mikrofonu na klawiaturze telefonu.'); });
+  $('#mic').addEventListener('click', startRec);
+  $('#voice').addEventListener('click', (e) => { const b = e.target.closest('[data-voice]'); if (b) voiceBtn(b.dataset.voice); });
+  $('#voice').addEventListener('cancel', (e) => { if ($('#voice .voice-in').dataset.state === 'work') e.preventDefault(); });   // w trakcie pracy nie zamykamy
+  $('#voice').addEventListener('close', () => { if (rec.mr) stopRec(true); });
   $('#bell').addEventListener('click', bell);
   $('#luna').addEventListener('click', openIntro);
   $('#report-btn').addEventListener('click', async () => { if (!state.report) await loadReport(); openReport(); });

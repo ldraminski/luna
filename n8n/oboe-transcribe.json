@@ -1,0 +1,286 @@
+{
+ "name": "Oboe: Dyktowanie",
+ "nodes": [
+  {
+   "id": "d8902a5d-5157-4f0e-bd3a-7e3b40ee4978",
+   "name": "Opis",
+   "type": "n8n-nodes-base.stickyNote",
+   "typeVersion": 1,
+   "position": [
+    -400,
+    -220
+   ],
+   "parameters": {
+    "width": 520,
+    "height": 240,
+    "content": "## Oboe: Dyktowanie\nMikrofon w Lunie → `POST /api/transcribe {audio: dataURL}` → Whisper u nas (kontener `whisper`, large-v3-turbo, CPU) → `{text}`. Aplikacja wysyła tekst dalej jak zwykły wpis.\nNagranie nie jest zapisywane. `vad_filter` = cisza daje pusty tekst zamiast zmyśleń.\nŹródło: `~/Work/oboe/n8n/build_transcribe.py`."
+   }
+  },
+  {
+   "id": "490bf3f4-fe7e-48a2-865e-43dcc0d0c1a4",
+   "name": "POST transcribe",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    0
+   ],
+   "parameters": {
+    "httpMethod": "POST",
+    "path": "oboe/transcribe",
+    "responseMode": "responseNode",
+    "options": {}
+   },
+   "webhookId": "4a276454-5dfb-46f7-b698-cf7b35eca94c"
+  },
+  {
+   "id": "94a2ae84-36a7-4b55-9cd9-6a34d8139e4d",
+   "name": "Sesja",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    220,
+    0
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "WITH me AS (\n  UPDATE sessions SET last_used_at = now()\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id)\nSELECT (SELECT user_id FROM me) AS user_id",
+    "options": {
+     "queryReplacement": "={{ [ ($json.headers.authorization || '').replace(/^Bearer\\s+/i, '') ] }}"
+    }
+   },
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   }
+  },
+  {
+   "id": "849f520c-d1eb-4d3c-b046-ac747ce99601",
+   "name": "Zalogowany i jest nagranie?",
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2.2,
+   "position": [
+    440,
+    0
+   ],
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "loose",
+      "version": 2
+     },
+     "conditions": [
+      {
+       "id": "2090b19f-c181-4b1f-b906-4e2cb3394ab2",
+       "leftValue": "={{ $json.user_id }}",
+       "rightValue": "",
+       "operator": {
+        "type": "string",
+        "operation": "notEmpty",
+        "singleValue": true
+       }
+      },
+      {
+       "id": "247c71b9-b53c-40a0-88a6-3b813d85d7c6",
+       "leftValue": "={{ /^data:audio\\/[a-z0-9.+-]+(;[a-z0-9=._-]+)*;base64,[A-Za-z0-9+\\/=]+$/i.test(String($('POST transcribe').item.json.body.audio || '')) }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "94ba7df1-34b5-4f2c-80a9-8515f8d6c8e0",
+   "name": "Odmów",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    660,
+    180
+   ],
+   "parameters": {
+    "respondWith": "json",
+    "options": {
+     "responseCode": "={{ $json.user_id ? 400 : 401 }}"
+    },
+    "responseBody": "={{ $json.user_id ? { status: 400, error: 'Nie dostałam nagrania — spróbuj jeszcze raz.' } : { status: 401, error: 'Zaloguj się ponownie' } }}"
+   }
+  },
+  {
+   "id": "e4c1d824-fedf-43a8-b911-15abbe6c301c",
+   "name": "Nagranie → plik",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    660,
+    0
+   ],
+   "parameters": {
+    "jsCode": "const url = String($('POST transcribe').first().json.body.audio);\nconst mime = url.slice(5, url.indexOf(';')).toLowerCase();\nconst ext = mime.includes('mp4') || mime.includes('m4a') || mime.includes('aac') ? 'm4a'\n  : mime.includes('ogg') ? 'ogg' : mime.includes('wav') ? 'wav' : mime.includes('mpeg') ? 'mp3' : 'webm';\nconst buf = Buffer.from(url.slice(url.indexOf(',') + 1), 'base64');\nconst bin = await this.helpers.prepareBinaryData(buf, 'glosowka.' + ext, mime);\nreturn [{ json: { bytes: buf.length }, binary: { audio: bin } }];"
+   }
+  },
+  {
+   "id": "fec21fe1-b2c8-4950-a13e-0110a351b492",
+   "name": "Whisper",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    880,
+    0
+   ],
+   "parameters": {
+    "method": "POST",
+    "url": "http://whisper:8000/v1/audio/transcriptions",
+    "sendBody": true,
+    "contentType": "multipart-form-data",
+    "bodyParameters": {
+     "parameters": [
+      {
+       "parameterType": "formBinaryData",
+       "name": "file",
+       "inputDataFieldName": "audio"
+      },
+      {
+       "name": "model",
+       "value": "deepdml/faster-whisper-large-v3-turbo-ct2"
+      },
+      {
+       "name": "language",
+       "value": "pl"
+      },
+      {
+       "name": "vad_filter",
+       "value": "true"
+      }
+     ]
+    },
+    "options": {
+     "timeout": 90000
+    }
+   },
+   "retryOnFail": true,
+   "maxTries": 2,
+   "onError": "continueRegularOutput"
+  },
+  {
+   "id": "04c1666c-3efa-4dc7-843d-fb336de80cd1",
+   "name": "Tekst",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1100,
+    0
+   ],
+   "parameters": {
+    "jsCode": "const j = $input.first().json;\nif (j.error || typeof j.text !== 'string') return [{ json: { result: { status: 502, error: 'Nie udało mi się odsłuchać nagrania — spróbuj jeszcze raz albo napisz.' } } }];\n// Klasyczne zmyślenia Whispera po polsku (napisy z filmów) — gdyby VAD coś przepuścił.\nconst FAKE = /^(dzi[eę]kuj[eę] za (uwag[eę]|obejrzenie|ogl[aą]danie)|dzi[eę]ki za (ogl[aą]danie|uwag[eę])|napisy stworzone przez spo[lł]eczno[sś][cć] amara\\.org|do zobaczenia)[.!]*$/i;\nconst text = j.text.replace(/\\s+/g, ' ').trim();\nif (!text || FAKE.test(text)) return [{ json: { result: { status: 422, error: 'Nic nie usłyszałam — spróbuj jeszcze raz, bliżej telefonu.' } } }];\nreturn [{ json: { result: { status: 200, text: text.slice(0, 1000) } } }];"
+   }
+  },
+  {
+   "id": "39024cd0-dd60-4488-a87a-ef0bce71972d",
+   "name": "Odpowiedz: tekst",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    1320,
+    0
+   ],
+   "parameters": {
+    "respondWith": "json",
+    "responseBody": "={{ $json.result }}",
+    "options": {
+     "responseCode": "={{ $json.result.status || 200 }}"
+    }
+   }
+  }
+ ],
+ "connections": {
+  "POST transcribe": {
+   "main": [
+    [
+     {
+      "node": "Sesja",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Sesja": {
+   "main": [
+    [
+     {
+      "node": "Zalogowany i jest nagranie?",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Zalogowany i jest nagranie?": {
+   "main": [
+    [
+     {
+      "node": "Nagranie → plik",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Odmów",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Nagranie → plik": {
+   "main": [
+    [
+     {
+      "node": "Whisper",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Whisper": {
+   "main": [
+    [
+     {
+      "node": "Tekst",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Tekst": {
+   "main": [
+    [
+     {
+      "node": "Odpowiedz: tekst",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1",
+  "timezone": "Europe/Warsaw"
+ }
+}

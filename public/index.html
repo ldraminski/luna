@@ -172,6 +172,30 @@
   </div>
 </dialog>
 
+<!-- DYKTOWANIE · słucham → odsłuchuję → podsumowanie (Hikari, 28.09) -->
+<dialog class="chat nudge voice" id="voice" aria-labelledby="voice-title">
+  <div class="chat-in nudge-in voice-in" data-state="rec">
+    <div class="voice-orb" aria-hidden="true">
+      <svg class="i v-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+      <svg class="i v-spin" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9"/></svg>
+      <svg class="i v-ok" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+    </div>
+    <p class="voice-time" id="voice-time">0:00</p>
+    <h2 id="voice-title">Słucham</h2>
+    <p class="nudge-lead" id="voice-lead"></p>
+    <div class="voice-sum" id="voice-sum" hidden>
+      <p class="voice-lbl">Usłyszałam</p>
+      <p class="voice-heard" id="voice-heard"></p>
+      <p class="voice-lbl" id="voice-did-lbl">Co z tym zrobiłam</p>
+      <p class="voice-did" id="voice-did"></p>
+    </div>
+    <div class="voice-act">
+      <button class="cta alt" type="button" data-voice="left">Anuluj</button>
+      <button class="cta" type="button" data-voice="right">Gotowe</button>
+    </div>
+  </div>
+</dialog>
+
 <!-- ALARM · czerwona karta w chwili terminu (dopóki nie przełożysz / nie wyłączysz — push co 20 s) -->
 <dialog class="chat alarm" id="alarm" aria-labelledby="alarm-title">
   <div class="chat-in alarm-in">

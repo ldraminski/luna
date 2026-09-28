@@ -432,3 +432,32 @@ html.locked,html.locked body{overflow:hidden;height:100%}
 html,body{overflow-x:hidden;overscroll-behavior-x:none}
 body{touch-action:manipulation}
 .days{touch-action:pan-x pan-y}
+
+/* dyktowanie (Hikari, 28.09): osobne okno — słucham / odsłuchuję / podsumowanie */
+.voice-in{text-align:center;align-items:center;padding-top:26px}
+.voice-orb{width:88px;height:88px;border-radius:50%;display:grid;place-items:center;background:var(--late);color:#fff;margin:0 auto}
+.voice-orb .i{width:38px;height:38px;grid-area:1/1;display:none}
+.voice-in[data-state=rec] .voice-orb{animation:rec 1.4s ease-in-out infinite}
+.voice-in[data-state=rec] .v-mic{display:block}
+.voice-in[data-state=work] .voice-orb{background:var(--surface-2);color:var(--navy)}
+.voice-in[data-state=work] .v-spin{display:block;animation:spin 1s linear infinite}
+.voice-in[data-state=sum] .voice-orb{background:var(--navy);color:var(--on-navy)}
+.voice-in[data-state=sum] .v-ok{display:block}
+.voice-in[data-state=err] .voice-orb{background:var(--surface-2);color:var(--late)}
+.voice-in[data-state=err] .v-mic{display:block}
+@keyframes rec{50%{box-shadow:0 0 0 14px rgba(155,28,90,.16)}}
+@media (prefers-reduced-motion:reduce){.voice-in[data-state=rec] .voice-orb{animation:none}}
+.voice-time{margin-top:12px;font-size:14px;font-weight:600;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.voice-in:not([data-state=rec]) .voice-time{display:none}
+.voice h2{font-size:22px;line-height:1.2;margin-top:14px;color:var(--navy)}
+.voice-in[data-state=rec] h2{margin-top:2px;color:var(--late)}
+.voice .nudge-lead{max-width:34ch;margin:8px auto 0;line-height:1.45}
+.voice-sum{width:100%;text-align:left;background:var(--surface);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow);margin-top:16px}
+.voice-lbl{font-size:12px;font-weight:600;color:var(--ink-2);text-transform:uppercase;letter-spacing:.05em}
+.voice-lbl + p{margin-top:3px}
+.voice-heard{font-size:15px;line-height:1.45;font-style:italic;overflow-wrap:anywhere}
+.voice-did{font-size:15px;line-height:1.45;font-weight:500;overflow-wrap:anywhere}
+.voice-heard + .voice-lbl{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.voice-act{display:flex;gap:10px;width:100%;margin-top:18px}
+.voice-act .cta{margin:0}
+.voice-in[data-state=work] .voice-act{display:none}
