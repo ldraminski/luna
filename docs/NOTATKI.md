@@ -134,6 +134,15 @@ DNS draminski.dev w Cloudflare: `resend._domainkey` (TXT, DKIM), `send` i `rsend
 **Maile tylko tekstowe** (test 29.09 na nowej skrzynce Gmail: HTML z przyciskiem „Zainstaluj” → spam, ta sama treść jako tekst → odebrane).
 Zmiana nadawcy/credentiala = `n8n/config.local.json` (`sender`, `credentials.smtp`) → `build_all.py` → PUT Harmonogram, Dostęp, Wydaj token.
 
+## Przegląd bezpieczeństwa przed udostępnieniem linku (29.09.2026)
+
+- Wszystkie 31 tras `/api/*` bez klucza → 401; `/api/admin/*` → 404 (nginx); webhooki `/webhook/oboe/*` na hoście n8n → 403 (WAF).
+- Z zewnątrz otwarty tylko SSH (port 58, tylko klucz). Postgres, n8n, Whisper — niedostępne.
+- **Naprawione:** strony nie wysyłały ŻADNYCH nagłówków bezpieczeństwa — `add_header` w `location` kasuje te z poziomu `server`.
+  Teraz `security-headers.inc` dołączany w każdej sekcji: CSP (skrypty tylko własne, `frame-ancestors 'none'`), HSTS, nosniff,
+  Referrer-Policy, Permissions-Policy. Sprawdzone Playwrightem: zero naruszeń CSP (lista, dodawanie, dyktowanie, biurko, regulamin, widget).
+- Właściciel sprawdzany w każdym zapytaniu (także pośrednio przez `widget_chats`), tekst użytkownika escapowany.
+
 ## Raport dnia / tygodnia i przypomnienie o zaległych (28.09.2026, Łukasz)
 
 Workflow „Oboe: Raport” (`n8n/build_report.py`, id w `n8n/.report-wf-id`), migracja `db/011-raporty.sql`.
