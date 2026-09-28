@@ -4,7 +4,8 @@
 // iOS wymaga, żeby KAŻDY push skończył się widocznym powiadomieniem — inaczej Apple cofa subskrypcję.
 
 const SHELL = 'oboe-shell-__V__';   // __V__ = skrót treści plików, podmieniany przy budowie obrazu (Dockerfile)
-const SHELL_FILES = ['/', '/index.html', '/app.css?v=__V__', '/app.js?v=__V__', '/api.js?v=__V__', '/manifest.webmanifest', '/icons/icon-192.png'];
+const SHELL_FILES = ['/', '/index.html', '/app.css?v=__V__', '/app.js?v=__V__', '/api.js?v=__V__', '/manifest.webmanifest', '/icons/icon-192.png',
+  '/fonts/lexend.css', '/fonts/lexend-latin.woff2', '/fonts/lexend-latin-ext.woff2'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(SHELL).then((c) => c.addAll(SHELL_FILES).catch(() => {})).then(() => self.skipWaiting()));
@@ -20,10 +21,14 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET' || url.origin !== location.origin || url.pathname.startsWith('/api/')) return;
   // Cloudflare dokleja max-age=14400 do CSS/JS — cache: 'no-cache' wymusza sprawdzenie u serwera (ETag), żeby telefon nie wziął starej wersji.
   const net = event.request.mode === 'navigate' ? fetch(event.request) : fetch(event.request, { cache: 'no-cache' });
-  event.respondWith(net.then((res) => {
+  const fromCache = () => caches.match(event.request).then((r) => r || (event.request.mode === 'navigate' ? caches.match('/') : undefined));
+  const saved = net.then((res) => {
     if (res.ok) { const copy = res.clone(); caches.open(SHELL).then((c) => c.put(event.request, copy)); }
     return res;
-  }).catch(() => caches.match(event.request).then((r) => r || caches.match('/'))));
+  });
+  // Serwer nie odpowiada (nie „brak sieci”, tylko wiszące połączenie) → po 4 s bierzemy wersję z pamięci, zamiast białego ekranu.
+  const timeout = new Promise((res) => setTimeout(res, 4000)).then(fromCache);
+  event.respondWith(Promise.race([saved.catch(fromCache), timeout.then((r) => r || saved)]).then((r) => r || saved).catch(fromCache));
 });
 
 function kvGet(k) {

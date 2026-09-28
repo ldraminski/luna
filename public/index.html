@@ -12,9 +12,7 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/icons/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/fonts/lexend.css">
 <link rel="stylesheet" href="/app.css?v=__V__">
 <script type="module" src="/app.js?v=__V__"></script>
 </head>
@@ -49,6 +47,7 @@
 
 <!-- EKRAN 1 · główny -->
 <main class="app" id="screen-main" hidden>
+  <p class="offline" id="offline" role="status" hidden></p>
   <header class="top">
     <h1 id="hello-name">Dzień dobry</h1>
     <div style="display:flex;gap:10px">

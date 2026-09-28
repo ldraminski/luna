@@ -119,6 +119,18 @@ done
 progi 80/95/100% → push + mail dla adminów, każdy raz (static data), <50% zeruje. Kwoty w zł wg kursu NBP.
 W aplikacji przy wyczerpanym limicie (402): „Mam chwilową przerwę — skończył się limit… Łukasz już o tym wie.”
 
+## Offline i niedziałający serwer (28.09.2026)
+
+- **Czcionka Lexend hostowana u nas** (`public/fonts/`, SIL OFL, jeden plik zmienny na podzbiór latin/latin-ext). Wcześniej arkusz z Google
+  blokował rysowanie strony → biały ekran bez sieci. NIE wracać do fonts.googleapis.com.
+- **Service worker:** po 4 s bez odpowiedzi serwera bierze wersję z pamięci (wiszące połączenie ≠ brak sieci); czcionki w `SHELL_FILES`.
+- **API:** limit czasu (15 s; dodawanie 90 s, czat 120 s); brak sieci / 5xx bez JSON-a → `ApiError(0)` = tryb offline.
+- **Aplikacja:** ostatni stan w `localStorage` (`luna-stan`) — bez połączenia pokazuje go z paskiem „Brak połączenia z Luną — stan z 8:17”,
+  NIE wylogowuje. Wpisy bez połączenia → kolejka `luna-kolejka` („Czeka na wysłanie”), wysyłają się same po powrocie (`online`, co 30 s, powrót do aplikacji).
+  Zdjęć offline nie kolejkujemy (za duże na localStorage).
+- **Przypomnienia przy padzie serwera:** harmonogram jest na tym samym serwerze — w czasie awarii nic nie wychodzi; po powrocie wysyła
+  wszystkie zaległe (`due_at <= now()`, jeszcze niewysłane) za jednym razem.
+
 ## Wdrożenie
 
 **Pamięć podręczna (27.09):** Cloudflare dokleja `max-age=14400` do CSS/JS mimo `no-cache` z nginx — telefon brał nowy HTML ze starym CSS.

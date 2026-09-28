@@ -36,20 +36,22 @@ export class ApiError extends Error {
   constructor(status, message) { super(message); this.status = status; }
 }
 
-async function call(path, { method = 'GET', body, token = getToken() } = {}) {
-  let res;
+// status 0 = nie ma jak dogadać się z serwerem (brak sieci, serwer nie odpowiada, Cloudflare 5xx) — aplikacja przechodzi w tryb offline.
+async function call(path, { method = 'GET', body, token = getToken(), timeout = 15000 } = {}) {
+  let res; const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), timeout);
   try {
     res = await fetch('/api/' + path, {
-      method,
+      method, signal: ctl.signal,
       headers: { Authorization: 'Bearer ' + token, ...(body ? { 'Content-Type': 'application/json' } : {}) },
       body: body ? JSON.stringify(body) : undefined,
       cache: 'no-store',
     });
   } catch {
-    throw new ApiError(0, 'Brak połączenia. Sprawdź internet.');
-  }
+    throw new ApiError(0, navigator.onLine === false ? 'Brak internetu.' : 'Serwer Luny nie odpowiada.');
+  } finally { clearTimeout(t); }
   let data = {};
   try { data = await res.json(); } catch {}
+  if (!res.ok && res.status >= 500 && !data.error) throw new ApiError(0, 'Serwer Luny chwilowo nie odpowiada.');
   if (!res.ok) throw new ApiError(res.status, data.error || 'Coś poszło nie tak (' + res.status + ').');
   return data;
 }
@@ -63,13 +65,13 @@ export const api = {
   accessRequests: () => call('access/requests').then((d) => d.requests || []),
   accessDecide: (id, accept) => call('access/decide', { method: 'POST', body: { id, accept } }),
   items: () => call('items').then((d) => d.items || []),
-  add: (text, image = '', thumb = '') => call('items', { method: 'POST', body: { text, ...(image ? { image, thumb } : {}) } }),
+  add: (text, image = '', thumb = '') => call('items', { method: 'POST', body: { text, ...(image ? { image, thumb } : {}) }, timeout: 90000 }),
   photo: (id) => call('items/photo?id=' + encodeURIComponent(id)).then((d) => d.image),
   done: (id) => call('items/done', { method: 'POST', body: { id } }),
   remove: (id) => call('items/delete', { method: 'POST', body: { id } }),
   check: (id, list, index, done) => call('items/check', { method: 'POST', body: { id, list, index, done } }),
   summarize: (id) => call('items/summarize', { method: 'POST', body: { id } }),
-  widgetChat: (id, message = '', image = '') => call('items/widget-chat', { method: 'POST', body: { id, message, ...(image ? { image } : {}) } }),
+  widgetChat: (id, message = '', image = '') => call('items/widget-chat', { method: 'POST', body: { id, message, ...(image ? { image } : {}) }, timeout: 120000 }),
   widgetChatClose: (id) => call('items/widget-chat/close', { method: 'POST', body: { id } }),
   widgetRegenerate: (id) => call('items/widget-regenerate', { method: 'POST', body: { id } }),
   widgetState: (id, state) => call('items/widget-state', { method: 'POST', body: { id, state } }),

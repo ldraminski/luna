@@ -226,14 +226,59 @@ function useExample(text) {
   toast('Wyślij, a zapiszę — albo zmień po swojemu.');
 }
 
+// ---------- offline: ostatni stan w pamięci telefonu + kolejka wpisów ----------
+const CACHE_KEY = 'luna-stan'; const OUTBOX_KEY = 'luna-kolejka';
+function saveCache() { try { localStorage.setItem(CACHE_KEY, JSON.stringify({ user: state.user, items: state.items, at: Date.now() })); } catch {} }
+function readCache() { try { return JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch { return null; } }
+function outbox() { try { return JSON.parse(localStorage.getItem(OUTBOX_KEY) || '[]'); } catch { return []; } }
+function setOutbox(list) { try { localStorage.setItem(OUTBOX_KEY, JSON.stringify(list)); } catch {} }
+function setOffline(on, at) {
+  state.offline = on;
+  const n = outbox().length;
+  $('#offline').hidden = !on && !n;
+  $('#offline').textContent = on
+    ? `Brak połączenia z Luną${at ? ` — pokazuję stan z ${fTime.format(new Date(at))}` : ''}.${n ? ` ${n} ${pl(n, 'wpis czeka', 'wpisy czekają', 'wpisów czeka')} na wysłanie.` : ' Nowe wpisy wyślę, gdy wróci połączenie.'}`
+    : `Wysyłam zaległe wpisy (${n})…`;
+}
+function renderOutbox() {
+  const list = outbox(); if (!list.length || state.day) return;
+  $('#list').insertAdjacentHTML('afterbegin', `<h2 class="sec" style="margin-top:0">Czeka na wysłanie</h2>` + list.map((x) => `
+    <article class="w pending"><p class="kind">${svg('clock', 'width:14px;height:14px')} Wyślę, gdy wróci połączenie</p><h3>${esc(x.text)}</h3></article>`).join(''));
+}
+let flushing = false;
+async function flushOutbox() {
+  if (flushing || !outbox().length) return;
+  flushing = true; setOffline(false);
+  try {
+    for (const x of outbox()) {
+      try {
+        const r = await api.add(x.text);
+        setOutbox(outbox().filter((y) => y.id !== x.id));
+        toast(r.item?.spec?.understood || 'Zapisałam zaległy wpis.');
+      } catch (err) {
+        if (err.status === 0) { setOffline(true, readCache()?.at); break; }
+        setOutbox(outbox().filter((y) => y.id !== x.id)); toast(`„${x.text.slice(0, 40)}” — ${err.message}`);
+      }
+    }
+  } finally { flushing = false; }
+  if (!outbox().length) { setOffline(false); load(); }
+}
+
 async function load() {
   try {
     if (state.user?.admin) api.accessRequests().then((r) => { state.requests = r; renderRequests(); }).catch(() => {});
     state.items = await api.items();
+    saveCache(); setOffline(false);
     render();
+    flushOutbox();
     watchGenerating();
   } catch (err) {
     if (err.status === 401) return logout('Klucz przestał działać — wpisz swój e-mail, a wyślę nowy.');
+    if (err.status === 0) {   // brak sieci / serwer nie odpowiada → ostatni zapamiętany stan
+      const c = readCache();
+      if (!state.items.length && c?.items) { state.items = c.items; }
+      render(); setOffline(true, c?.at); return;
+    }
     if (!state.items.length) $('#list').innerHTML = `<div class="empty"><h3>Nie udało się wczytać</h3><p>${esc(err.message)}</p></div>`;
     else toast(err.message);
   }
@@ -277,6 +322,7 @@ function render() {
   if (saved.length) html += '<h2 class="sec">Notatki</h2>' + saved.map((i) => card(i)).join('');
   $('#list').innerHTML = html;
   renderRequests();
+  renderOutbox();
   loadPhotos($('#list'));
 }
 
@@ -638,7 +684,13 @@ async function add(e) {
     await load();
   } catch (err) {
     if (err.status === 401) return logout('Klucz przestał działać — wpisz swój e-mail, a wyślę nowy.');
-    toast(err.message);
+    if (err.status === 0 && !image) {   // bez połączenia: wpis czeka w telefonie i wyśle się sam
+      setOutbox([...outbox(), { id: Date.now() + '-' + Math.random().toString(36).slice(2, 6), text, at: Date.now() }]);
+      q.value = ''; fitQ(); q.blur();
+      setOffline(true, readCache()?.at); render();
+      toast('Nie mam teraz połączenia — zapiszę to, gdy wróci.');
+    } else if (err.status === 0) toast('Zdjęcie wyślę dopiero z połączeniem — spróbuj za chwilę.');
+    else toast(err.message);
   } finally { clearTimeout(slow); form.classList.remove('busy'); }
 }
 
@@ -916,6 +968,8 @@ function bind() {
   $('#detail').addEventListener('click', onSum, true);
   addEventListener('popstate', () => closeDetail(true));
   addEventListener('keydown', (e) => { if (e.key !== 'Escape') return; if (!$('#intro').hidden) closeIntro(); else if (!$('#report').hidden) closeReport(); else closeDetail(); });
+  addEventListener('online', () => { if (state.user) load(); });
+  setInterval(() => { if (state.user && !document.hidden && (state.offline || outbox().length)) load(); }, 30000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden && state.user) { load().then(() => loadReport(true)); refreshBell(); } });
   navigator.serviceWorker?.addEventListener('message', (e) => { if (e.data?.type === 'open') { load().then(() => e.data.id && openDetail(e.data.id)); } });
 }
@@ -935,7 +989,9 @@ async function boot() {
     if (openId) { await load(); openDetail(openId); }
   } catch (err) {
     if (err instanceof ApiError && err.status === 401) return logout('Klucz przestał działać — wpisz swój e-mail, a wyślę nowy.');
-    showHello(err.message);
+    const c = readCache();
+    if (err.status === 0 && c?.user) { state.user = c.user; startMain(); return; }   // offline: pokaż ostatni stan, nie wylogowuj
+    showHello(err.status === 0 ? 'Nie mam teraz połączenia — spróbuj za chwilę.' : err.message);
   }
 }
 
