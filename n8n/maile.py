@@ -24,7 +24,8 @@ O_LUNIE = ("Jestem Luna — Twoja prywatna asystentka w telefonie. Piszesz mi zw
 def klucz_powitalny(r, wstep=O_LUNIE):
     return ("={{ " + _hej(r) + wstep + "\\n\\nOto Twój klucz:\\n\\n' + " + r + ".token + '\\n\\n" + _JAK +
       "Klucz działa bez końca. Nie przesyłaj go nikomu — kto go ma, widzi Twoje sprawy.\\n"
-      "Zgubisz go? Wejdź na " + APP_URL + ", wpisz swój e-mail, a wyślę Ci nowy.\\n\\nDo usłyszenia!\\n— Luna' }}")
+      "Zgubisz go? Wejdź na " + APP_URL + ", wpisz swój e-mail, a wyślę Ci nowy.\\n\\n"
+      "Korzystając z Luny, akceptujesz regulamin i zasady prywatności: " + APP_URL + "/regulamin\\n\\nDo usłyszenia!\\n— Luna' }}")
 
 def klucz_nowy(r):
     return ("={{ " + _hej(r) + "Oto Twój nowy klucz do Luny:\\n\\n' + " + r + ".token + '\\n\\n"

@@ -142,7 +142,7 @@ access requests by hand, usually the same day, and the access key arrives by e-m
 screen (iOS: *Share → Add to Home Screen*) with notifications on; on a computer try **[/biurko](https://luna.draminski.dev/biurko)**.
 
 It is a private instance on a single model key, so test accounts have a small daily limit — and please don't put anything
-sensitive in it.
+sensitive in it. By requesting access you accept the [terms and privacy notice](https://luna.draminski.dev/regulamin) (Polish).
 
 ---
 
