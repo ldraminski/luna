@@ -405,3 +405,18 @@ html.locked,html.locked body{overflow:hidden;height:100%}
 .offline{margin:4px 4px 14px;padding:10px 14px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line);font-size:13px;color:var(--ink-2)}
 .w.pending{opacity:.75;border:1.5px dashed var(--line);box-shadow:none;cursor:default}
 .w.pending + .sec{margin-top:24px}
+
+/* alarm w chwili terminu — czerwona karta (Hikari, 28.09) */
+.alarm::backdrop{background:rgba(155,28,90,.45)}
+.alarm-in{height:auto!important;max-height:90dvh;background:var(--late)!important;color:var(--on-navy);text-align:center;align-items:center;padding-top:28px;gap:0}
+.alarm-bell{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.16);display:grid;place-items:center;animation:ring 1.2s ease-in-out infinite}
+.alarm-bell .i{width:36px;height:36px;color:#fff}
+@keyframes ring{0%,60%,100%{transform:rotate(0)}10%,30%{transform:rotate(-14deg)}20%,40%{transform:rotate(14deg)}}
+@media (prefers-reduced-motion:reduce){.alarm-bell{animation:none}}
+.alarm-kind{margin-top:16px;font-size:14px;font-weight:600;opacity:.85;text-transform:uppercase;letter-spacing:.06em}
+.alarm h2{font-size:26px;line-height:1.2;margin-top:6px;overflow-wrap:anywhere}
+.alarm-lead{font-size:14px;opacity:.85;margin:10px 0 20px}
+.alarm .cta{margin-top:10px}
+.alarm .alarm-snooze{background:#fff;color:var(--late)}
+.alarm .cta.alt{background:rgba(255,255,255,.14);color:#fff;box-shadow:none}
+.alarm .ghost-txt{color:#fff;opacity:.85;margin:8px auto 0}

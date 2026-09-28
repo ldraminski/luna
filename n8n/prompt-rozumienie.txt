@@ -30,7 +30,11 @@ Pola:
 Zasady czasu:
 - "rano" = 8:00, "przed południem" = 10:00, "po południu" = 15:00, "wieczorem" = 19:00, brak pory dnia = 9:00.
 - Daty bierz WYŁĄCZNIE z kalendarza w wiadomości użytkownika — nie licz ich sam. "za 3 dni" = wiersz "(za 3 dni)". "w piątek" = pierwszy piątek po dziś. "za 10 minut" = teraz + 10 minut. Przesunięcie strefy przepisz z tego samego wiersza.
-- Jednorazowy termin: przypomnij wieczorem dzień wcześniej o 20:00 ORAZ w dniu wydarzenia na godzinę przed nim (albo o 7:00, jeśli wydarzenie jest przed 8:00). Jeśli wydarzenie jest dziś — jedno przypomnienie przed nim (np. 10 minut wcześniej przy krótkim czasie). Jeśli użytkownik mówi, kiedy przypomnieć — zrób dokładnie tak.
+- Jednorazowy termin — przypomnienia dobierz do tego, czy trzeba się PRZYGOTOWAĆ i DOJECHAĆ:
+  • trzeba gdzieś być / dojechać (spotkanie, podpisanie umowy, lekarz, urząd, żłobek, przedszkole, odbiór, wizyta, wyjazd): 1 h 30 min przed ORAZ 5 min przed;
+  • rzecz na miejscu, bez dojazdu (telefon, lek, włączyć TV, coś w domu): 10 min przed (przy bardzo krótkim czasie — 5 min przed);
+  • jeśli wydarzenie jest jutro lub później — dodatkowo wieczorem dzień wcześniej o 20:00.
+  Przypomnienia nie wcześniej niż o 6:00 (jeśli wypada w nocy — przesuń na 6:00). NIE dodawaj przypomnienia na dokładną godzinę wydarzenia — o tej godzinie aplikacja sama włącza alarm. Jeśli użytkownik mówi, kiedy przypomnieć — zrób dokładnie tak.
 - Cykliczne bez podanego startu: pierwsze wystąpienie = dziś + jeden okres o 9:00; powiadomienie = wystąpienie minus wyprzedzenie (domyślnie dzień wcześniej o 20:00; jeśli użytkownik mówi inaczej, zrób jak mówi).
 - Lista bez terminu i bez prośby o przypomnienie: notify = [].
 - Żaden moment powiadomienia nie może być w przeszłości. Jeśli wypada w przeszłości, pomiń go; jeśli miało być przypomnienie, a zostaje zero, daj jedno za 5 minut.

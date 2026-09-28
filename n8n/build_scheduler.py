@@ -26,8 +26,40 @@ node("Opis", "n8n-nodes-base.stickyNote", 1, [-420, -320], {"width": 600, "heigh
   "**Push** bez treści, jak w Alertach — telefon pobiera ją z `/api/pending`. Jeden push na urządzenie na przebieg.\n"
   "**Mail** gdy kanał `email` albo osoba nie ma działającego urządzenia z pushem.\n"
   "Źródło: `~/Work/oboe/n8n/build_scheduler.py`."})
-t = node("Co minutę", "n8n-nodes-base.scheduleTrigger", 1.2, [0, 0],
-  {"rule": {"interval": [{"field": "minutes", "minutesInterval": 1}]}})
+t = node("Co 20 s", "n8n-nodes-base.scheduleTrigger", 1.2, [-220, 0],
+  {"rule": {"interval": [{"field": "seconds", "secondsInterval": 20}]}})
+# Alarm w chwili terminu (28.09, Łukasz): jednorazowa rzecz, której termin właśnie minął, „dzwoni” — push co 20 s,
+# dopóki użytkownik nie przełoży (snoozed, +5 min), nie wyłączy (off) ani nie odhaczy. Bezpiecznik: 60 min, potem off + ostatni push.
+# Start tylko dla terminów z ostatniej godziny (stare zaległe nie zaczną dzwonić po wdrożeniu).
+alarm = node("Alarmy", "n8n-nodes-base.postgres", 2.6, [0, 0], {"operation": "executeQuery", "query": """
+WITH ring AS (
+  SELECT i.id, i.user_id, i.title, i.data->'alarm' AS a,
+    coalesce((i.data->'alarm'->>'started_at')::timestamptz, now()) AS started
+  FROM items i
+  WHERE i.status = 'active' AND i.spec->>'event_at' IS NOT NULL
+    AND coalesce(jsonb_typeof(i.spec->'recurrence'), 'null') = 'null'
+    AND (i.spec->>'event_at')::timestamptz <= now()
+    AND coalesce(i.data->'alarm'->>'state', '') <> 'off'
+    AND coalesce((i.data->'alarm'->>'next_at')::timestamptz, '-infinity'::timestamptz) <= now()
+    AND ((i.spec->>'event_at')::timestamptz > now() - interval '60 minutes'
+         OR i.data->'alarm'->>'state' IN ('ringing', 'snoozed'))
+  FOR UPDATE SKIP LOCKED),
+upd AS (
+  UPDATE items i SET data = jsonb_set(i.data, '{alarm}', jsonb_build_object(
+      'state', CASE WHEN now() - r.started > interval '60 minutes' THEN 'off' ELSE 'ringing' END,
+      'stopped', CASE WHEN now() - r.started > interval '60 minutes' THEN 'timeout' END,
+      'started_at', r.started, 'next_at', now() + interval '19 seconds',
+      'count', coalesce((r.a->>'count')::int, 0) + 1))
+  FROM ring r WHERE i.id = r.id
+  RETURNING i.id, i.user_id, i.title, i.data->'alarm'->>'state' AS state),
+ins AS (INSERT INTO notifications (item_id, user_id, due_at, channels, title, body, kind)
+SELECT id, user_id, now(), '{push}',
+  CASE WHEN state = 'off' THEN 'Wyłączyłam alarm: ' || title ELSE '⏰ Teraz: ' || title END,
+  CASE WHEN state = 'off' THEN 'Przez godzinę nikt nie zareagował. Rzecz czeka w „Po terminie”.'
+       ELSE 'Przełóż o 5 min albo wyłącz przypomnienie — do tego czasu przypominam co 20 s.' END,
+  CASE WHEN state = 'off' THEN 'reminder' ELSE 'alarm' END
+FROM upd RETURNING id)
+SELECT count(*) AS alarms FROM ins""", "options": {}}, credentials=PG)
 claim = node("Weź zaległe", "n8n-nodes-base.postgres", 2.6, [220, 0], {"operation": "executeQuery", "query": """
 WITH due AS (
   SELECT id FROM notifications WHERE sent_at IS NULL AND due_at <= now()
@@ -59,7 +91,8 @@ ev AS (
 SELECT c.id, c.user_id, c.item_id, c.title, coalesce(c.body, '') AS body, u.email, coalesce(u.name, '') AS name,
   ('email' = ANY(c.channels) OR NOT EXISTS (
      SELECT 1 FROM push_subscriptions s WHERE s.user_id = c.user_id AND s.failures < 3))
-    AND NOT coalesce((i.spec->>'summarize')::boolean, false) AS send_email,
+    AND NOT coalesce((i.spec->>'summarize')::boolean, false)
+    AND c.kind <> 'alarm' AS send_email,   -- alarm (co 20 s) NIGDY mailem — inaczej 180 maili na godzinę
   ('push' = ANY(c.channels)) AND NOT coalesce((i.spec->>'summarize')::boolean, false) AS send_push,
   coalesce((i.spec->>'summarize')::boolean, false) AS summarize,
   (SELECT count(*) FROM ev) AS next_planned
@@ -136,7 +169,7 @@ fset = node("Id strony", "n8n-nodes-base.set", 3.4, [680, -320], {"mode": "manua
 fx = node("Streść stronę (w tle)", "n8n-nodes-base.executeWorkflow", 1.2, [900, -320], {
   "source": "database", "workflowId": {"__rl": True, "value": SUMMARY_WF, "mode": "id"},
   "options": {"waitForSubWorkflow": False}})
-link(t, claim); link(claim, fm); link(claim, subs); link(claim, fs); link(fs, fset); link(fset, fx)
+link(t, alarm); link(alarm, claim); link(claim, fm); link(claim, subs); link(claim, fs); link(fs, fset); link(fset, fx)
 link(fm, mail); link(mail, mark)
 link(subs, jwt); link(jwt, sign); link(sign, hdr); link(hdr, push); link(push, res); link(res, upd)
 

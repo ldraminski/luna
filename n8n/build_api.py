@@ -67,13 +67,25 @@ SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
   ELSE json_build_object('status', 200, 'settings', (SELECT row_to_json(upd) FROM upd)) END AS result""",
    "={{ [ " + TOKEN + ", /^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(String($json.body.time)) ? $json.body.time : '09:00', $json.body.enabled !== false ] }}"),
 
+  # Alarm: „przełóż o 5 min” (snoozed) albo „wyłącz przypomnienie” (off) — z czerwonej karty albo przycisku w powiadomieniu (Android).
+  ("POST", "items/alarm", "Alarm", f"""
+WITH {ME},
+upd AS (UPDATE items SET updated_at = now(), data = jsonb_set(data, '{{alarm}}', CASE WHEN $3 = 'snooze'
+      THEN jsonb_build_object('state', 'snoozed', 'next_at', now() + interval '5 minutes', 'started_at', NULL, 'count', coalesce((data->'alarm'->>'count')::int, 0))
+      ELSE coalesce(data->'alarm', '{{}}'::jsonb) || jsonb_build_object('state', 'off', 'stopped', 'user') END)
+    WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) RETURNING data->'alarm' AS alarm)
+SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
+  WHEN NOT EXISTS (SELECT 1 FROM upd) THEN json_build_object('status', 404, 'error', 'Nie ma już tej rzeczy.')
+  ELSE json_build_object('status', 200, 'alarm', (SELECT alarm FROM upd)) END AS result""",
+   "={{ [ " + TOKEN + ", /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000', $json.body.action === 'snooze' ? 'snooze' : 'off' ] }}"),
+
   ("GET", "pending", "Do pokazania", f"""
 WITH {ME},
 p AS (
   UPDATE notifications SET shown_at = now()
   WHERE user_id = (SELECT user_id FROM me) AND sent_at IS NOT NULL AND shown_at IS NULL
     AND sent_at > now() - interval '1 day'
-  RETURNING id, item_id, title, body, sent_at)
+  RETURNING id, item_id, title, body, sent_at, kind)
 SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
   ELSE json_build_object('status', 200, 'items',
        coalesce((SELECT json_agg(p ORDER BY p.sent_at DESC) FROM p), '[]'::json)) END AS result""",

@@ -171,6 +171,44 @@ async function saveReportTime() {
   } catch (err) { toast(err.message); }
 }
 
+// ---------- alarm w chwili terminu: czerwona karta (serwer w tym czasie wysyła push co 20 s) ----------
+// Ta sama reguła co w „Oboe: Harmonogram”: jednorazowa rzecz, termin minął (w ciągu ostatniej godziny albo alarm już trwa / przełożony),
+// alarm nie jest wyłączony, a przełożony już „wrócił”.
+function ringing(it) {
+  if (it.spec?.recurrence) return false;
+  const ev = dt(it.spec?.event_at); if (!ev || ev > Date.now()) return false;
+  const a = it.data?.alarm || {};
+  if (a.state === 'off') return false;
+  if (a.state === 'snoozed') return Date.parse(a.next_at) <= Date.now();
+  if (a.state === 'ringing') return Date.now() - Date.parse(a.started_at || ev) < 3600e3;
+  return Date.now() - ev < 3600e3;
+}
+function checkAlarm() {
+  if (!state.user || $('#alarm').open) return;
+  const it = state.items.find(ringing); if (!it) return;
+  if ($('#nudge').open) $('#nudge').close();   // alarm ma pierwszeństwo przed kartą zaległych
+  state.alarmId = it.id;
+  const ev = dt(it.spec.event_at); const late = Math.round((Date.now() - ev) / 60000);
+  $('#alarm-kind').textContent = late < 1 ? `Teraz · ${fTime.format(ev)}` : `${fTime.format(ev)} · ${late} min temu`;
+  $('#alarm-title').textContent = it.title;
+  $('#alarm').showModal();
+  try { navigator.vibrate?.([300, 150, 300]); } catch {}
+}
+async function alarmAction(act) {
+  const id = state.alarmId; const it = state.items.find((x) => x.id === id); if (!id) return;
+  $('#alarm').querySelectorAll('button').forEach((b) => { b.disabled = true; });
+  try {
+    if (act === 'done') { await api.done(id); state.items = state.items.filter((x) => x.id !== id); toast('Zrobione ✓'); }
+    else {
+      const r = await api.alarm(id, act);
+      if (it) it.data = { ...(it.data || {}), alarm: r.alarm };
+      toast(act === 'snooze' ? 'Przypomnę za 5 minut.' : 'Wyłączyłam przypomnienie.');
+    }
+    $('#alarm').close(); render(); if (state.openId === id) openDetail(id);
+  } catch (err) { toast(err.message); }
+  finally { $('#alarm').querySelectorAll('button').forEach((b) => { b.disabled = false; }); }
+}
+
 // ---------- przypomnienie o zaległych: karta od dołu, dopóki są nierozwiązane (najwyżej co 3 h) ----------
 function lateRow(x) {
   return `<li data-late="${x.id}"><span class="n">${esc(x.title)}${x.when ? `<small>${esc(x.when)}</small>` : ''}</span>
@@ -178,8 +216,9 @@ function lateRow(x) {
     <button type="button" class="ghost-txt" data-late-act="close">Nieaktualne — zamknij</button></span></li>`;
 }
 function maybeNudge(force = false) {
-  const late = state.items.filter(isLate);
-  if (!late.length || $('#nudge').open || !$('#report').hidden || !$('#intro').hidden || state.openId) return;
+  // rzecz, która właśnie „dzwoni”, obsługuje czerwony alarm — nie dublujemy jej w karcie zaległych
+  const late = state.items.filter((it) => isLate(it) && !ringing(it));
+  if (!late.length || $('#nudge').open || $('#alarm').open || state.items.some(ringing) || !$('#report').hidden || !$('#intro').hidden || state.openId) return;
   let last = 0; try { last = Number(localStorage.getItem('luna-nudge-at')) || 0; } catch {}
   if (!force && Date.now() - last < 3 * 3600e3) return;
   try { localStorage.setItem('luna-nudge-at', String(Date.now())); } catch {}
@@ -269,7 +308,7 @@ async function load() {
     if (state.user?.admin) api.accessRequests().then((r) => { state.requests = r; renderRequests(); }).catch(() => {});
     state.items = await api.items();
     saveCache(); setOffline(false);
-    render();
+    render(); checkAlarm();
     flushOutbox();
     watchGenerating();
   } catch (err) {
@@ -969,6 +1008,9 @@ function bind() {
   addEventListener('popstate', () => closeDetail(true));
   addEventListener('keydown', (e) => { if (e.key !== 'Escape') return; if (!$('#intro').hidden) closeIntro(); else if (!$('#report').hidden) closeReport(); else closeDetail(); });
   addEventListener('online', () => { if (state.user) load(); });
+  $('#alarm').addEventListener('click', (e) => { const b = e.target.closest('[data-alarm]'); if (b) alarmAction(b.dataset.alarm); });
+  $('#alarm').addEventListener('cancel', (e) => e.preventDefault());   // alarmu nie zamyka się Escape — trzeba wybrać
+  setInterval(() => { if (!document.hidden) checkAlarm(); }, 5000);
   setInterval(() => { if (state.user && !document.hidden && (state.offline || outbox().length)) load(); }, 30000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden && state.user) { load().then(() => loadReport(true)); refreshBell(); } });
   navigator.serviceWorker?.addEventListener('message', (e) => { if (e.data?.type === 'open') { load().then(() => e.data.id && openDetail(e.data.id)); } });

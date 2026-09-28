@@ -59,6 +59,7 @@ async function call(path, { method = 'GET', body, token = getToken(), timeout = 
 export const api = {
   me: (token) => call('me', { token }),
   report: () => call('report'),
+  alarm: (id, action) => call('items/alarm', { method: 'POST', body: { id, action } }),
   reportSeen: (id) => call('report/seen', { method: 'POST', body: { id } }),
   settings: (time, enabled) => call('settings', { method: 'POST', body: { time, enabled } }),
   accessRequest: (email, name) => call('access/request', { method: 'POST', body: { email, name }, token: '' }),

@@ -172,6 +172,19 @@
   </div>
 </dialog>
 
+<!-- ALARM · czerwona karta w chwili terminu (dopóki nie przełożysz / nie wyłączysz — push co 20 s) -->
+<dialog class="chat alarm" id="alarm" aria-labelledby="alarm-title">
+  <div class="chat-in alarm-in">
+    <div class="alarm-bell" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.3 20a1.9 1.9 0 0 0 3.4 0"/></svg></div>
+    <p class="alarm-kind" id="alarm-kind">Teraz</p>
+    <h2 id="alarm-title"></h2>
+    <p class="alarm-lead">Dopóki czegoś nie wybierzesz, przypominam co 20 sekund.</p>
+    <button class="cta wide alarm-snooze" type="button" data-alarm="snooze">Przełóż o 5 min</button>
+    <button class="cta alt wide" type="button" data-alarm="off">Wyłącz przypomnienie</button>
+    <button class="ghost-txt" type="button" data-alarm="done">Już zrobione</button>
+  </div>
+</dialog>
+
 <!-- EKRAN 2 · szczegół -->
 <section class="detail" id="detail" aria-label="Szczegóły" aria-modal="true" role="dialog"></section>
 

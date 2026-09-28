@@ -56,9 +56,11 @@ async function handlePush() {
     return self.registration.showNotification('Luna', { body: 'Mam dla ciebie przypomnienie — zajrzyj.', icon: '/icons/icon-192.png', tag: 'oboe-fallback', data: {} });
   }
   const shown = items.slice(0, 3);
-  await Promise.all(shown.map((n) => self.registration.showNotification(n.title, {
-    body: n.body || '', icon: '/icons/icon-192.png', tag: 'oboe-' + n.id, data: { item: n.item_id },
-  })));
+  await Promise.all(shown.map((n) => self.registration.showNotification(n.title, n.kind === 'alarm'
+    // alarm: jedno powiadomienie na rzecz, podmieniane co 20 s i dzwoniące od nowa; przyciski działają tam, gdzie system je pokazuje (Android)
+    ? { body: n.body || '', icon: '/icons/icon-192.png', tag: 'oboe-alarm-' + n.item_id, renotify: true, requireInteraction: true,
+        actions: [{ action: 'snooze', title: 'Przełóż o 5 min' }, { action: 'off', title: 'Wyłącz' }], data: { item: n.item_id, alarm: true } }
+    : { body: n.body || '', icon: '/icons/icon-192.png', tag: 'oboe-' + n.id, data: { item: n.item_id } })));
   if (items.length > 3) {
     await self.registration.showNotification('Luna', { body: `…i jeszcze ${items.length - 3} ${items.length - 3 === 1 ? 'przypomnienie' : (items.length - 3) % 10 >= 2 && (items.length - 3) % 10 <= 4 && ((items.length - 3) % 100 < 10 || (items.length - 3) % 100 >= 20) ? 'przypomnienia' : 'przypomnień'}`, tag: 'oboe-more', icon: '/icons/icon-192.png', data: {} });
   }
@@ -68,6 +70,11 @@ self.addEventListener('push', (event) => event.waitUntil(handlePush()));
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const id = event.notification.data?.item || null;
+  if (id && (event.action === 'snooze' || event.action === 'off')) {
+    event.waitUntil(kvGet('token').then((token) => fetch('/api/items/alarm', { method: 'POST',
+      headers: { Authorization: 'Bearer ' + (token || ''), 'Content-Type': 'application/json' }, body: JSON.stringify({ id, action: event.action }) })).catch(() => {}));
+    return;
+  }
   event.waitUntil((async () => {
     const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     const own = wins.find((w) => new URL(w.url).origin === location.origin);

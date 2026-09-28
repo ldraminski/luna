@@ -2,7 +2,7 @@
  "name": "Oboe: Harmonogram",
  "nodes": [
   {
-   "id": "fc13cb51-99a5-40ca-85d7-91476f8fafcd",
+   "id": "7c2a791c-f73f-437b-be5a-1bc5b40514e5",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,37 +17,37 @@
    }
   },
   {
-   "id": "5c500eb7-daab-4520-9baf-d807d3c8bd1c",
-   "name": "Co minutę",
+   "id": "ac198124-872e-41f5-98d7-0a7d39aa40d5",
+   "name": "Co 20 s",
    "type": "n8n-nodes-base.scheduleTrigger",
    "typeVersion": 1.2,
    "position": [
-    0,
+    -220,
     0
    ],
    "parameters": {
     "rule": {
      "interval": [
       {
-       "field": "minutes",
-       "minutesInterval": 1
+       "field": "seconds",
+       "secondsInterval": 20
       }
      ]
     }
    }
   },
   {
-   "id": "6876d6a0-7411-48df-a9b9-0f91f8247ada",
-   "name": "Weź zaległe",
+   "id": "2ab60143-d943-4774-9dfe-69e05455a54e",
+   "name": "Alarmy",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
    "position": [
-    220,
+    0,
     0
    ],
    "parameters": {
     "operation": "executeQuery",
-    "query": "WITH due AS (\n  SELECT id FROM notifications WHERE sent_at IS NULL AND due_at <= now()\n  ORDER BY due_at LIMIT 100 FOR UPDATE SKIP LOCKED),\nclaimed AS (\n  UPDATE notifications n SET sent_at = now() FROM due WHERE n.id = due.id RETURNING n.*),\nrec AS (\n  SELECT DISTINCT ON (c.item_id) c.*, i.spec FROM claimed c JOIN items i ON i.id = c.item_id\n  WHERE i.status = 'active' AND oboe_period(i.spec) IS NOT NULL\n    -- CTE widzą stan sprzed UPDATE w claimed, więc właśnie wzięte trzeba wykluczyć jawnie\n    AND NOT EXISTS (SELECT 1 FROM notifications x WHERE x.item_id = c.item_id AND x.sent_at IS NULL\n                    AND x.id NOT IN (SELECT id FROM claimed))\n  ORDER BY c.item_id, c.due_at DESC),\nnxt AS (\n  INSERT INTO notifications (item_id, user_id, due_at, channels, title, body)\n  SELECT item_id, user_id, due_at + oboe_period(spec), channels, title, body FROM rec RETURNING item_id),\nev AS (\n  -- następne wystąpienie: przesuń termin, a listy odnawiane (lists[].reset) wyczyść na nowy cykl\n  UPDATE items i SET updated_at = now(),\n    spec = CASE WHEN i.spec->>'event_at' IS NULL THEN i.spec ELSE\n      jsonb_set(i.spec, '{event_at}', to_jsonb(to_char(((i.spec->>'event_at')::timestamptz + oboe_period(i.spec)) AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"'))) END,\n    data = CASE WHEN jsonb_typeof(i.data->'lists') = 'array' THEN\n      jsonb_set(i.data, '{lists}', (SELECT coalesce(jsonb_agg(CASE WHEN (l->>'reset')::boolean IS TRUE\n          THEN jsonb_set(l, '{items}', (SELECT coalesce(jsonb_agg(x || '{\"done\": false}'::jsonb), '[]'::jsonb) FROM jsonb_array_elements(l->'items') x))\n          ELSE l END ORDER BY n), '[]'::jsonb) FROM jsonb_array_elements(i.data->'lists') WITH ORDINALITY AS t(l, n)))\n      ELSE i.data END\n  WHERE i.id IN (SELECT item_id FROM nxt)\n  RETURNING 1)\nSELECT c.id, c.user_id, c.item_id, c.title, coalesce(c.body, '') AS body, u.email, coalesce(u.name, '') AS name,\n  ('email' = ANY(c.channels) OR NOT EXISTS (\n     SELECT 1 FROM push_subscriptions s WHERE s.user_id = c.user_id AND s.failures < 3))\n    AND NOT coalesce((i.spec->>'summarize')::boolean, false) AS send_email,\n  ('push' = ANY(c.channels)) AND NOT coalesce((i.spec->>'summarize')::boolean, false) AS send_push,\n  coalesce((i.spec->>'summarize')::boolean, false) AS summarize,\n  (SELECT count(*) FROM ev) AS next_planned\nFROM claimed c JOIN users u ON u.id = c.user_id LEFT JOIN items i ON i.id = c.item_id\nORDER BY c.due_at",
+    "query": "\nWITH ring AS (\n  SELECT i.id, i.user_id, i.title, i.data->'alarm' AS a,\n    coalesce((i.data->'alarm'->>'started_at')::timestamptz, now()) AS started\n  FROM items i\n  WHERE i.status = 'active' AND i.spec->>'event_at' IS NOT NULL\n    AND coalesce(jsonb_typeof(i.spec->'recurrence'), 'null') = 'null'\n    AND (i.spec->>'event_at')::timestamptz <= now()\n    AND coalesce(i.data->'alarm'->>'state', '') <> 'off'\n    AND coalesce((i.data->'alarm'->>'next_at')::timestamptz, '-infinity'::timestamptz) <= now()\n    AND ((i.spec->>'event_at')::timestamptz > now() - interval '60 minutes'\n         OR i.data->'alarm'->>'state' IN ('ringing', 'snoozed'))\n  FOR UPDATE SKIP LOCKED),\nupd AS (\n  UPDATE items i SET data = jsonb_set(i.data, '{alarm}', jsonb_build_object(\n      'state', CASE WHEN now() - r.started > interval '60 minutes' THEN 'off' ELSE 'ringing' END,\n      'stopped', CASE WHEN now() - r.started > interval '60 minutes' THEN 'timeout' END,\n      'started_at', r.started, 'next_at', now() + interval '19 seconds',\n      'count', coalesce((r.a->>'count')::int, 0) + 1))\n  FROM ring r WHERE i.id = r.id\n  RETURNING i.id, i.user_id, i.title, i.data->'alarm'->>'state' AS state),\nins AS (INSERT INTO notifications (item_id, user_id, due_at, channels, title, body, kind)\nSELECT id, user_id, now(), '{push}',\n  CASE WHEN state = 'off' THEN 'Wyłączyłam alarm: ' || title ELSE '⏰ Teraz: ' || title END,\n  CASE WHEN state = 'off' THEN 'Przez godzinę nikt nie zareagował. Rzecz czeka w „Po terminie”.'\n       ELSE 'Przełóż o 5 min albo wyłącz przypomnienie — do tego czasu przypominam co 20 s.' END,\n  CASE WHEN state = 'off' THEN 'reminder' ELSE 'alarm' END\nFROM upd RETURNING id)\nSELECT count(*) AS alarms FROM ins",
     "options": {}
    },
    "credentials": {
@@ -58,7 +58,28 @@
    }
   },
   {
-   "id": "b2897eaf-b02b-44a6-b87a-8f2bb8cb4eea",
+   "id": "1b31698f-d746-470c-ae0b-1df1e679e190",
+   "name": "Weź zaległe",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    220,
+    0
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "WITH due AS (\n  SELECT id FROM notifications WHERE sent_at IS NULL AND due_at <= now()\n  ORDER BY due_at LIMIT 100 FOR UPDATE SKIP LOCKED),\nclaimed AS (\n  UPDATE notifications n SET sent_at = now() FROM due WHERE n.id = due.id RETURNING n.*),\nrec AS (\n  SELECT DISTINCT ON (c.item_id) c.*, i.spec FROM claimed c JOIN items i ON i.id = c.item_id\n  WHERE i.status = 'active' AND oboe_period(i.spec) IS NOT NULL\n    -- CTE widzą stan sprzed UPDATE w claimed, więc właśnie wzięte trzeba wykluczyć jawnie\n    AND NOT EXISTS (SELECT 1 FROM notifications x WHERE x.item_id = c.item_id AND x.sent_at IS NULL\n                    AND x.id NOT IN (SELECT id FROM claimed))\n  ORDER BY c.item_id, c.due_at DESC),\nnxt AS (\n  INSERT INTO notifications (item_id, user_id, due_at, channels, title, body)\n  SELECT item_id, user_id, due_at + oboe_period(spec), channels, title, body FROM rec RETURNING item_id),\nev AS (\n  -- następne wystąpienie: przesuń termin, a listy odnawiane (lists[].reset) wyczyść na nowy cykl\n  UPDATE items i SET updated_at = now(),\n    spec = CASE WHEN i.spec->>'event_at' IS NULL THEN i.spec ELSE\n      jsonb_set(i.spec, '{event_at}', to_jsonb(to_char(((i.spec->>'event_at')::timestamptz + oboe_period(i.spec)) AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"'))) END,\n    data = CASE WHEN jsonb_typeof(i.data->'lists') = 'array' THEN\n      jsonb_set(i.data, '{lists}', (SELECT coalesce(jsonb_agg(CASE WHEN (l->>'reset')::boolean IS TRUE\n          THEN jsonb_set(l, '{items}', (SELECT coalesce(jsonb_agg(x || '{\"done\": false}'::jsonb), '[]'::jsonb) FROM jsonb_array_elements(l->'items') x))\n          ELSE l END ORDER BY n), '[]'::jsonb) FROM jsonb_array_elements(i.data->'lists') WITH ORDINALITY AS t(l, n)))\n      ELSE i.data END\n  WHERE i.id IN (SELECT item_id FROM nxt)\n  RETURNING 1)\nSELECT c.id, c.user_id, c.item_id, c.title, coalesce(c.body, '') AS body, u.email, coalesce(u.name, '') AS name,\n  ('email' = ANY(c.channels) OR NOT EXISTS (\n     SELECT 1 FROM push_subscriptions s WHERE s.user_id = c.user_id AND s.failures < 3))\n    AND NOT coalesce((i.spec->>'summarize')::boolean, false)\n    AND c.kind <> 'alarm' AS send_email,   -- alarm (co 20 s) NIGDY mailem — inaczej 180 maili na godzinę\n  ('push' = ANY(c.channels)) AND NOT coalesce((i.spec->>'summarize')::boolean, false) AS send_push,\n  coalesce((i.spec->>'summarize')::boolean, false) AS summarize,\n  (SELECT count(*) FROM ev) AS next_planned\nFROM claimed c JOIN users u ON u.id = c.user_id LEFT JOIN items i ON i.id = c.item_id\nORDER BY c.due_at",
+    "options": {}
+   },
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   }
+  },
+  {
+   "id": "aabe5308-50cc-4f1f-89a1-c4baa50cc877",
    "name": "Tylko mail",
    "type": "n8n-nodes-base.filter",
    "typeVersion": 2.2,
@@ -76,7 +97,7 @@
      },
      "conditions": [
       {
-       "id": "d21e59f1-937a-47df-9472-34c1516fc70e",
+       "id": "c7761987-b36e-45d0-8d1e-88f6e3aec3da",
        "leftValue": "={{ $json.send_email }}",
        "rightValue": "",
        "operator": {
@@ -92,7 +113,7 @@
    }
   },
   {
-   "id": "a49070f7-c1cf-45a2-b9e5-e4e3a6346053",
+   "id": "480a1078-9d95-4127-a075-3dcccd53069b",
    "name": "Wyślij mail",
    "type": "n8n-nodes-base.emailSend",
    "typeVersion": 2.1,
@@ -119,7 +140,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "8c2d1130-6009-4351-bf36-162ba3621ed1",
+   "id": "f5b7b2ad-07a8-47c3-982e-ebf59d4e842a",
    "name": "Oznacz wysłane mailem",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -142,7 +163,7 @@
    }
   },
   {
-   "id": "8e3f2f27-188b-41b8-81d3-fea54100788c",
+   "id": "4625ab0d-0cc0-4fa7-8807-480de9cd9683",
    "name": "Urządzenia",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -166,7 +187,7 @@
    "executeOnce": true
   },
   {
-   "id": "a4cc12b1-faff-4643-ba0a-cf87ac48c039",
+   "id": "4ab739f8-6988-417e-a70e-1e05ac7f93fc",
    "name": "Podpisz JWT",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -179,7 +200,7 @@
    }
   },
   {
-   "id": "81f16bac-c915-4508-b79c-269c876dce3a",
+   "id": "bbd10014-7f0a-4b73-b520-6fa2246e0284",
    "name": "Podpis ES256",
    "type": "n8n-nodes-base.crypto",
    "typeVersion": 2,
@@ -202,7 +223,7 @@
    }
   },
   {
-   "id": "f5bee159-2fba-4a9c-8688-adcae1eaf7de",
+   "id": "0a96900f-0941-42e2-90ef-a818d9a7db9b",
    "name": "Złóż nagłówek VAPID",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -215,7 +236,7 @@
    }
   },
   {
-   "id": "4a065a97-a788-4fc0-9679-7ee70ca5e71d",
+   "id": "de2e6d5a-d882-475c-bb6c-52906b3dcd46",
    "name": "Wyślij push",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -260,7 +281,7 @@
    }
   },
   {
-   "id": "5bf39dd1-4526-4a91-908d-2ebf872f5bc9",
+   "id": "c57d56cd-b58a-4d4b-89b3-b2d9d4e843bb",
    "name": "Wynik wysyłki",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -273,7 +294,7 @@
    }
   },
   {
-   "id": "43544c74-0eb4-4d81-85fb-f3b9e752ef3d",
+   "id": "d26e3515-b08f-4910-88c9-0a16c1e1ed80",
    "name": "Aktualizuj urządzenia",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -296,7 +317,7 @@
    }
   },
   {
-   "id": "9c54fe40-958d-4075-9f58-fd4cb854a294",
+   "id": "142663e3-2b2a-4ac3-a15d-5a2c50172181",
    "name": "Tylko strony do streszczenia",
    "type": "n8n-nodes-base.filter",
    "typeVersion": 2.2,
@@ -314,7 +335,7 @@
      },
      "conditions": [
       {
-       "id": "bb6608a5-3acc-458b-bbbc-de67df1cc7c7",
+       "id": "fe8cdf71-c722-478b-8091-b056f60568bc",
        "leftValue": "={{ $json.summarize }}",
        "rightValue": "",
        "operator": {
@@ -330,7 +351,7 @@
    }
   },
   {
-   "id": "5bd89191-2989-4635-a09f-36e81886b3eb",
+   "id": "d06f77be-bd49-42da-996e-17e6eccaa10b",
    "name": "Id strony",
    "type": "n8n-nodes-base.set",
    "typeVersion": 3.4,
@@ -344,13 +365,13 @@
     "assignments": {
      "assignments": [
       {
-       "id": "21d0ca0b-8daa-4aee-a882-65699564854a",
+       "id": "ea4c8646-7272-49c2-afd6-9cf308c49f69",
        "name": "item_id",
        "type": "string",
        "value": "={{ $json.item_id }}"
       },
       {
-       "id": "f7cdc68e-09ac-44b4-a933-ce3deb1d3caf",
+       "id": "23e3ce9b-d1be-47d1-a5a3-b2586fed2bc6",
        "name": "reason",
        "type": "string",
        "value": "scheduled"
@@ -361,7 +382,7 @@
    }
   },
   {
-   "id": "37ee885e-bde8-445e-922b-fa509b8b84f2",
+   "id": "7d450c80-38f3-4e9f-9a35-dcc045a7b595",
    "name": "Streść stronę (w tle)",
    "type": "n8n-nodes-base.executeWorkflow",
    "typeVersion": 1.2,
@@ -383,7 +404,18 @@
   }
  ],
  "connections": {
-  "Co minutę": {
+  "Co 20 s": {
+   "main": [
+    [
+     {
+      "node": "Alarmy",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Alarmy": {
    "main": [
     [
      {

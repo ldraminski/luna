@@ -131,6 +131,17 @@ W aplikacji przy wyczerpanym limicie (402): „Mam chwilową przerwę — skońc
 - **Przypomnienia przy padzie serwera:** harmonogram jest na tym samym serwerze — w czasie awarii nic nie wychodzi; po powrocie wysyła
   wszystkie zaległe (`due_at <= now()`, jeszcze niewysłane) za jednym razem.
 
+## Przypomnienia i alarm w chwili terminu (28.09.2026, Łukasz)
+
+- **Czas przypomnień** (`prompt-rozumienie.txt`): trzeba dojechać (umowa, żłobek, lekarz, urząd…) → **1:30 h i 5 min przed**; bez dojazdu (telefon, lek, TV)
+  → 10 min przed; wydarzenie jutro lub później → też 20:00 dzień wcześniej. Nie wcześniej niż 6:00, nigdy „na dokładną godzinę” (wtedy alarm).
+- **Alarm:** „Oboe: Harmonogram” chodzi **co 20 s**; krok „Alarmy” — jednorazowa rzecz z minionym terminem (start tylko dla ostatniej godziny)
+  dostaje powiadomienie `kind='alarm'` co 20 s, dopóki `data.alarm.state` nie jest `off`, przełożona (`snoozed`, +5 min) ani odhaczona.
+  Bezpiecznik 60 min (Apple może zablokować zasypujące pushe) → `off` + ostatni push. Alarm NIGDY mailem (fallback wyłączony dla `kind='alarm'`).
+- Push alarmu: jeden na rzecz (`tag` + `renotify`), na Androidzie przyciski „Przełóż o 5 min” / „Wyłącz” (`POST /api/items/alarm` z SW).
+  W aplikacji czerwona karta (`#alarm`) ma pierwszeństwo przed kartą zaległych. Migracja `db/012-alarm.sql` (`notifications.kind`).
+- Udanych przebiegów Harmonogramu n8n nie zapisuje (`saveDataSuccessExecution: none`) — 4320/dobę.
+
 ## Wdrożenie
 
 **Pamięć podręczna (27.09):** Cloudflare dokleja `max-age=14400` do CSS/JS mimo `no-cache` z nginx — telefon brał nowy HTML ze starym CSS.
