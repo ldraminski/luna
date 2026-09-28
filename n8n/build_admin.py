@@ -52,7 +52,7 @@ iff = node("Wysłać mail?", "n8n-nodes-base.if", 2.2, [440, 0], {
 TEXT = maile.klucz_powitalny("$json.result")
 mail = node("Wyślij token mailem", "n8n-nodes-base.emailSend", 2.1, [660, -100], {
   "fromEmail": maile.NADAWCA, "toEmail": "={{ $json.result.email }}",
-  "subject": "Cześć, tu Luna — Twój klucz", "emailFormat": "both", "text": TEXT, "html": maile.html_powitalny("$json.result"), "options": {"appendAttribution": False}},
+  "subject": "Cześć, tu Luna — Twój klucz", "emailFormat": "text", "text": TEXT, "options": {"appendAttribution": False}},
   credentials=SMTP, onError="continueRegularOutput")
 r_mail = node("Odpowiedz: wysłano", "n8n-nodes-base.respondToWebhook", 1.1, [880, -100], {
   "respondWith": "json", "options": {},

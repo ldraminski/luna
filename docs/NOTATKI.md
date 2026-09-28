@@ -131,6 +131,7 @@ Wcześniej `n8n@renlab.ovh` (OVH): SPF/DKIM/DMARC przechodziły, a i tak u czę�
 nadawca z innej domeny niż linki, DKIM OVH podpisuje tylko nagłówek From). Teraz **`Luna <luna@draminski.dev>` przez Resend** (SMTP
 `smtp.resend.com:465`, user `resend`, hasło = klucz API z uprawnieniem tylko do wysyłki; credential n8n „SMTP account”).
 DNS draminski.dev w Cloudflare: `resend._domainkey` (TXT, DKIM), `send` i `rsend` (CNAME, bez proxy), `_dmarc` (`p=none`).
+**Maile tylko tekstowe** (test 29.09 na nowej skrzynce Gmail: HTML z przyciskiem „Zainstaluj” → spam, ta sama treść jako tekst → odebrane).
 Zmiana nadawcy/credentiala = `n8n/config.local.json` (`sender`, `credentials.smtp`) → `build_all.py` → PUT Harmonogram, Dostęp, Wydaj token.
 
 ## Raport dnia / tygodnia i przypomnienie o zaległych (28.09.2026, Łukasz)
