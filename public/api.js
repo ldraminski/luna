@@ -70,6 +70,8 @@ export const api = {
   photo: (id) => call('items/photo?id=' + encodeURIComponent(id)).then((d) => d.image),
   done: (id) => call('items/done', { method: 'POST', body: { id } }),
   remove: (id) => call('items/delete', { method: 'POST', body: { id } }),
+  undo: (id) => call('items/undo', { method: 'POST', body: { id } }),
+  doneList: () => call('items/done').then((d) => d.items || []),
   check: (id, list, index, done) => call('items/check', { method: 'POST', body: { id, list, index, done } }),
   summarize: (id) => call('items/summarize', { method: 'POST', body: { id } }),
   widgetChat: (id, message = '', image = '') => call('items/widget-chat', { method: 'POST', body: { id, message, ...(image ? { image } : {}) }, timeout: 120000 }),

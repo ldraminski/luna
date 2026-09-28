@@ -32,7 +32,8 @@ t = node("Co 20 s", "n8n-nodes-base.scheduleTrigger", 1.2, [-220, 0],
 # dopóki użytkownik nie przełoży (snoozed, +5 min), nie wyłączy (off) ani nie odhaczy. Bezpiecznik: 60 min, potem off + ostatni push.
 # Start tylko dla terminów z ostatniej godziny (stare zaległe nie zaczną dzwonić po wdrożeniu).
 alarm = node("Alarmy", "n8n-nodes-base.postgres", 2.6, [0, 0], {"operation": "executeQuery", "query": """
-WITH ring AS (
+WITH purge AS (DELETE FROM items WHERE status = 'deleted' AND updated_at < now() - interval '30 days' RETURNING 1),   -- kosz: 30 dni
+ring AS (
   SELECT i.id, i.user_id, i.title, i.data->'alarm' AS a,
     coalesce((i.data->'alarm'->>'started_at')::timestamptz, now()) AS started
   FROM items i
@@ -62,7 +63,9 @@ FROM upd RETURNING id)
 SELECT count(*) AS alarms FROM ins""", "options": {}}, credentials=PG)
 claim = node("Weź zaległe", "n8n-nodes-base.postgres", 2.6, [220, 0], {"operation": "executeQuery", "query": """
 WITH due AS (
-  SELECT id FROM notifications WHERE sent_at IS NULL AND due_at <= now()
+  SELECT id FROM notifications n WHERE sent_at IS NULL AND due_at <= now()
+    -- odhaczone / usunięte rzeczy milkną (a „Cofnij” przywraca je razem z przypomnieniami)
+    AND (n.item_id IS NULL OR EXISTS (SELECT 1 FROM items i WHERE i.id = n.item_id AND i.status = 'active'))
   ORDER BY due_at LIMIT 100 FOR UPDATE SKIP LOCKED),
 claimed AS (
   UPDATE notifications n SET sent_at = now() FROM due WHERE n.id = due.id RETURNING n.*),

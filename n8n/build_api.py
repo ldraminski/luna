@@ -116,8 +116,8 @@ SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
   ("POST", "items/done", "Odhacz", f"""
 WITH {ME},
 upd AS (UPDATE items SET status = 'done', updated_at = now()
-        WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) RETURNING id),
-cancel AS (DELETE FROM notifications WHERE item_id IN (SELECT id FROM upd) AND sent_at IS NULL RETURNING 1)
+        WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) RETURNING id)
+-- przypomnień NIE kasujemy (Harmonogram pomija nieaktywne rzeczy) — „Cofnij” ma co przywrócić
 SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
   WHEN NOT EXISTS (SELECT 1 FROM upd) THEN json_build_object('status', 404, 'error', 'Nie ma już tej rzeczy.')
   ELSE json_build_object('status', 200, 'ok', true) END AS result""",
@@ -158,9 +158,30 @@ SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
   ELSE json_build_object('status', 200, 'ok', true) END AS result""",
    "={{ [ " + TOKEN + ", /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000' ] }}"),
 
+  # „Cofnij” po odhaczeniu / usunięciu (do 30 dni). Stare, niewysłane przypomnienia kasujemy, żeby nie przyszła ich lawina.
+  ("POST", "items/undo", "Cofnij", f"""
+WITH {ME},
+u AS (UPDATE items SET status = 'active', updated_at = now()
+      WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) AND status IN ('done', 'deleted') AND updated_at > now() - interval '30 days'
+      RETURNING id),
+stale AS (DELETE FROM notifications WHERE item_id IN (SELECT id FROM u) AND sent_at IS NULL AND due_at < now() RETURNING 1)
+SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
+  WHEN NOT EXISTS (SELECT 1 FROM u) THEN json_build_object('status', 404, 'error', 'Tej rzeczy nie da się już przywrócić.')
+  ELSE json_build_object('status', 200, 'ok', true) END AS result""",
+   "={{ [ " + TOKEN + ", /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000' ] }}"),
+
+  ("GET", "items/done", "Zrobione", f"""
+WITH {ME}
+SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
+  ELSE json_build_object('status', 200, 'items', coalesce((SELECT json_agg(t ORDER BY t.updated_at DESC) FROM (
+    SELECT id, title, kind, updated_at FROM items WHERE user_id = (SELECT user_id FROM me) AND status = 'done'
+      AND updated_at > now() - interval '7 days' LIMIT 50) t), '[]'::json)) END AS result""",
+   "={{ [ " + TOKEN + " ] }}"),
+
   ("POST", "items/delete", "Usuń", f"""
 WITH {ME},
-d AS (DELETE FROM items WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) RETURNING id)
+d AS (UPDATE items SET status = 'deleted', updated_at = now() WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) AND status <> 'deleted' RETURNING id)
+-- miękkie usunięcie: „Cofnij” działa; na dobre znika po 30 dniach (Harmonogram)
 SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN {UNAUTH}
   WHEN NOT EXISTS (SELECT 1 FROM d) THEN json_build_object('status', 404, 'error', 'Nie ma już tej rzeczy.')
   ELSE json_build_object('status', 200, 'ok', true) END AS result""",

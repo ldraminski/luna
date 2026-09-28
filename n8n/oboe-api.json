@@ -2,7 +2,7 @@
  "name": "Oboe: API",
  "nodes": [
   {
-   "id": "9ad3ca63-1615-4459-aa66-924a99e5a512",
+   "id": "a8d2f066-ede8-4358-8543-6c57303f20c1",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "cc07b1d0-f134-4af2-9d27-e0f8d211545b",
+   "id": "adab7051-6e73-413f-9dfd-8caf6540ac68",
    "name": "GET me",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -25,7 +25,7 @@
     0,
     0
    ],
-   "webhookId": "1f2a7b40-f164-4acd-9971-56ca1eb5c5da",
+   "webhookId": "e694fc75-d8cd-454b-a1ec-616671597290",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/me",
@@ -34,7 +34,7 @@
    }
   },
   {
-   "id": "7d6e774a-fd24-4ab0-bdf3-158f36b6b47f",
+   "id": "bd2f57f5-4091-44d8-a30a-6825d4e9f43c",
    "name": "Kim jestem",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -58,7 +58,7 @@
    }
   },
   {
-   "id": "d7704c18-5ee8-4dda-9006-952c33303626",
+   "id": "1f66de89-e471-4996-8625-c19a5a2f3f70",
    "name": "Odpowiedz: Kim jestem",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -75,7 +75,7 @@
    }
   },
   {
-   "id": "d8a55abc-814f-404a-8535-b67156c65b38",
+   "id": "1ab239c3-d6dd-4e99-824b-dc6b66579f5b",
    "name": "GET items",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -83,7 +83,7 @@
     0,
     200
    ],
-   "webhookId": "08d6f0e6-9790-409d-8092-b54b092aacea",
+   "webhookId": "21aaea72-7a7b-4729-82fd-347cb70a3d0b",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/items",
@@ -92,7 +92,7 @@
    }
   },
   {
-   "id": "bf899882-1681-4978-baa4-6e7e535ead12",
+   "id": "93f9ac7c-e4c3-4ce4-9f75-c8f1434bf124",
    "name": "Lista rzeczy",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -116,7 +116,7 @@
    }
   },
   {
-   "id": "c82bc008-55ae-44a5-b4dc-d12d595f709b",
+   "id": "9efe5bf4-3aa5-454e-a242-8c018f5609dd",
    "name": "Odpowiedz: Lista rzeczy",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -133,7 +133,7 @@
    }
   },
   {
-   "id": "02866067-c83b-4b4c-86b0-321f4fe80c53",
+   "id": "836b8e70-276a-417d-8938-51069717b2fc",
    "name": "GET items/photo",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -141,7 +141,7 @@
     0,
     400
    ],
-   "webhookId": "de59a72d-cc76-4b76-b3dd-5f308dd9d3eb",
+   "webhookId": "f8338beb-7c9b-45e9-bf9a-77b7d5dee49f",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/items/photo",
@@ -150,7 +150,7 @@
    }
   },
   {
-   "id": "30944d15-07c4-452f-816e-3415e8a88705",
+   "id": "a2fbbd16-ac6a-4453-9373-ac82fbb65f00",
    "name": "Zdjęcie rzeczy",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -174,7 +174,7 @@
    }
   },
   {
-   "id": "35bdf561-7a1e-4110-bd25-a8ff886fd03d",
+   "id": "839245f2-e014-43fa-83de-05cd940a16f1",
    "name": "Odpowiedz: Zdjęcie rzeczy",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -191,7 +191,7 @@
    }
   },
   {
-   "id": "3fdad8d2-f029-46c3-80b4-5d37bac384a1",
+   "id": "a1aa2dff-6985-4a77-b5ad-200d983371f5",
    "name": "GET report",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -199,7 +199,7 @@
     0,
     600
    ],
-   "webhookId": "e8a11dd4-24b2-44d8-bcfb-c588e4d99667",
+   "webhookId": "47b83560-1b57-4e03-a67a-9c114f562514",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/report",
@@ -208,7 +208,7 @@
    }
   },
   {
-   "id": "68e28278-819c-41aa-95e3-11e87164dc7e",
+   "id": "f358ded7-fb66-4118-9d56-ba3d64e492dd",
    "name": "Raport",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -232,7 +232,7 @@
    }
   },
   {
-   "id": "159fcb75-6a1d-40d6-8d8c-158cde44a9eb",
+   "id": "a319af0c-a51b-4df8-a936-2bef32ebb6de",
    "name": "Odpowiedz: Raport",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -249,7 +249,7 @@
    }
   },
   {
-   "id": "5e3ce33b-190c-4f5e-8f02-2fe3089ee31f",
+   "id": "501fcc27-155c-46f3-9f7b-df60e25c8ec8",
    "name": "POST report/seen",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -257,7 +257,7 @@
     0,
     800
    ],
-   "webhookId": "27c74a67-ed1c-4f19-82dc-c6e589884999",
+   "webhookId": "d1e293a5-5225-4aea-986e-c9af1c5f9fe3",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/report/seen",
@@ -266,7 +266,7 @@
    }
   },
   {
-   "id": "bc397c2d-f7a1-40ee-b21d-6c2f09039759",
+   "id": "c4e5e43a-9d1d-4962-af0d-ae690990c400",
    "name": "Raport obejrzany",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -290,7 +290,7 @@
    }
   },
   {
-   "id": "bcaae2f5-0f09-450f-b46a-0b56cf7f60ed",
+   "id": "ee37d894-f722-4a1d-894e-1f2c8034a37f",
    "name": "Odpowiedz: Raport obejrzany",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -307,7 +307,7 @@
    }
   },
   {
-   "id": "d17f340e-28ac-4e2a-b1e0-595ded62370c",
+   "id": "edb56a56-27e2-468e-a0a6-4536e7951735",
    "name": "POST settings",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -315,7 +315,7 @@
     0,
     1000
    ],
-   "webhookId": "34a87809-3d95-4fd6-b993-ccfeedbfe43c",
+   "webhookId": "82eeab8d-1f45-43c6-8e29-64e09fd2d7cb",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/settings",
@@ -324,7 +324,7 @@
    }
   },
   {
-   "id": "f592ca2d-4ab5-450a-930a-50645bf2f97f",
+   "id": "796c0c3b-3fde-4452-b1fd-4a77ecc313bc",
    "name": "Ustawienia raportu",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -348,7 +348,7 @@
    }
   },
   {
-   "id": "7f5d0199-17d4-479b-a86d-9303c5304842",
+   "id": "9b29f066-2237-407d-8466-ad337b97a750",
    "name": "Odpowiedz: Ustawienia raportu",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -365,7 +365,7 @@
    }
   },
   {
-   "id": "534941fb-dcbe-430e-b2f0-c5bcc76f7972",
+   "id": "ef0ce9ba-d459-4dcd-9d6a-5397f7779c62",
    "name": "POST items/alarm",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -373,7 +373,7 @@
     0,
     1200
    ],
-   "webhookId": "0bb93ff8-83f6-4409-9f80-539f2590a2c4",
+   "webhookId": "b45389f6-affe-4abb-b2a7-505e85fcd87a",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/alarm",
@@ -382,7 +382,7 @@
    }
   },
   {
-   "id": "a9bef639-98eb-4dc7-8707-43930e77a06d",
+   "id": "8946cfb0-4e5a-4165-b6a9-5c0b2f306957",
    "name": "Alarm",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -406,7 +406,7 @@
    }
   },
   {
-   "id": "c48547ed-e9ac-4bde-b137-1f7cbee8385f",
+   "id": "cced1dc2-e71c-4f8b-b3aa-915472b0956b",
    "name": "Odpowiedz: Alarm",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -423,7 +423,7 @@
    }
   },
   {
-   "id": "bacc0e24-19cc-44d9-89a2-cbe8ebcd964c",
+   "id": "faa831e2-d861-418f-a150-adf075b89a0c",
    "name": "GET pending",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -431,7 +431,7 @@
     0,
     1400
    ],
-   "webhookId": "b3c19df9-4c72-4a20-894d-0d7bc0e92d38",
+   "webhookId": "6d22c82c-15fe-4ef6-950d-e587c1fabfaa",
    "parameters": {
     "httpMethod": "GET",
     "path": "oboe/pending",
@@ -440,7 +440,7 @@
    }
   },
   {
-   "id": "7682729b-6682-4266-b937-991dc5fbed9d",
+   "id": "bf92a118-22bd-471a-be40-5a58698b557f",
    "name": "Do pokazania",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -464,7 +464,7 @@
    }
   },
   {
-   "id": "dff07b50-7cc8-4083-b732-9c837b5d84f0",
+   "id": "6ef87850-6d15-456c-a6c1-13b03c96e09c",
    "name": "Odpowiedz: Do pokazania",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -481,7 +481,7 @@
    }
   },
   {
-   "id": "8142ee79-0381-463b-be69-f683191bd044",
+   "id": "68c272ad-0da5-4129-9cb7-920e2eceedc3",
    "name": "POST push/subscribe",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -489,7 +489,7 @@
     0,
     1600
    ],
-   "webhookId": "f0486ec3-c6d8-48e7-ac03-49d23dc08ea6",
+   "webhookId": "684d3a7d-61d9-4a04-b4ca-429dd2fe9450",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/push/subscribe",
@@ -498,7 +498,7 @@
    }
   },
   {
-   "id": "e69cafd0-8ced-4405-aa86-c2bb66a577a6",
+   "id": "ee9a8baa-6582-461b-8e12-0d4e76601cb3",
    "name": "Zapisz urządzenie",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -522,7 +522,7 @@
    }
   },
   {
-   "id": "e4efeaa0-3bab-4330-b0cb-05789aab5a38",
+   "id": "7aef662e-7de3-4123-8f36-c0a818de658b",
    "name": "Odpowiedz: Zapisz urządzenie",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -539,7 +539,7 @@
    }
   },
   {
-   "id": "38d5fefc-ac4b-470d-97a8-ea87f0baeaf7",
+   "id": "98f1d9ac-62b3-4259-9a7c-f1825bfe3f58",
    "name": "POST push/unsubscribe",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -547,7 +547,7 @@
     0,
     1800
    ],
-   "webhookId": "38f58db6-b781-436a-97b5-81935de77b04",
+   "webhookId": "7a5a9c1b-de8f-4b3c-8883-7f67a85bed83",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/push/unsubscribe",
@@ -556,7 +556,7 @@
    }
   },
   {
-   "id": "c8443e27-d6e8-4a72-80c8-ffe0d4548c54",
+   "id": "5e71531d-2871-40e3-ba96-14d2695084e9",
    "name": "Usuń urządzenie",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -580,7 +580,7 @@
    }
   },
   {
-   "id": "3e40f23d-1567-4d03-b8f3-4bc8e9f35140",
+   "id": "1b0c897b-c009-45fc-a258-b68298c32b99",
    "name": "Odpowiedz: Usuń urządzenie",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -597,7 +597,7 @@
    }
   },
   {
-   "id": "42b310ec-92f9-4fef-8e3b-cd869dcc55e4",
+   "id": "9683a137-9f96-4060-8a15-eaab19816ee8",
    "name": "POST items/done",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -605,7 +605,7 @@
     0,
     2000
    ],
-   "webhookId": "9b9b3e0d-95e0-47bf-9c22-d139b4433dbf",
+   "webhookId": "d0770ec7-9cf1-48bf-9cdd-b14e862272f3",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/done",
@@ -614,7 +614,7 @@
    }
   },
   {
-   "id": "fd614fb6-202b-4aca-99ab-4f9a85a96d74",
+   "id": "83b09b2f-25dd-4b68-9107-70f935ad6951",
    "name": "Odhacz",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -631,14 +631,14 @@
    "alwaysOutputData": false,
    "parameters": {
     "operation": "executeQuery",
-    "query": "WITH me AS (\n  UPDATE sessions SET last_used_at = now()\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id),\nupd AS (UPDATE items SET status = 'done', updated_at = now()\n        WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) RETURNING id),\ncancel AS (DELETE FROM notifications WHERE item_id IN (SELECT id FROM upd) AND sent_at IS NULL RETURNING 1)\nSELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN json_build_object('status', 401, 'error', 'Zaloguj się ponownie')\n  WHEN NOT EXISTS (SELECT 1 FROM upd) THEN json_build_object('status', 404, 'error', 'Nie ma już tej rzeczy.')\n  ELSE json_build_object('status', 200, 'ok', true) END AS result",
+    "query": "WITH me AS (\n  UPDATE sessions SET last_used_at = now()\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id),\nupd AS (UPDATE items SET status = 'done', updated_at = now()\n        WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) RETURNING id)\n-- przypomnień NIE kasujemy (Harmonogram pomija nieaktywne rzeczy) — „Cofnij” ma co przywrócić\nSELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN json_build_object('status', 401, 'error', 'Zaloguj się ponownie')\n  WHEN NOT EXISTS (SELECT 1 FROM upd) THEN json_build_object('status', 404, 'error', 'Nie ma już tej rzeczy.')\n  ELSE json_build_object('status', 200, 'ok', true) END AS result",
     "options": {
      "queryReplacement": "={{ [ ($json.headers.authorization || '').replace(/^Bearer\\s+/i, ''), /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000' ] }}"
     }
    }
   },
   {
-   "id": "588d9483-8914-47bd-a735-0c37bfe582dd",
+   "id": "10fc1f1a-6351-451e-8a7e-86bd11b8e83c",
    "name": "Odpowiedz: Odhacz",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -655,7 +655,7 @@
    }
   },
   {
-   "id": "436c1aa5-32b4-404e-9fb2-e1eeb33658a3",
+   "id": "86bb85d0-111e-44fb-bbcf-acc7cdff3b51",
    "name": "POST items/check",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -663,7 +663,7 @@
     0,
     2200
    ],
-   "webhookId": "43d9b867-fb14-4eef-a4fe-a25c2d3b70a2",
+   "webhookId": "78ced78c-cf45-467a-8edd-a8f84722ca26",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/check",
@@ -672,7 +672,7 @@
    }
   },
   {
-   "id": "eb088438-9fdc-4463-a706-8bc7f83c038b",
+   "id": "8790311e-7acf-419f-9637-d3c844d53af9",
    "name": "Odhacz pozycję",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -696,7 +696,7 @@
    }
   },
   {
-   "id": "58313602-6f34-4ba4-8348-cc6ced876119",
+   "id": "70eda09d-943c-4a89-aa10-214b04a6ceeb",
    "name": "Odpowiedz: Odhacz pozycję",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -713,7 +713,7 @@
    }
   },
   {
-   "id": "1df7ba64-1bf5-4986-b7b9-03c30f82a674",
+   "id": "02b9ec27-eb0e-42e9-8df6-14fec7085149",
    "name": "POST items/widget-state",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -721,7 +721,7 @@
     0,
     2400
    ],
-   "webhookId": "54f7835c-eb38-4e29-b4eb-d0c31d991f6f",
+   "webhookId": "dab0457f-96dc-480f-a5e4-1e99c4dfd753",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/widget-state",
@@ -730,7 +730,7 @@
    }
   },
   {
-   "id": "29f04f53-983b-4388-89f4-b52fda35f6ef",
+   "id": "20a81c75-0d6b-4b97-b0de-07d560013dbb",
    "name": "Stan widgetu",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -754,7 +754,7 @@
    }
   },
   {
-   "id": "a9c37da8-a7be-4a65-b695-ec0800e0ede7",
+   "id": "85e445be-737b-44e7-af59-ff0858999dd1",
    "name": "Odpowiedz: Stan widgetu",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -771,7 +771,7 @@
    }
   },
   {
-   "id": "07d0f5d1-da58-4ed1-acd2-adfda3be8afc",
+   "id": "294a3ca4-6098-49ee-afdc-cb27082d4f9f",
    "name": "POST items/widget-chat/close",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -779,7 +779,7 @@
     0,
     2600
    ],
-   "webhookId": "813d77c8-2ea2-43c2-8a20-d30fd5c6b64e",
+   "webhookId": "aa5e0b98-a4f3-4d8a-846b-bcd90b62656a",
    "parameters": {
     "httpMethod": "POST",
     "path": "oboe/items/widget-chat/close",
@@ -788,7 +788,7 @@
    }
   },
   {
-   "id": "c7668a72-e493-4624-a7f1-ee72d58c0fe2",
+   "id": "85ae3af8-55d0-4fda-b1bb-55a35f57462e",
    "name": "Zamknij czat",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -812,7 +812,7 @@
    }
   },
   {
-   "id": "729b4901-9955-44af-a588-bb5715fa5212",
+   "id": "dafad058-ca6e-4a03-8b27-3e96bf7f3c91",
    "name": "Odpowiedz: Zamknij czat",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -829,25 +829,25 @@
    }
   },
   {
-   "id": "666fa7ba-af84-4ba9-8e80-f877a4449941",
-   "name": "POST items/delete",
+   "id": "497f83a4-f939-49e6-8202-4a6e68e84486",
+   "name": "POST items/undo",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
    "position": [
     0,
     2800
    ],
-   "webhookId": "6251b8c7-c08b-4d2a-bd37-acc2bcca5308",
+   "webhookId": "38a6cf9c-2c30-485f-8bc1-829980cfd710",
    "parameters": {
     "httpMethod": "POST",
-    "path": "oboe/items/delete",
+    "path": "oboe/items/undo",
     "responseMode": "responseNode",
     "options": {}
    }
   },
   {
-   "id": "8b2c086c-a850-42fa-ba40-01425aa18d79",
-   "name": "Usuń",
+   "id": "2350a48e-e4b6-4690-bd64-17ed996f1227",
+   "name": "Cofnij",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
    "position": [
@@ -863,15 +863,15 @@
    "alwaysOutputData": false,
    "parameters": {
     "operation": "executeQuery",
-    "query": "WITH me AS (\n  UPDATE sessions SET last_used_at = now()\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id),\nd AS (DELETE FROM items WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) RETURNING id)\nSELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN json_build_object('status', 401, 'error', 'Zaloguj się ponownie')\n  WHEN NOT EXISTS (SELECT 1 FROM d) THEN json_build_object('status', 404, 'error', 'Nie ma już tej rzeczy.')\n  ELSE json_build_object('status', 200, 'ok', true) END AS result",
+    "query": "WITH me AS (\n  UPDATE sessions SET last_used_at = now()\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id),\nu AS (UPDATE items SET status = 'active', updated_at = now()\n      WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) AND status IN ('done', 'deleted') AND updated_at > now() - interval '30 days'\n      RETURNING id),\nstale AS (DELETE FROM notifications WHERE item_id IN (SELECT id FROM u) AND sent_at IS NULL AND due_at < now() RETURNING 1)\nSELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN json_build_object('status', 401, 'error', 'Zaloguj się ponownie')\n  WHEN NOT EXISTS (SELECT 1 FROM u) THEN json_build_object('status', 404, 'error', 'Tej rzeczy nie da się już przywrócić.')\n  ELSE json_build_object('status', 200, 'ok', true) END AS result",
     "options": {
      "queryReplacement": "={{ [ ($json.headers.authorization || '').replace(/^Bearer\\s+/i, ''), /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000' ] }}"
     }
    }
   },
   {
-   "id": "2ba3fc5b-b6e0-41d4-9c12-37d7510d7405",
-   "name": "Odpowiedz: Usuń",
+   "id": "d547613c-f5fe-4acb-bffd-a0540833e4f0",
+   "name": "Odpowiedz: Cofnij",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
    "position": [
@@ -887,13 +887,129 @@
    }
   },
   {
-   "id": "2377f653-0821-4bc8-bac3-fbcd5a0b7ad4",
+   "id": "e3def23f-72ee-457d-90d5-b3f22063a1b6",
+   "name": "GET items/done",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    3000
+   ],
+   "webhookId": "fff1b93a-53ce-4755-98bf-4faee4d1521d",
+   "parameters": {
+    "httpMethod": "GET",
+    "path": "oboe/items/done",
+    "responseMode": "responseNode",
+    "options": {}
+   }
+  },
+  {
+   "id": "9c722471-4824-4ce3-aff1-9fed164c5567",
+   "name": "Zrobione",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    240,
+    3000
+   ],
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   },
+   "alwaysOutputData": false,
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "WITH me AS (\n  UPDATE sessions SET last_used_at = now()\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id)\nSELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN json_build_object('status', 401, 'error', 'Zaloguj się ponownie')\n  ELSE json_build_object('status', 200, 'items', coalesce((SELECT json_agg(t ORDER BY t.updated_at DESC) FROM (\n    SELECT id, title, kind, updated_at FROM items WHERE user_id = (SELECT user_id FROM me) AND status = 'done'\n      AND updated_at > now() - interval '7 days' LIMIT 50) t), '[]'::json)) END AS result",
+    "options": {
+     "queryReplacement": "={{ [ ($json.headers.authorization || '').replace(/^Bearer\\s+/i, '') ] }}"
+    }
+   }
+  },
+  {
+   "id": "304a50cd-767b-4033-94d3-f1826f5dfaff",
+   "name": "Odpowiedz: Zrobione",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    480,
+    3000
+   ],
+   "parameters": {
+    "respondWith": "json",
+    "responseBody": "={{ $json.result }}",
+    "options": {
+     "responseCode": "={{ $json.result.status || 200 }}"
+    }
+   }
+  },
+  {
+   "id": "6b7357e9-412b-4761-8553-256f1976f330",
+   "name": "POST items/delete",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2,
+   "position": [
+    0,
+    3200
+   ],
+   "webhookId": "22a247f0-9597-4400-98ec-9722a57e3363",
+   "parameters": {
+    "httpMethod": "POST",
+    "path": "oboe/items/delete",
+    "responseMode": "responseNode",
+    "options": {}
+   }
+  },
+  {
+   "id": "1d99f7a8-b167-463d-90f9-3057d0da9d7d",
+   "name": "Usuń",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    240,
+    3200
+   ],
+   "credentials": {
+    "postgres": {
+     "id": "IAfnl61Lb7KbTeZi",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   },
+   "alwaysOutputData": false,
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "WITH me AS (\n  UPDATE sessions SET last_used_at = now()\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id),\nd AS (UPDATE items SET status = 'deleted', updated_at = now() WHERE id = $2::uuid AND user_id = (SELECT user_id FROM me) AND status <> 'deleted' RETURNING id)\n-- miękkie usunięcie: „Cofnij” działa; na dobre znika po 30 dniach (Harmonogram)\nSELECT CASE WHEN NOT EXISTS (SELECT 1 FROM me) THEN json_build_object('status', 401, 'error', 'Zaloguj się ponownie')\n  WHEN NOT EXISTS (SELECT 1 FROM d) THEN json_build_object('status', 404, 'error', 'Nie ma już tej rzeczy.')\n  ELSE json_build_object('status', 200, 'ok', true) END AS result",
+    "options": {
+     "queryReplacement": "={{ [ ($json.headers.authorization || '').replace(/^Bearer\\s+/i, ''), /^[0-9a-f-]{36}$/i.test($json.body.id || '') ? $json.body.id : '00000000-0000-0000-0000-000000000000' ] }}"
+    }
+   }
+  },
+  {
+   "id": "314927fa-fc68-46d1-a5be-2a99eacc3b4e",
+   "name": "Odpowiedz: Usuń",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    480,
+    3200
+   ],
+   "parameters": {
+    "respondWith": "json",
+    "responseBody": "={{ $json.result }}",
+    "options": {
+     "responseCode": "={{ $json.result.status || 200 }}"
+    }
+   }
+  },
+  {
+   "id": "f274f1b3-dd40-40fd-9fec-bc685f4216c4",
    "name": "POST items",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
    "position": [
     0,
-    3100
+    3500
    ],
    "parameters": {
     "httpMethod": "POST",
@@ -901,16 +1017,16 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "386f6993-5e9c-4ce0-af72-51552c05c07e"
+   "webhookId": "ec22a849-8b99-464f-9f13-a3091e7c660d"
   },
   {
-   "id": "fd3294f9-f7f7-4f4c-aeb7-eece2aa373ae",
+   "id": "a380aa35-19dc-4f94-99e5-4f6c9c1f1764",
    "name": "Sesja",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
    "position": [
     220,
-    3100
+    3500
    ],
    "parameters": {
     "operation": "executeQuery",
@@ -927,13 +1043,13 @@
    }
   },
   {
-   "id": "81ab91e4-2251-4c6e-98ab-278f744ec15c",
+   "id": "1ff13f42-fcc8-4818-ab72-975cb6acb8a6",
    "name": "Zalogowany i jest tekst?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
    "position": [
     440,
-    3100
+    3500
    ],
    "parameters": {
     "conditions": {
@@ -945,7 +1061,7 @@
      },
      "conditions": [
       {
-       "id": "f6101a46-a292-4b6c-ba84-b475ce7f1e71",
+       "id": "36d6644e-80fe-4afe-8bc3-a0024229050f",
        "leftValue": "={{ $json.user_id }}",
        "rightValue": "",
        "operator": {
@@ -955,7 +1071,7 @@
        }
       },
       {
-       "id": "2289377c-9300-4002-94b3-b5fa22cc569b",
+       "id": "eaf1444e-586b-414c-bead-2b2d35c6afcd",
        "leftValue": "={{ String($('POST items').item.json.body.text || '').trim() || (/^data:image\\//.test(String($('POST items').item.json.body.image || '')) ? 'zdjęcie' : '') }}",
        "rightValue": "",
        "operator": {
@@ -971,13 +1087,13 @@
    }
   },
   {
-   "id": "a488fc5f-1d5f-46fb-8c9c-fc2796d36489",
+   "id": "24a7e3d3-96b0-4437-8d3b-bcc86d6aca30",
    "name": "Odmów",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
    "position": [
     660,
-    3280
+    3680
    ],
    "parameters": {
     "respondWith": "json",
@@ -988,26 +1104,26 @@
    }
   },
   {
-   "id": "9e0b5d6b-8070-4cc0-b3be-f338b7852105",
+   "id": "fd21c9ab-7eba-4100-8bce-93baea823e07",
    "name": "Kalendarz",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
    "position": [
     660,
-    3100
+    3500
    ],
    "parameters": {
     "jsCode": "// Model źle liczy daty (\"za 3 dni\", \"w piątek\"), więc dostaje gotowy kalendarz liczony tutaj (Luxon, strefa workflow = Europe/Warsaw).\nconst DNI = ['poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela'];\nconst now = $now.setZone('Europe/Warsaw');\nconst lines = [];\nfor (let i = 0; i < 35; i++) {\n  const d = now.plus({ days: i });\n  const label = i === 0 ? 'dziś' : i === 1 ? 'jutro' : i === 2 ? 'pojutrze' : `za ${i} dni`;\n  lines.push(`${d.toFormat('yyyy-MM-dd')} ${DNI[d.weekday - 1]} (${label}), przesunięcie ${d.set({ hour: 12 }).toFormat('ZZ')}`);\n}\nreturn [{ json: {\n  teraz: `${now.toFormat('yyyy-MM-dd HH:mm')} (${DNI[now.weekday - 1]}), strefa Europe/Warsaw, przesunięcie ${now.toFormat('ZZ')}`,\n  kalendarz: lines.join('\\n'),\n} }];\n"
    }
   },
   {
-   "id": "9ffe8383-f63a-4dc1-9f4f-59bf82dead18",
+   "id": "4911aeda-080b-4d80-887e-e378387e885f",
    "name": "DeepSeek: zrozum",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
    "position": [
     880,
-    3100
+    3500
    ],
    "parameters": {
     "method": "POST",
@@ -1045,26 +1161,26 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "7d0fee0d-42c7-4779-9bd1-0017baaffd1e",
+   "id": "5b86b943-a76d-42cd-ba7a-97f90099cc8f",
    "name": "Sprawdź odpowiedź",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
    "position": [
     1100,
-    3100
+    3500
    ],
    "parameters": {
     "jsCode": "// Sprawdza odpowiedź modelu; niczego nie zgaduje — przy błędzie zwraca ok:false z komunikatem.\n// Rzecz składa się z części (termin, lista, strona, szczegóły); `kind` to tylko część główna — do sortowania i sekcji.\nconst src = String($('POST items').first().json.body.text || '').trim().slice(0, 1000) || '📷 Zdjęcie';\nconst fail = (error) => [{ json: { ok: false, error, notify: [], spec: {}, data: {}, source_text: src } }];\n\nconst raw = $json.choices?.[0]?.message?.content;\n// 402 z OpenRoutera = wyczerpany limit klucza Luny (alarm dostaje Łukasz z „Oboe: Limit klucza”)\nif (!raw && /\\b402\\b|insufficient|credits|limit/i.test(JSON.stringify($json.error || $json))) return fail('Mam chwilową przerwę — skończył się limit, z którego korzystam. Łukasz już o tym wie.');\nif (!raw) return fail('Nie udało mi się odpowiedzieć — spróbuj jeszcze raz.');\nlet m;\ntry { m = JSON.parse(raw.replace(/^```(json)?|```$/g, '').trim()); } catch (e) { return fail('Nie zrozumiałam. Spróbuj napisać to inaczej.'); }\n\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst now = Date.now();\nconst iso = (v) => { const t = Date.parse(v); return Number.isFinite(t) ? new Date(t).toISOString() : null; };\n\nconst notify = (Array.isArray(m.notify) ? m.notify : [])\n  .map((n) => ({ at: iso(n.at), title: cut(n.title, 50) || cut(m.title, 50), body: cut(n.body, 120) }))\n  .filter((n) => n.at && Date.parse(n.at) > now - 60000 && Date.parse(n.at) < now + 400 * 864e5)\n  .slice(0, 10);\n\nconst r = m.recurrence;\nconst recurrence = r && Number(r.every) > 0 && ['day', 'week', 'month'].includes(r.unit)\n  ? { every: Math.min(Math.round(Number(r.every)), 365), unit: r.unit } : null;\n\n// Code node nie ma URL — prosta walidacja wyrażeniem.\nconst u = String(m.url || '').trim();\nconst url = /^https?:\\/\\/[a-z0-9.-]+\\.[a-z]{2,}(:\\d+)?(\\/\\S*)?$/i.test(u) ? u.slice(0, 500) : null;\n\nconst checklist = (Array.isArray(m.checklist) ? m.checklist : [])\n  .map((x) => ({ text: cut(String(x), 80), done: false })).filter((x) => x.text).slice(0, 30);\nconst fields = (Array.isArray(m.fields) ? m.fields : [])\n  .map((f) => ({ label: cut(f?.label, 20), value: cut(String(f?.value ?? ''), 60) })).filter((f) => f.label && f.value).slice(0, 4);\n\nconst TINTS = ['lavender', 'mint', 'blue', 'pink', 'sky'];\nconst ICONS = ['clock', 'cycle', 'list', 'globe', 'note', 'building', 'tv', 'health', 'car', 'home', 'cart', 'work', 'money', 'sport', 'people', 'doc', 'food', 'travel'];\nconst event_at = iso(m.event_at);\n\nconst kind = recurrence ? 'reminder-recurring' : event_at || notify.length ? 'reminder-once'\n  : checklist.length ? 'checklist' : url ? 'page-summary' : 'note';\nconst look = {\n  tint: TINTS.includes(m.look?.tint) ? m.look.tint : { 'reminder-recurring': 'mint', checklist: 'pink', 'page-summary': 'blue' }[kind] || 'lavender',\n  icon: ICONS.includes(m.look?.icon) ? m.look.icon : { 'reminder-recurring': 'cycle', checklist: 'list', 'page-summary': 'globe', note: 'note' }[kind] || 'clock',\n};\n\nreturn [{ json: {\n  ok: true, kind, title: cut(m.title, 40) || src.slice(0, 40), source_text: src, widget_slug: kind,\n  spec: { understood: cut(m.understood, 300), event_at, recurrence, url, summarize: m.summarize === true && !!url, model: 'deepseek/deepseek-v4.1-flash',\n    widget_brief: cut(m.widget?.brief, 300) || undefined },\n  data: {\n    tip: cut(m.tip, 80) || null, look, fields,\n    widget: m.widget?.brief ? { status: 'generating' } : undefined,\n    // listy z nazwami (Popraw może dołożyć kolejne); z jednego zdania powstaje najwyżej jedna, bez nazwy\n    photo: (() => { try { return $('Wejście do modelu').first().json.photo || undefined; } catch (e) { return undefined; } })(),   // opis zdjęcia, jeśli było\n    lists: checklist.length ? [{ name: null, items: checklist, reset: !!(recurrence && m.checklist_reset !== false) }] : undefined,\n  },\n  notify,\n  research: cut(m.research?.query, 200) || null,   // tylko sterowanie przepływem — nie trafia do bazy\n} }];\n"
    }
   },
   {
-   "id": "797b711e-50d4-484c-be17-ccc3abd61cbb",
+   "id": "252170c8-08a1-4a3f-96f9-f715849cc91d",
    "name": "Zapisz",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
    "position": [
     1320,
-    3100
+    3500
    ],
    "parameters": {
     "operation": "executeQuery",
@@ -1081,13 +1197,13 @@
    }
   },
   {
-   "id": "64d2ef4b-6aab-4b32-a3d7-051072216922",
+   "id": "56d8bfa7-b5b8-486a-af04-a7c0e4a9ec3b",
    "name": "Odpowiedz: dodano",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
    "position": [
     1540,
-    3100
+    3500
    ],
    "parameters": {
     "respondWith": "json",
@@ -1098,13 +1214,13 @@
    }
   },
   {
-   "id": "10bb18f2-e515-4a5c-902f-f0423751d6c1",
+   "id": "da3cac82-d329-4c58-b384-89460a885367",
    "name": "Potrzebny widget?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
    "position": [
     1760,
-    3100
+    3500
    ],
    "parameters": {
     "conditions": {
@@ -1116,7 +1232,7 @@
      },
      "conditions": [
       {
-       "id": "102b5685-ec1e-4b19-b0e5-7fe1f1e06753",
+       "id": "6c7caa95-79fe-4201-8a70-760bb4882f6d",
        "leftValue": "={{ $json.result.status === 200 && !!(($json.result.item || {}).data || {}).widget }}",
        "rightValue": "",
        "operator": {
@@ -1132,13 +1248,13 @@
    }
   },
   {
-   "id": "7158c5a6-d218-4f78-9394-9c2da7f772df",
+   "id": "bf03a6e1-67b6-49ea-80d9-131f8243fc67",
    "name": "Generuj widget (w tle)",
    "type": "n8n-nodes-base.executeWorkflow",
    "typeVersion": 1.2,
    "position": [
     1980,
-    3100
+    3500
    ],
    "parameters": {
     "source": "database",
@@ -1153,13 +1269,13 @@
    }
   },
   {
-   "id": "7f7b0705-eabd-4195-963b-ab2ba695a8fd",
+   "id": "6538dec8-36ea-44f6-a079-4504bb34128c",
    "name": "Id rzeczy",
    "type": "n8n-nodes-base.set",
    "typeVersion": 3.4,
    "position": [
     1870,
-    3100
+    3500
    ],
    "parameters": {
     "mode": "manual",
@@ -1167,7 +1283,7 @@
     "assignments": {
      "assignments": [
       {
-       "id": "59f3a76e-771a-4a25-b2eb-71a4b77241d2",
+       "id": "34c78c97-c3e6-41b3-add3-737cbc29db33",
        "name": "item_id",
        "type": "string",
        "value": "={{ $json.result.item.id }}"
@@ -1178,13 +1294,13 @@
    }
   },
   {
-   "id": "89129922-2ae7-4dc8-bd5d-4cf7146b92fc",
+   "id": "ae5ca2d9-47af-4b8b-abfe-cc911e872746",
    "name": "Streścić stronę?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
    "position": [
     1760,
-    3300
+    3700
    ],
    "parameters": {
     "conditions": {
@@ -1196,7 +1312,7 @@
      },
      "conditions": [
       {
-       "id": "b4a36eab-22d7-4e5e-a8e8-adaae6d3b549",
+       "id": "84f1f268-84cc-4e5d-8fc7-65da3868b529",
        "leftValue": "={{ $json.result.status === 200 && !!(($json.result.item || {}).spec || {}).summarize }}",
        "rightValue": "",
        "operator": {
@@ -1212,13 +1328,13 @@
    }
   },
   {
-   "id": "618219a3-49c0-4a5f-81a3-d785983d73cd",
+   "id": "589472dd-ea12-4019-9a7f-eb03418b5e89",
    "name": "Id do streszczenia",
    "type": "n8n-nodes-base.set",
    "typeVersion": 3.4,
    "position": [
     1870,
-    3300
+    3700
    ],
    "parameters": {
     "mode": "manual",
@@ -1226,13 +1342,13 @@
     "assignments": {
      "assignments": [
       {
-       "id": "1862ba4a-cfff-46c8-a14b-693249ba3a10",
+       "id": "140de42a-66e9-4e44-8bfd-4ef99e612b7e",
        "name": "item_id",
        "type": "string",
        "value": "={{ $json.result.item.id }}"
       },
       {
-       "id": "18fd18ab-212a-41e5-9fab-b55a60d8d9bd",
+       "id": "7a7ac595-82d8-431c-9376-b8ed2982d74d",
        "name": "reason",
        "type": "string",
        "value": "created"
@@ -1243,13 +1359,13 @@
    }
   },
   {
-   "id": "99ec12a6-ec34-4a6e-976c-14c178e26cd6",
+   "id": "7cc4ceca-2daa-4f47-9851-22d6deb53d70",
    "name": "Streść (w tle)",
    "type": "n8n-nodes-base.executeWorkflow",
    "typeVersion": 1.2,
    "position": [
     1980,
-    3300
+    3700
    ],
    "parameters": {
     "source": "database",
@@ -1264,13 +1380,13 @@
    }
   },
   {
-   "id": "9e9c241b-aaf9-45d3-9b6a-bdad64e06a91",
+   "id": "fedde54b-5ae0-46a0-ba73-2b7cd3784b6b",
    "name": "POST items/summarize",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
    "position": [
     0,
-    3600
+    4000
    ],
    "parameters": {
     "httpMethod": "POST",
@@ -1278,16 +1394,16 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "1e9c9c9e-65a5-4680-b98f-5c26f406888f"
+   "webhookId": "116fdacc-028a-4e46-a690-4a7fde4af459"
   },
   {
-   "id": "04781a1e-216d-4253-82b0-c58f28967a71",
+   "id": "55b46d13-60d7-42b3-8f75-5587c355c5f6",
    "name": "Sprawdź teraz",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
    "position": [
     220,
-    3600
+    4000
    ],
    "parameters": {
     "operation": "executeQuery",
@@ -1304,13 +1420,13 @@
    }
   },
   {
-   "id": "12cee7d3-65d1-4751-aab6-70a3c79d90f9",
+   "id": "788ed51b-f13f-4343-8e47-e6b5f12200a8",
    "name": "Odpowiedz: sprawdzam",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
    "position": [
     440,
-    3600
+    4000
    ],
    "parameters": {
     "respondWith": "json",
@@ -1321,13 +1437,13 @@
    }
   },
   {
-   "id": "ee2a82e2-699a-47fc-aaa0-e5a1256729ce",
+   "id": "f8694c95-9f88-4a64-8693-63d417f4e6f6",
    "name": "Ruszać?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
    "position": [
     660,
-    3600
+    4000
    ],
    "parameters": {
     "conditions": {
@@ -1339,7 +1455,7 @@
      },
      "conditions": [
       {
-       "id": "80e5b48c-7cb8-41a3-9dab-a186d4668484",
+       "id": "dbd0f205-9ae0-4c19-87c6-49f72896fcaa",
        "leftValue": "={{ $json.result.status === 202 }}",
        "rightValue": "",
        "operator": {
@@ -1355,13 +1471,13 @@
    }
   },
   {
-   "id": "62949559-41ff-4186-a89f-fee903eb0f56",
+   "id": "c916f23f-3285-4e8c-ae1f-ef18e95e7888",
    "name": "Id (sprawdź teraz)",
    "type": "n8n-nodes-base.set",
    "typeVersion": 3.4,
    "position": [
     880,
-    3600
+    4000
    ],
    "parameters": {
     "mode": "manual",
@@ -1369,13 +1485,13 @@
     "assignments": {
      "assignments": [
       {
-       "id": "df545608-626f-4427-8c4e-9510d9b888c0",
+       "id": "75b1c2a0-5954-4959-85bb-c44ad659caf8",
        "name": "item_id",
        "type": "string",
        "value": "={{ $json.result.id }}"
       },
       {
-       "id": "d6e665b0-5d90-4a4e-8302-61ae155b9ca3",
+       "id": "712033e6-122c-4381-877a-6e117043ccb9",
        "name": "reason",
        "type": "string",
        "value": "manual"
@@ -1386,13 +1502,13 @@
    }
   },
   {
-   "id": "e77398dd-b367-480e-b2d4-daadae74a0c1",
+   "id": "546a22ec-d162-4ce7-8ec5-edcc3b418c9a",
    "name": "Streść teraz (w tle)",
    "type": "n8n-nodes-base.executeWorkflow",
    "typeVersion": 1.2,
    "position": [
     1100,
-    3600
+    4000
    ],
    "parameters": {
     "source": "database",
@@ -1407,13 +1523,13 @@
    }
   },
   {
-   "id": "3c357a95-e039-425a-bfc2-fffc6d451590",
+   "id": "9423886c-a8d4-4e77-91d0-972091b9286d",
    "name": "Jest zdjęcie?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
    "position": [
     770,
-    3360
+    3760
    ],
    "parameters": {
     "conditions": {
@@ -1425,7 +1541,7 @@
      },
      "conditions": [
       {
-       "id": "9ff72d88-7759-4cbc-bbf6-e8c5dee47cc8",
+       "id": "4c28adb7-9e93-4d6e-91a1-d202a1139dcb",
        "leftValue": "={{ /^data:image\\/(jpeg|png|webp);base64,[A-Za-z0-9+\\/=]+$/.test(String($('POST items').item.json.body.image || '')) && String($('POST items').item.json.body.image).length < 4000000 }}",
        "rightValue": "",
        "operator": {
@@ -1441,13 +1557,13 @@
    }
   },
   {
-   "id": "a28a786a-701d-43cf-833e-530d05922f5b",
+   "id": "4175bdc7-a1d5-441d-a8db-bbf3826340fd",
    "name": "Zdjęcie: analiza",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
    "position": [
     990,
-    3500
+    3900
    ],
    "parameters": {
     "method": "POST",
@@ -1485,26 +1601,26 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "44dd8c76-e63c-487b-8776-1ac3a122f90d",
+   "id": "386700b9-f612-45ae-bab0-45cca684f137",
    "name": "Zdjęcie: wynik",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
    "position": [
     1210,
-    3500
+    3900
    ],
    "parameters": {
     "jsCode": "const cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst raw = String($json.choices?.[0]?.message?.content || '');\nlet m = {};\ntry { m = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1)); } catch (e) {}\nconst photo = { title: cut(m.title, 60), description: cut(m.description, 600), text: cut(m.text, 3000) };\nreturn [{ json: { photo: photo.title && photo.description ? photo : null } }];"
    }
   },
   {
-   "id": "16df935b-58fa-4a9c-a748-495d592fad82",
+   "id": "1f29f6f3-1b94-4460-9ac4-e5c80303f66d",
    "name": "Zdjęcie odczytane?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
    "position": [
     1430,
-    3500
+    3900
    ],
    "parameters": {
     "conditions": {
@@ -1516,7 +1632,7 @@
      },
      "conditions": [
       {
-       "id": "f85d43e9-c82b-4715-9d43-8945eeba86db",
+       "id": "b0196c07-f6fe-4db6-b582-eec0347954f9",
        "leftValue": "={{ !!$json.photo }}",
        "rightValue": "",
        "operator": {
@@ -1532,13 +1648,13 @@
    }
   },
   {
-   "id": "68fad0a1-8068-40d3-9682-8d020585088c",
+   "id": "3d280928-88cf-4283-80f7-3fc5929488ff",
    "name": "Zdjęcie: analiza (2. próba)",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
    "position": [
     1650,
-    3660
+    4060
    ],
    "parameters": {
     "method": "POST",
@@ -1576,26 +1692,26 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "bd4fd61f-1740-48b5-b200-4ae8d659a805",
+   "id": "af0f5c54-e607-4cab-8924-a660d20bad05",
    "name": "Zdjęcie: wynik (2. próba)",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
    "position": [
     1870,
-    3660
+    4060
    ],
    "parameters": {
     "jsCode": "const cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst raw = String($json.choices?.[0]?.message?.content || '');\nlet m = {};\ntry { m = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1)); } catch (e) {}\nconst photo = { title: cut(m.title, 60), description: cut(m.description, 600), text: cut(m.text, 3000) };\nreturn [{ json: { photo: photo.title && photo.description ? photo : null } }];"
    }
   },
   {
-   "id": "1e20372e-c13b-41c9-a545-7583b83e93d8",
+   "id": "3937f3e0-d843-4401-95e1-3509a9ca908c",
    "name": "Zdjęcie nieczytelne?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
    "position": [
     2090,
-    3660
+    4060
    ],
    "parameters": {
     "conditions": {
@@ -1607,7 +1723,7 @@
      },
      "conditions": [
       {
-       "id": "9756ce29-834a-42ff-aa2a-1d670e5d9b42",
+       "id": "839129ac-79f9-40aa-9d0a-2f16a0d6d840",
        "leftValue": "={{ !$json.photo && !String($('POST items').item.json.body.text || '').trim() }}",
        "rightValue": "",
        "operator": {
@@ -1623,13 +1739,13 @@
    }
   },
   {
-   "id": "e0db03ea-c8db-466f-9587-d2821d17c733",
+   "id": "72851f91-b899-4fb2-ae4a-ada40b069f73",
    "name": "Odpowiedz: zdjęcie nieczytelne",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
    "position": [
     2310,
-    3800
+    4200
    ],
    "parameters": {
     "respondWith": "json",
@@ -1640,26 +1756,26 @@
    }
   },
   {
-   "id": "7c841b13-7bcb-400a-80d4-41e9125a8037",
+   "id": "0b4399d8-d542-473c-94d3-a75aba935cdd",
    "name": "Wejście do modelu",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
    "position": [
     880,
-    3220
+    3620
    ],
    "parameters": {
     "jsCode": "// Wspólne wejście dla rozumienia zdania: kalendarz + (opcjonalnie) opis zdjęcia.\nconst k = $('Kalendarz').first().json;\nreturn [{ json: { teraz: k.teraz, kalendarz: k.kalendarz, photo: $json.photo || null } }];"
    }
   },
   {
-   "id": "692f76e1-833e-4125-b7af-dc8414c89411",
+   "id": "3122d821-0cdf-4a6c-bdab-62ae3b971dbb",
    "name": "Szukać w sieci?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
    "position": [
     1210,
-    2840
+    3240
    ],
    "parameters": {
     "conditions": {
@@ -1671,7 +1787,7 @@
      },
      "conditions": [
       {
-       "id": "6042ccc6-a0c3-4c36-bf2f-10760a3b1d44",
+       "id": "4726af51-02af-4ee3-a48d-8e1f1f07d8b2",
        "leftValue": "={{ $json.ok === true && !!$json.research }}",
        "rightValue": "",
        "operator": {
@@ -1687,13 +1803,13 @@
    }
   },
   {
-   "id": "492bd664-0c85-4c65-8753-e0215cf649a3",
+   "id": "6592964b-c3cf-40c9-af50-fe794afee695",
    "name": "Szukaj w sieci",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
    "position": [
     1430,
-    2700
+    3100
    ],
    "parameters": {
     "method": "POST",
@@ -1731,26 +1847,26 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "c79afdcd-61ec-4a2b-b950-7af5bd96cef4",
+   "id": "f9a7b61c-d201-410f-8db6-92eefb6145f0",
    "name": "Wynik z sieci",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
    "position": [
     1650,
-    2700
+    3100
    ],
    "parameters": {
     "jsCode": "// Odpowiedź + źródła (adnotacje url_citation). Tekst czyścimy z markdownu i linków — źródła pokazuje aplikacja.\nconst msg = $json.choices?.[0]?.message || {};\nconst answer = String(msg.content || '').replace(/\\(\\[[^\\]]*\\]\\([^)]*\\)(, *\\[[^\\]]*\\]\\([^)]*\\))*\\)/g, '')\n  .replace(/\\[([^\\]]*)\\]\\([^)]*\\)/g, '$1').replace(/[*_#`]/g, '').replace(/[ \\t]+([.,;:!?])/g, '$1').replace(/\\s+\\n/g, '\\n').trim().slice(0, 1200);\nconst seen = new Set(); const sources = [];\nfor (const a of msg.annotations || []) {\n  const u = a?.url_citation?.url; if (!/^https?:\\/\\//i.test(u || '')) continue;\n  const host = u.replace(/^https?:\\/\\//i, '').split('/')[0].replace(/^www\\./, '');\n  if (seen.has(host)) continue; seen.add(host);\n  sources.push({ url: u.slice(0, 500), title: String(a.url_citation.title || host).slice(0, 120), host });\n  if (sources.length >= 5) break;\n}\nreturn [{ json: { answer, sources, query: $('Sprawdź odpowiedź').item.json.research } }];"
    }
   },
   {
-   "id": "86739196-2ea4-4771-b1c8-0c831ba5adca",
+   "id": "4a2c8cca-6702-40f5-b43d-7e182f3e405e",
    "name": "DeepSeek: zrozum z faktami",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
    "position": [
     1870,
-    2700
+    3100
    ],
    "parameters": {
     "method": "POST",
@@ -1788,39 +1904,39 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "224b882e-9aa9-4dc6-8da5-13d61eca2475",
+   "id": "55e09545-90e0-4006-a68c-0df58b34c3bd",
    "name": "Sprawdź odpowiedź 2",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
    "position": [
     2090,
-    2700
+    3100
    ],
    "parameters": {
     "jsCode": "// Sprawdza odpowiedź modelu; niczego nie zgaduje — przy błędzie zwraca ok:false z komunikatem.\n// Rzecz składa się z części (termin, lista, strona, szczegóły); `kind` to tylko część główna — do sortowania i sekcji.\nconst src = String($('POST items').first().json.body.text || '').trim().slice(0, 1000) || '📷 Zdjęcie';\nconst fail = (error) => [{ json: { ok: false, error, notify: [], spec: {}, data: {}, source_text: src } }];\n\nconst raw = $json.choices?.[0]?.message?.content;\n// 402 z OpenRoutera = wyczerpany limit klucza Luny (alarm dostaje Łukasz z „Oboe: Limit klucza”)\nif (!raw && /\\b402\\b|insufficient|credits|limit/i.test(JSON.stringify($json.error || $json))) return fail('Mam chwilową przerwę — skończył się limit, z którego korzystam. Łukasz już o tym wie.');\nif (!raw) return fail('Nie udało mi się odpowiedzieć — spróbuj jeszcze raz.');\nlet m;\ntry { m = JSON.parse(raw.replace(/^```(json)?|```$/g, '').trim()); } catch (e) { return fail('Nie zrozumiałam. Spróbuj napisać to inaczej.'); }\n\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst now = Date.now();\nconst iso = (v) => { const t = Date.parse(v); return Number.isFinite(t) ? new Date(t).toISOString() : null; };\n\nconst notify = (Array.isArray(m.notify) ? m.notify : [])\n  .map((n) => ({ at: iso(n.at), title: cut(n.title, 50) || cut(m.title, 50), body: cut(n.body, 120) }))\n  .filter((n) => n.at && Date.parse(n.at) > now - 60000 && Date.parse(n.at) < now + 400 * 864e5)\n  .slice(0, 10);\n\nconst r = m.recurrence;\nconst recurrence = r && Number(r.every) > 0 && ['day', 'week', 'month'].includes(r.unit)\n  ? { every: Math.min(Math.round(Number(r.every)), 365), unit: r.unit } : null;\n\n// Code node nie ma URL — prosta walidacja wyrażeniem.\nconst u = String(m.url || '').trim();\nconst url = /^https?:\\/\\/[a-z0-9.-]+\\.[a-z]{2,}(:\\d+)?(\\/\\S*)?$/i.test(u) ? u.slice(0, 500) : null;\n\nconst checklist = (Array.isArray(m.checklist) ? m.checklist : [])\n  .map((x) => ({ text: cut(String(x), 80), done: false })).filter((x) => x.text).slice(0, 30);\nconst fields = (Array.isArray(m.fields) ? m.fields : [])\n  .map((f) => ({ label: cut(f?.label, 20), value: cut(String(f?.value ?? ''), 60) })).filter((f) => f.label && f.value).slice(0, 4);\n\nconst TINTS = ['lavender', 'mint', 'blue', 'pink', 'sky'];\nconst ICONS = ['clock', 'cycle', 'list', 'globe', 'note', 'building', 'tv', 'health', 'car', 'home', 'cart', 'work', 'money', 'sport', 'people', 'doc', 'food', 'travel'];\nconst event_at = iso(m.event_at);\n\nconst kind = recurrence ? 'reminder-recurring' : event_at || notify.length ? 'reminder-once'\n  : checklist.length ? 'checklist' : url ? 'page-summary' : 'note';\nconst look = {\n  tint: TINTS.includes(m.look?.tint) ? m.look.tint : { 'reminder-recurring': 'mint', checklist: 'pink', 'page-summary': 'blue' }[kind] || 'lavender',\n  icon: ICONS.includes(m.look?.icon) ? m.look.icon : { 'reminder-recurring': 'cycle', checklist: 'list', 'page-summary': 'globe', note: 'note' }[kind] || 'clock',\n};\n\nreturn [{ json: {\n  ok: true, kind, title: cut(m.title, 40) || src.slice(0, 40), source_text: src, widget_slug: kind,\n  spec: { understood: cut(m.understood, 300), event_at, recurrence, url, summarize: m.summarize === true && !!url, model: 'deepseek/deepseek-v4.1-flash',\n    widget_brief: cut(m.widget?.brief, 300) || undefined },\n  data: {\n    tip: cut(m.tip, 80) || null, look, fields,\n    widget: m.widget?.brief ? { status: 'generating' } : undefined,\n    // listy z nazwami (Popraw może dołożyć kolejne); z jednego zdania powstaje najwyżej jedna, bez nazwy\n    photo: (() => { try { return $('Wejście do modelu').first().json.photo || undefined; } catch (e) { return undefined; } })(),   // opis zdjęcia, jeśli było\n    lists: checklist.length ? [{ name: null, items: checklist, reset: !!(recurrence && m.checklist_reset !== false) }] : undefined,\n  },\n  notify,\n  research: cut(m.research?.query, 200) || null,   // tylko sterowanie przepływem — nie trafia do bazy\n} }];\n"
    }
   },
   {
-   "id": "6c0cc23b-7128-4f13-9937-b28eb8a000a2",
+   "id": "956a7c51-3495-4bf2-855e-18bfd329cd79",
    "name": "Dołącz źródła",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
    "position": [
     2310,
-    2700
+    3100
    ],
    "parameters": {
     "jsCode": "// Wynik sprawdzania w sieci zapisujemy przy rzeczy — karta pokazuje odpowiedź i źródła.\nconst r = $('Wynik z sieci').item.json;\nconst it = { ...$json };\nif (it.ok && (r.answer || r.sources.length)) it.data = { ...it.data, research: { query: r.query, answer: r.answer, sources: r.sources, checked_at: new Date().toISOString() } };\nreturn [{ json: it }];"
    }
   },
   {
-   "id": "8be922f3-ac76-4b44-8b90-923a6397a59d",
+   "id": "db68ee90-724d-4e61-8160-3caf906227d4",
    "name": "POST items/widget-chat",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
    "position": [
     0,
-    3900
+    4300
    ],
    "parameters": {
     "httpMethod": "POST",
@@ -1828,16 +1944,16 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "60d16105-f1f8-4fb9-b2a6-287703f91b5d"
+   "webhookId": "21f7f7ca-b80c-4c31-9c33-fb4aa818ef62"
   },
   {
-   "id": "3a1ecae4-2108-4d71-924c-b43e56ef6e5c",
+   "id": "ac6d7c7f-386c-4041-8d61-264203d74f83",
    "name": "Czat: jest zdjęcie?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
    "position": [
     180,
-    3900
+    4300
    ],
    "parameters": {
     "conditions": {
@@ -1849,7 +1965,7 @@
      },
      "conditions": [
       {
-       "id": "84fbff1a-7a78-4be3-99e9-9a6167be1e81",
+       "id": "6c14337d-d672-421a-9500-779337eaf5bc",
        "leftValue": "={{ /^data:image\\/(jpeg|png|webp);base64,[A-Za-z0-9+\\/=]+$/.test(String($json.body.image || '')) && String($json.body.image).length < 4000000 }}",
        "rightValue": "",
        "operator": {
@@ -1865,13 +1981,13 @@
    }
   },
   {
-   "id": "85eeb3ad-8fdf-48b5-ac24-1f99f298c26e",
+   "id": "f903f1ab-d496-4f76-8e5c-6e47aca65728",
    "name": "Czat: odczytaj zdjęcie",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
    "position": [
     360,
-    3740
+    4140
    ],
    "parameters": {
     "method": "POST",
@@ -1909,26 +2025,26 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "e167248f-b1e3-4131-8e94-e5b9858ad05d",
+   "id": "f39b6aa0-8f80-4b65-bf30-94cb35959660",
    "name": "Czat: wiadomość",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
    "position": [
     540,
-    3900
+    4300
    ],
    "parameters": {
     "jsCode": "// Treść wiadomości użytkownika; zdjęcie → „[ZDJĘCIE] odczytana treść” (samo zdjęcie nie jest nigdzie zapisywane).\nconst b = $('POST items/widget-chat').first().json.body || {};\nlet msg = String(b.message || '').trim().slice(0, 1000);\nif (b.image) {\n  const txt = String($json.choices?.[0]?.message?.content || '').trim().slice(0, 3000);\n  msg = (txt ? '[ZDJĘCIE] ' + txt : '[ZDJĘCIE] (nie udało się odczytać zdjęcia)') + (msg ? '\\n\\n' + msg : '');\n}\nreturn [{ json: { msg } }];"
    }
   },
   {
-   "id": "6465c5f7-ea80-42c9-9f1e-cd862ce1a033",
+   "id": "9fcb84f0-40d4-4975-8afa-a7a1a349fb9c",
    "name": "Czat: dopisz wiadomość",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
    "position": [
     720,
-    3900
+    4300
    ],
    "parameters": {
     "operation": "executeQuery",
@@ -1945,13 +2061,13 @@
    }
   },
   {
-   "id": "a2af8968-e609-4c45-965a-3eb6a87a3fce",
+   "id": "5b0f7e54-8ffa-453e-a9b7-7443d1aa7e60",
    "name": "Czat: pytać AI?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
    "position": [
     900,
-    3900
+    4300
    ],
    "parameters": {
     "conditions": {
@@ -1963,7 +2079,7 @@
      },
      "conditions": [
       {
-       "id": "8b193c6a-c578-4bf1-b6a4-7a30b1869ad2",
+       "id": "50455e5a-b73f-4988-bdec-7fc3c00f55eb",
        "leftValue": "={{ $json.result.status === 200 && $json.result.ask === true }}",
        "rightValue": "",
        "operator": {
@@ -1979,13 +2095,13 @@
    }
   },
   {
-   "id": "c67f80e4-5c3f-4454-885f-6ab315c2a731",
+   "id": "149e68ad-1b23-4e48-a02f-bed54beecbc9",
    "name": "Czat: odpowiedz od razu",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
    "position": [
     1080,
-    4080
+    4480
    ],
    "parameters": {
     "respondWith": "json",
@@ -1996,26 +2112,26 @@
    }
   },
   {
-   "id": "2a837a60-380b-4be2-be8a-1c64fc917709",
+   "id": "431e3f78-8dc3-45ff-bb89-d3e90b0e7275",
    "name": "Czat: kalendarz",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
    "position": [
     1080,
-    3900
+    4300
    ],
    "parameters": {
     "jsCode": "// Model źle liczy daty (\"za 3 dni\", \"w piątek\"), więc dostaje gotowy kalendarz liczony tutaj (Luxon, strefa workflow = Europe/Warsaw).\nconst DNI = ['poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela'];\nconst now = $now.setZone('Europe/Warsaw');\nconst lines = [];\nfor (let i = 0; i < 35; i++) {\n  const d = now.plus({ days: i });\n  const label = i === 0 ? 'dziś' : i === 1 ? 'jutro' : i === 2 ? 'pojutrze' : `za ${i} dni`;\n  lines.push(`${d.toFormat('yyyy-MM-dd')} ${DNI[d.weekday - 1]} (${label}), przesunięcie ${d.set({ hour: 12 }).toFormat('ZZ')}`);\n}\nreturn [{ json: {\n  teraz: `${now.toFormat('yyyy-MM-dd HH:mm')} (${DNI[now.weekday - 1]}), strefa Europe/Warsaw, przesunięcie ${now.toFormat('ZZ')}`,\n  kalendarz: lines.join('\\n'),\n} }];\n"
    }
   },
   {
-   "id": "32daadd5-9c22-4a1b-a7bf-205ca7bedbed",
+   "id": "4ef1f14d-1782-434a-8de7-08de12b14a5f",
    "name": "Czat: AI",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
    "position": [
     1260,
-    3900
+    4300
    ],
    "parameters": {
     "method": "POST",
@@ -2053,26 +2169,26 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "3c521964-2732-4efe-af63-df6eac65a53e",
+   "id": "beae04f1-5a8e-4106-ad4e-c5913beb8db3",
    "name": "Czat: sprawdź odpowiedź",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
    "position": [
     1440,
-    3900
+    4300
    ],
    "parameters": {
     "jsCode": "\nconst ctx = $('Czat: dopisz wiadomość').first().json.result;\nlet m = {};\ntry { m = JSON.parse(String($json.choices?.[0]?.message?.content || '').replace(/^```(json)?|```$/g, '').trim()); } catch (e) {}\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst reply = cut(m.reply, 700) || 'Coś mi się pomieszało — napisz jeszcze raz, co zmienić?';\nlet proposal = null;\nconst ch = m.changes && typeof m.changes === 'object' ? m.changes : null;\nif (m.ready === true && ch) {\n  proposal = { summary: cut(m.summary, 1200) || reply, changes: ch, widget: false };\n  const w = ch.widget;\n  // Blokada w kodzie: widget na zamówienie nie może powtarzać wbudowanej listy — listy robimy zawsze wbudowane.\n  const dup = w && /(lista|checklist|odhacz|do zrobienia|zadani)/i.test(String(w.title || '') + ' ' + String(w.description || ''));\n  if (w && typeof w === 'object' && cut(w.spec, 10) && !dup) {\n    const state = w.state && typeof w.state === 'object' ? w.state : (ctx.widget || {}).state || {};\n    if (JSON.stringify(state).length <= 20000) Object.assign(proposal, { widget: true, title: cut(w.title, 40) || ctx.item.title.slice(0, 40),\n      description: cut(w.description, 200), input_schema: w.input_schema && typeof w.input_schema === 'object' ? w.input_schema : {}, state, spec: cut(w.spec, 2000) });\n  }\n  delete proposal.changes.widget;\n}\nreturn [{ json: { chat_id: ctx.chat_id, reply, proposal } }];\n"
    }
   },
   {
-   "id": "ffed19d0-ec70-4c60-b421-4c32feb445df",
+   "id": "13c07274-b5da-4153-a69d-d5bf6fba9c75",
    "name": "Czat: zapisz odpowiedź",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
    "position": [
     1620,
-    3900
+    4300
    ],
    "parameters": {
     "operation": "executeQuery",
@@ -2089,13 +2205,13 @@
    }
   },
   {
-   "id": "a4031ed8-cfe4-462b-8bae-1c71ac7ad56b",
+   "id": "1241aed6-411d-44cd-a582-8036d63a0b6b",
    "name": "Czat: odpowiedz",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
    "position": [
     1800,
-    3900
+    4300
    ],
    "parameters": {
     "respondWith": "json",
@@ -2104,13 +2220,13 @@
    }
   },
   {
-   "id": "dcbfbaff-d718-4157-920a-a449fe6f4737",
+   "id": "d985335b-173d-437b-9634-87c0f2cc2536",
    "name": "POST items/widget-regenerate",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
    "position": [
     0,
-    4400
+    4800
    ],
    "parameters": {
     "httpMethod": "POST",
@@ -2118,16 +2234,16 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "5bf14a90-cddb-4d80-915f-6cd92d1969c2"
+   "webhookId": "aaa5af94-7d96-4944-98f8-3841dd175cca"
   },
   {
-   "id": "4d4ead89-47ff-4478-abb9-a83f519f5c56",
+   "id": "2e935ea8-4905-4673-9098-53fe491f9bb9",
    "name": "Weź plan",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
    "position": [
     220,
-    4400
+    4800
    ],
    "parameters": {
     "operation": "executeQuery",
@@ -2144,13 +2260,13 @@
    }
   },
   {
-   "id": "6c03dce9-a6c5-46ae-8087-5dfdc86981c0",
+   "id": "b6bcda80-3e51-46f7-91c3-35a95bf9fcb4",
    "name": "Jest plan?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
    "position": [
     440,
-    4400
+    4800
    ],
    "parameters": {
     "conditions": {
@@ -2162,7 +2278,7 @@
      },
      "conditions": [
       {
-       "id": "3e9c8e15-8d2e-43cd-9027-9eb53306cf0a",
+       "id": "8b923e97-bb6c-47cd-aa88-e6be3a72e6f9",
        "leftValue": "={{ $json.result.status === 200 }}",
        "rightValue": "",
        "operator": {
@@ -2178,13 +2294,13 @@
    }
   },
   {
-   "id": "10125f3e-1f37-4d2a-a43a-88fe09eeaf46",
+   "id": "27f411f2-8f9c-40a2-ae18-f169c5957884",
    "name": "Odpowiedz: brak planu",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
    "position": [
     660,
-    4580
+    4980
    ],
    "parameters": {
     "respondWith": "json",
@@ -2195,26 +2311,26 @@
    }
   },
   {
-   "id": "f53b295a-74ab-424a-8c18-c3ef23ca121e",
+   "id": "f85b7871-a7f1-49f1-808d-3db62c72b7e8",
    "name": "Zastosuj zmiany",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
    "position": [
     660,
-    4400
+    4800
    ],
    "parameters": {
     "jsCode": "// „Zrób to” w czacie Popraw: wprowadza plan z rozmowy do rzeczy. Niczego nie zgaduje — każda zmiana jest walidowana,\n// a to, czego nie da się bezpiecznie zastosować, jest pomijane. Widget na zamówienie idzie osobno (w tle).\nconst r = $json.result; const p = r.proposal || {}; const ch = p.changes || {}; const it = r.item;\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst iso = (v) => { const t = Date.parse(v); return Number.isFinite(t) ? new Date(t).toISOString() : null; };\nconst now = Date.now();\nconst spec = { ...(it.spec || {}) }; const data = { ...(it.data || {}) };\nconst title = cut(ch.title, 40) || it.title;\n\n// termin, powtarzanie, przypomnienia — tylko gdy plan je zmienia (wtedy cały nowy zestaw przypomnień)\nlet notify = []; let replace = false;\nif (ch.when && typeof ch.when === 'object') {\n  replace = true;\n  spec.event_at = iso(ch.when.event_at);\n  const rc = ch.when.recurrence;\n  spec.recurrence = rc && Number(rc.every) > 0 && ['day', 'week', 'month'].includes(rc.unit)\n    ? { every: Math.min(Math.round(Number(rc.every)), 365), unit: rc.unit } : null;\n  notify = (Array.isArray(ch.when.notify) ? ch.when.notify : [])\n    .map((n) => ({ at: iso(n.at), title: cut(n.title, 50) || title.slice(0, 50), body: cut(n.body, 120) }))\n    .filter((n) => n.at && Date.parse(n.at) > now - 60000 && Date.parse(n.at) < now + 400 * 864e5).slice(0, 10);\n}\n\n// listy z nazwami\nconst norm = (s) => String(s || '').trim().toLowerCase();\nconst item = (t) => ({ text: cut(String(t ?? ''), 80), done: false });\nlet lists = (Array.isArray(data.lists) ? data.lists : []).map((l) => ({ name: l.name ?? null, reset: !!l.reset, items: [...(l.items || [])] }));\nfor (const op of Array.isArray(ch.lists) ? ch.lists : []) {\n  if (!op || typeof op !== 'object') continue;\n  if (op.op === 'add') {\n    const items = (Array.isArray(op.items) ? op.items : []).map(item).filter((x) => x.text).slice(0, 40);\n    if (items.length && lists.length < 10) lists.push({ name: cut(op.name, 40) || null, reset: op.reset === true, items });\n  } else if (op.op === 'edit' || op.op === 'delete') {\n    const L = lists[Number(op.list)]; if (!L) continue;\n    if (op.op === 'delete') { L.deleted = true; continue; }\n    if (typeof op.name === 'string' && op.name.trim()) L.name = cut(op.name, 40);\n    if (typeof op.reset === 'boolean') L.reset = op.reset;\n    const rm = new Set((Array.isArray(op.remove) ? op.remove : []).map(norm));\n    L.items = L.items.filter((x) => !rm.has(norm(x.text)));\n    for (const rn of Array.isArray(op.rename) ? op.rename : []) {\n      const x = L.items.find((y) => norm(y.text) === norm(rn?.from)); if (x && cut(rn?.to, 80)) x.text = cut(rn.to, 80);\n    }\n    for (const t of Array.isArray(op.add) ? op.add : []) { const x = item(t); if (x.text && L.items.length < 40) L.items.push(x); }\n  }\n}\nlists = lists.filter((l) => !l.deleted && l.items.length);\nif (lists.length) data.lists = lists; else delete data.lists;\nif (!spec.recurrence) data.lists?.forEach((l) => { l.reset = false; });\n\n// szczegóły i wygląd\nif (Array.isArray(ch.fields)) data.fields = ch.fields.map((f) => ({ label: cut(f?.label, 20), value: cut(String(f?.value ?? ''), 60) })).filter((f) => f.label && f.value).slice(0, 4);\nconst TINTS = ['lavender', 'mint', 'blue', 'pink', 'sky'];\nconst ICONS = ['clock', 'cycle', 'list', 'globe', 'note', 'building', 'tv', 'health', 'car', 'home', 'cart', 'work', 'money', 'sport', 'people', 'doc', 'food', 'travel'];\nif (ch.look && typeof ch.look === 'object') data.look = { tint: TINTS.includes(ch.look.tint) ? ch.look.tint : data.look?.tint, icon: ICONS.includes(ch.look.icon) ? ch.look.icon : data.look?.icon };\n\n// widget na zamówienie: usunięcie albo przebudowa (w tle, stary działa do czasu podmiany)\nif (ch.widget_remove === true && !p.widget) { delete data.widget; delete spec.widget_brief; }\nif (p.widget) {\n  const w = data.widget || {};\n  data.widget = w.slug ? { ...w, pending: true } : { status: 'generating' };\n  delete data.widget.revision_error;\n}\n\nconst timed = spec.event_at || (replace ? notify.length > 0 : it.kind === 'reminder-once');\nconst kind = spec.recurrence ? 'reminder-recurring' : timed ? 'reminder-once' : lists.length ? 'checklist' : spec.url ? 'page-summary' : 'note';\nconst done = 'Zrobione ✓' + (p.widget ? ' Widget przebudowuję w tle — stary działa do czasu podmiany.' : '');\nreturn [{ json: { item_id: it.id, chat_id: r.chat_id, title, kind, spec, data, notify, replace_notify: replace, done, widget: !!p.widget } }];\n"
    }
   },
   {
-   "id": "20d7b24d-b560-4234-89ee-f883008a17ee",
+   "id": "dc829848-6e50-4ef4-994e-8d26db82f2b5",
    "name": "Zapisz zmiany",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
    "position": [
     880,
-    4400
+    4800
    ],
    "parameters": {
     "operation": "executeQuery",
@@ -2231,13 +2347,13 @@
    }
   },
   {
-   "id": "c92a5cc1-7cfb-46e5-bf0b-3f9621a032b7",
+   "id": "f0aa825f-6564-423b-b86c-1ff0160ba40e",
    "name": "Odpowiedz: zrobione",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
    "position": [
     1100,
-    4400
+    4800
    ],
    "parameters": {
     "respondWith": "json",
@@ -2246,13 +2362,13 @@
    }
   },
   {
-   "id": "23099c0b-b49c-4d97-bea6-94a0e64a6164",
+   "id": "dbd3cf9f-d8ad-46f7-836d-d7b9265c874a",
    "name": "Przebudować widget?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
    "position": [
     1320,
-    4400
+    4800
    ],
    "parameters": {
     "conditions": {
@@ -2264,7 +2380,7 @@
      },
      "conditions": [
       {
-       "id": "725816b0-48f7-44dd-8099-473f7a0f79a0",
+       "id": "ab21a7fb-2abc-49fe-ae77-5e560213e277",
        "leftValue": "={{ $json.result.widget === true }}",
        "rightValue": "",
        "operator": {
@@ -2280,13 +2396,13 @@
    }
   },
   {
-   "id": "7d887ec5-40d4-4ea2-a285-8ec53c44dd3b",
+   "id": "ee96f6ef-fca0-4afc-931c-9f3d5da42a54",
    "name": "Dane przebudowy",
    "type": "n8n-nodes-base.set",
    "typeVersion": 3.4,
    "position": [
     1540,
-    4400
+    4800
    ],
    "parameters": {
     "mode": "manual",
@@ -2294,19 +2410,19 @@
     "assignments": {
      "assignments": [
       {
-       "id": "3de6cc5e-a1e0-4c83-9312-37ec57d690b0",
+       "id": "f650e3ec-8686-450d-bf91-d287ebbedb78",
        "name": "item_id",
        "type": "string",
        "value": "={{ $json.result.item_id }}"
       },
       {
-       "id": "509bab62-c056-480d-9e04-5f8a31cb95f3",
+       "id": "377508e2-d3a5-401a-b8cb-1bc3244dc181",
        "name": "mode",
        "type": "string",
        "value": "revise"
       },
       {
-       "id": "59565dab-8d74-4265-b1fc-55dda7e9fa41",
+       "id": "c9effdf9-08d6-4f1d-bee9-fe2cab41e6ff",
        "name": "chat_id",
        "type": "number",
        "value": "={{ $json.result.chat_id }}"
@@ -2317,13 +2433,13 @@
    }
   },
   {
-   "id": "61b4032b-b325-49fc-85e7-c0a023cdeafe",
+   "id": "241d5144-0c79-479c-8452-7f584b5c1b14",
    "name": "Przebuduj widget (w tle)",
    "type": "n8n-nodes-base.executeWorkflow",
    "typeVersion": 1.2,
    "position": [
     1760,
-    4400
+    4800
    ],
    "parameters": {
     "source": "database",
@@ -2641,6 +2757,50 @@
     [
      {
       "node": "Odpowiedz: Zamknij czat",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "POST items/undo": {
+   "main": [
+    [
+     {
+      "node": "Cofnij",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Cofnij": {
+   "main": [
+    [
+     {
+      "node": "Odpowiedz: Cofnij",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "GET items/done": {
+   "main": [
+    [
+     {
+      "node": "Zrobione",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Zrobione": {
+   "main": [
+    [
+     {
+      "node": "Odpowiedz: Zrobione",
       "type": "main",
       "index": 0
      }

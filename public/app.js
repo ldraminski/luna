@@ -198,7 +198,7 @@ async function alarmAction(act) {
   const id = state.alarmId; const it = state.items.find((x) => x.id === id); if (!id) return;
   $('#alarm').querySelectorAll('button').forEach((b) => { b.disabled = true; });
   try {
-    if (act === 'done') { await api.done(id); state.items = state.items.filter((x) => x.id !== id); toast('Zrobione ✓'); }
+    if (act === 'done') { await api.done(id); state.items = state.items.filter((x) => x.id !== id); undoToast(id, 'Zrobione ✓'); }
     else {
       const r = await api.alarm(id, act);
       if (it) it.data = { ...(it.data || {}), alarm: r.alarm };
@@ -234,8 +234,8 @@ async function resolveLate(e) {
     await api.done(id);
     state.items = state.items.filter((x) => x.id !== id);
     li.remove(); render();
-    toast(b.dataset.lateAct === 'done' ? 'Zrobione ✓' : 'Zamknęłam.');
-    if (!state.items.some(isLate)) { if ($('#nudge').open) $('#nudge').close(); toast('Wszystko nadrobione ✓'); }
+    undoToast(id, b.dataset.lateAct === 'done' ? 'Zrobione ✓' : 'Zamknęłam.');
+    if (!state.items.some(isLate)) { if ($('#nudge').open) $('#nudge').close(); undoToast(id, 'Wszystko nadrobione ✓'); }
     else if ($('#nudge').open) $('#nudge-title').textContent = `Masz ${state.items.filter(isLate).length} ${pl(state.items.filter(isLate).length, 'przeterminowaną rzecz', 'przeterminowane rzeczy', 'przeterminowanych rzeczy')}`;
   } catch (err) { li.querySelectorAll('button').forEach((x) => { x.disabled = false; }); toast(err.message); }
 }
@@ -359,6 +359,7 @@ function render() {
   if (tracked.length) html += '<h2 class="sec">Śledzone</h2>' + tracked.map((i) => card(i)).join('');
   if (lists.length) html += '<h2 class="sec">Listy</h2>' + lists.map((i) => card(i)).join('');
   if (saved.length) html += '<h2 class="sec">Notatki</h2>' + saved.map((i) => card(i)).join('');
+  html += `<button type="button" class="ghost-txt done-link" data-open-done>Zrobione w tym tygodniu</button>`;
   $('#list').innerHTML = html;
   renderRequests();
   renderOutbox();
@@ -682,7 +683,7 @@ function closeDetail(fromPop = false) {
 async function markDone(id) {
   await api.done(id);
   state.items = state.items.filter((x) => x.id !== id);
-  render(); toast('Zrobione ✓');
+  render(); undoToast(id, 'Zrobione ✓');
 }
 
 // Gdy termin minie przy otwartej aplikacji, karta ma sama przejść do „Po terminie”. Render tylko przy zmianie zbioru,
@@ -700,13 +701,23 @@ async function detailAction(act) {
   const id = state.openId;
   if (act === 'close') return closeDetail();
   if (act === 'chat') return openChat(id);
-  if (act === 'delete' && !confirm('Usunąć tę rzecz? Tego nie da się cofnąć.')) return;
+  // bez pytania „na pewno?” — jest „Cofnij”
   try {
     await (act === 'done' ? api.done(id) : api.remove(id));
     state.items = state.items.filter((x) => x.id !== id);
     closeDetail(); render();
-    toast(act === 'done' ? 'Zrobione ✓' : 'Usunęłam.');
+    undoToast(id, act === 'done' ? 'Zrobione ✓' : 'Usunęłam.');
   } catch (err) { toast(err.message); }
+}
+
+// ---------- zrobione w tym tygodniu (z „Przywróć”) ----------
+async function openDone() {
+  let list = [];
+  try { list = await api.doneList(); } catch (err) { return toast(err.message); }
+  $('#done-list').innerHTML = list.length ? list.map((x) => `<li data-undo="${x.id}"><span class="n">${esc(x.title)}<small>${esc(rel(dt(x.updated_at)))}, ${esc(fTime.format(dt(x.updated_at)))}</small></span>
+      <span class="b"><button type="button" class="ghost-txt" data-undo-go>Przywróć</button></span></li>`).join('')
+    : '<li><span class="n">W tym tygodniu nic jeszcze nie odhaczono.</span></li>';
+  $('#done').showModal();
 }
 
 // ---------- dodawanie ----------
@@ -905,13 +916,24 @@ function watchGenerating() {
 
 // ---------- drobne ----------
 let toastTimer;
-function toast(msg) {
+function toast(msg, action = null) {
   document.querySelector('.toast')?.remove();
   const el = document.createElement('div');
-  el.className = 'toast'; el.setAttribute('role', 'status'); el.textContent = msg;
+  el.className = 'toast'; el.setAttribute('role', 'status');
+  const t = document.createElement('span'); t.textContent = msg; el.appendChild(t);
+  if (action) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'toast-act'; b.textContent = action.label;
+    b.addEventListener('click', () => { el.remove(); action.run(); }); el.appendChild(b);
+  }
   document.body.appendChild(el);
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.remove(), Math.min(9000, 2500 + msg.length * 45));
+  toastTimer = setTimeout(() => el.remove(), action ? 8000 : Math.min(9000, 2500 + msg.length * 45));
+}
+// „Cofnij” po odhaczeniu / usunięciu: rzecz wraca (serwer trzyma ją 30 dni)
+function undoToast(id, msg) {
+  toast(msg, { label: 'Cofnij', run: async () => {
+    try { await api.undo(id); toast('Przywróciłam.'); await load(); } catch (err) { toast(err.message); }
+  } });
 }
 
 function bind() {
@@ -1009,6 +1031,13 @@ function bind() {
   addEventListener('keydown', (e) => { if (e.key !== 'Escape') return; if (!$('#intro').hidden) closeIntro(); else if (!$('#report').hidden) closeReport(); else closeDetail(); });
   addEventListener('online', () => { if (state.user) load(); });
   $('#alarm').addEventListener('click', (e) => { const b = e.target.closest('[data-alarm]'); if (b) alarmAction(b.dataset.alarm); });
+  $('#list').addEventListener('click', (e) => { if (e.target.closest('[data-open-done]')) openDone(); });
+  $('#done').addEventListener('click', async (e) => {
+    if (e.target.closest('[data-done-close]') || e.target === $('#done')) return $('#done').close();
+    const b = e.target.closest('[data-undo-go]'); if (!b) return;
+    const li = b.closest('[data-undo]'); b.disabled = true;
+    try { await api.undo(li.dataset.undo); li.remove(); toast('Przywróciłam.'); load(); } catch (err) { b.disabled = false; toast(err.message); }
+  });
   $('#alarm').addEventListener('cancel', (e) => e.preventDefault());   // alarmu nie zamyka się Escape — trzeba wybrać
   setInterval(() => { if (!document.hidden) checkAlarm(); }, 5000);
   setInterval(() => { if (state.user && !document.hidden && (state.offline || outbox().length)) load(); }, 30000);

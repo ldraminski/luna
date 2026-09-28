@@ -420,3 +420,9 @@ html.locked,html.locked body{overflow:hidden;height:100%}
 .alarm .alarm-snooze{background:#fff;color:var(--late)}
 .alarm .cta.alt{background:rgba(255,255,255,.14);color:#fff;box-shadow:none}
 .alarm .ghost-txt{color:#fff;opacity:.85;margin:8px auto 0}
+
+/* „Cofnij” w komunikacie i link do zrobionych (Hikari, 28.09) */
+.toast{display:flex;align-items:center;gap:14px}
+.toast-act{border:0;background:rgba(255,255,255,.16);color:#fff;font:inherit;font-weight:600;font-size:14px;border-radius:var(--r-pill);padding:8px 14px;cursor:pointer;flex:none;min-height:36px}
+.done-link{display:block;margin:28px auto 0}
+#done .nudge-list .n small{margin-top:3px}

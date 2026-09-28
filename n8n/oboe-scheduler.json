@@ -2,7 +2,7 @@
  "name": "Oboe: Harmonogram",
  "nodes": [
   {
-   "id": "7c2a791c-f73f-437b-be5a-1bc5b40514e5",
+   "id": "aeabaa36-1473-4572-9df1-6739d6077b62",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "ac198124-872e-41f5-98d7-0a7d39aa40d5",
+   "id": "a6f54be3-dc26-4e5e-b4f6-7cc6e4b8e47f",
    "name": "Co 20 s",
    "type": "n8n-nodes-base.scheduleTrigger",
    "typeVersion": 1.2,
@@ -37,7 +37,7 @@
    }
   },
   {
-   "id": "2ab60143-d943-4774-9dfe-69e05455a54e",
+   "id": "b444309d-3781-4b63-88e3-3e0448a5fa18",
    "name": "Alarmy",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -47,7 +47,7 @@
    ],
    "parameters": {
     "operation": "executeQuery",
-    "query": "\nWITH ring AS (\n  SELECT i.id, i.user_id, i.title, i.data->'alarm' AS a,\n    coalesce((i.data->'alarm'->>'started_at')::timestamptz, now()) AS started\n  FROM items i\n  WHERE i.status = 'active' AND i.spec->>'event_at' IS NOT NULL\n    AND coalesce(jsonb_typeof(i.spec->'recurrence'), 'null') = 'null'\n    AND (i.spec->>'event_at')::timestamptz <= now()\n    AND coalesce(i.data->'alarm'->>'state', '') <> 'off'\n    AND coalesce((i.data->'alarm'->>'next_at')::timestamptz, '-infinity'::timestamptz) <= now()\n    AND ((i.spec->>'event_at')::timestamptz > now() - interval '60 minutes'\n         OR i.data->'alarm'->>'state' IN ('ringing', 'snoozed'))\n  FOR UPDATE SKIP LOCKED),\nupd AS (\n  UPDATE items i SET data = jsonb_set(i.data, '{alarm}', jsonb_build_object(\n      'state', CASE WHEN now() - r.started > interval '60 minutes' THEN 'off' ELSE 'ringing' END,\n      'stopped', CASE WHEN now() - r.started > interval '60 minutes' THEN 'timeout' END,\n      'started_at', r.started, 'next_at', now() + interval '19 seconds',\n      'count', coalesce((r.a->>'count')::int, 0) + 1))\n  FROM ring r WHERE i.id = r.id\n  RETURNING i.id, i.user_id, i.title, i.data->'alarm'->>'state' AS state),\nins AS (INSERT INTO notifications (item_id, user_id, due_at, channels, title, body, kind)\nSELECT id, user_id, now(), '{push}',\n  CASE WHEN state = 'off' THEN 'Wyłączyłam alarm: ' || title ELSE '⏰ Teraz: ' || title END,\n  CASE WHEN state = 'off' THEN 'Przez godzinę nikt nie zareagował. Rzecz czeka w „Po terminie”.'\n       ELSE 'Przełóż o 5 min albo wyłącz przypomnienie — do tego czasu przypominam co 20 s.' END,\n  CASE WHEN state = 'off' THEN 'reminder' ELSE 'alarm' END\nFROM upd RETURNING id)\nSELECT count(*) AS alarms FROM ins",
+    "query": "\nWITH purge AS (DELETE FROM items WHERE status = 'deleted' AND updated_at < now() - interval '30 days' RETURNING 1),   -- kosz: 30 dni\nring AS (\n  SELECT i.id, i.user_id, i.title, i.data->'alarm' AS a,\n    coalesce((i.data->'alarm'->>'started_at')::timestamptz, now()) AS started\n  FROM items i\n  WHERE i.status = 'active' AND i.spec->>'event_at' IS NOT NULL\n    AND coalesce(jsonb_typeof(i.spec->'recurrence'), 'null') = 'null'\n    AND (i.spec->>'event_at')::timestamptz <= now()\n    AND coalesce(i.data->'alarm'->>'state', '') <> 'off'\n    AND coalesce((i.data->'alarm'->>'next_at')::timestamptz, '-infinity'::timestamptz) <= now()\n    AND ((i.spec->>'event_at')::timestamptz > now() - interval '60 minutes'\n         OR i.data->'alarm'->>'state' IN ('ringing', 'snoozed'))\n  FOR UPDATE SKIP LOCKED),\nupd AS (\n  UPDATE items i SET data = jsonb_set(i.data, '{alarm}', jsonb_build_object(\n      'state', CASE WHEN now() - r.started > interval '60 minutes' THEN 'off' ELSE 'ringing' END,\n      'stopped', CASE WHEN now() - r.started > interval '60 minutes' THEN 'timeout' END,\n      'started_at', r.started, 'next_at', now() + interval '19 seconds',\n      'count', coalesce((r.a->>'count')::int, 0) + 1))\n  FROM ring r WHERE i.id = r.id\n  RETURNING i.id, i.user_id, i.title, i.data->'alarm'->>'state' AS state),\nins AS (INSERT INTO notifications (item_id, user_id, due_at, channels, title, body, kind)\nSELECT id, user_id, now(), '{push}',\n  CASE WHEN state = 'off' THEN 'Wyłączyłam alarm: ' || title ELSE '⏰ Teraz: ' || title END,\n  CASE WHEN state = 'off' THEN 'Przez godzinę nikt nie zareagował. Rzecz czeka w „Po terminie”.'\n       ELSE 'Przełóż o 5 min albo wyłącz przypomnienie — do tego czasu przypominam co 20 s.' END,\n  CASE WHEN state = 'off' THEN 'reminder' ELSE 'alarm' END\nFROM upd RETURNING id)\nSELECT count(*) AS alarms FROM ins",
     "options": {}
    },
    "credentials": {
@@ -58,7 +58,7 @@
    }
   },
   {
-   "id": "1b31698f-d746-470c-ae0b-1df1e679e190",
+   "id": "f36bce1a-425b-415d-9aa5-9e04dd28c8b5",
    "name": "Weź zaległe",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -68,7 +68,7 @@
    ],
    "parameters": {
     "operation": "executeQuery",
-    "query": "WITH due AS (\n  SELECT id FROM notifications WHERE sent_at IS NULL AND due_at <= now()\n  ORDER BY due_at LIMIT 100 FOR UPDATE SKIP LOCKED),\nclaimed AS (\n  UPDATE notifications n SET sent_at = now() FROM due WHERE n.id = due.id RETURNING n.*),\nrec AS (\n  SELECT DISTINCT ON (c.item_id) c.*, i.spec FROM claimed c JOIN items i ON i.id = c.item_id\n  WHERE i.status = 'active' AND oboe_period(i.spec) IS NOT NULL\n    -- CTE widzą stan sprzed UPDATE w claimed, więc właśnie wzięte trzeba wykluczyć jawnie\n    AND NOT EXISTS (SELECT 1 FROM notifications x WHERE x.item_id = c.item_id AND x.sent_at IS NULL\n                    AND x.id NOT IN (SELECT id FROM claimed))\n  ORDER BY c.item_id, c.due_at DESC),\nnxt AS (\n  INSERT INTO notifications (item_id, user_id, due_at, channels, title, body)\n  SELECT item_id, user_id, due_at + oboe_period(spec), channels, title, body FROM rec RETURNING item_id),\nev AS (\n  -- następne wystąpienie: przesuń termin, a listy odnawiane (lists[].reset) wyczyść na nowy cykl\n  UPDATE items i SET updated_at = now(),\n    spec = CASE WHEN i.spec->>'event_at' IS NULL THEN i.spec ELSE\n      jsonb_set(i.spec, '{event_at}', to_jsonb(to_char(((i.spec->>'event_at')::timestamptz + oboe_period(i.spec)) AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"'))) END,\n    data = CASE WHEN jsonb_typeof(i.data->'lists') = 'array' THEN\n      jsonb_set(i.data, '{lists}', (SELECT coalesce(jsonb_agg(CASE WHEN (l->>'reset')::boolean IS TRUE\n          THEN jsonb_set(l, '{items}', (SELECT coalesce(jsonb_agg(x || '{\"done\": false}'::jsonb), '[]'::jsonb) FROM jsonb_array_elements(l->'items') x))\n          ELSE l END ORDER BY n), '[]'::jsonb) FROM jsonb_array_elements(i.data->'lists') WITH ORDINALITY AS t(l, n)))\n      ELSE i.data END\n  WHERE i.id IN (SELECT item_id FROM nxt)\n  RETURNING 1)\nSELECT c.id, c.user_id, c.item_id, c.title, coalesce(c.body, '') AS body, u.email, coalesce(u.name, '') AS name,\n  ('email' = ANY(c.channels) OR NOT EXISTS (\n     SELECT 1 FROM push_subscriptions s WHERE s.user_id = c.user_id AND s.failures < 3))\n    AND NOT coalesce((i.spec->>'summarize')::boolean, false)\n    AND c.kind <> 'alarm' AS send_email,   -- alarm (co 20 s) NIGDY mailem — inaczej 180 maili na godzinę\n  ('push' = ANY(c.channels)) AND NOT coalesce((i.spec->>'summarize')::boolean, false) AS send_push,\n  coalesce((i.spec->>'summarize')::boolean, false) AS summarize,\n  (SELECT count(*) FROM ev) AS next_planned\nFROM claimed c JOIN users u ON u.id = c.user_id LEFT JOIN items i ON i.id = c.item_id\nORDER BY c.due_at",
+    "query": "WITH due AS (\n  SELECT id FROM notifications n WHERE sent_at IS NULL AND due_at <= now()\n    -- odhaczone / usunięte rzeczy milkną (a „Cofnij” przywraca je razem z przypomnieniami)\n    AND (n.item_id IS NULL OR EXISTS (SELECT 1 FROM items i WHERE i.id = n.item_id AND i.status = 'active'))\n  ORDER BY due_at LIMIT 100 FOR UPDATE SKIP LOCKED),\nclaimed AS (\n  UPDATE notifications n SET sent_at = now() FROM due WHERE n.id = due.id RETURNING n.*),\nrec AS (\n  SELECT DISTINCT ON (c.item_id) c.*, i.spec FROM claimed c JOIN items i ON i.id = c.item_id\n  WHERE i.status = 'active' AND oboe_period(i.spec) IS NOT NULL\n    -- CTE widzą stan sprzed UPDATE w claimed, więc właśnie wzięte trzeba wykluczyć jawnie\n    AND NOT EXISTS (SELECT 1 FROM notifications x WHERE x.item_id = c.item_id AND x.sent_at IS NULL\n                    AND x.id NOT IN (SELECT id FROM claimed))\n  ORDER BY c.item_id, c.due_at DESC),\nnxt AS (\n  INSERT INTO notifications (item_id, user_id, due_at, channels, title, body)\n  SELECT item_id, user_id, due_at + oboe_period(spec), channels, title, body FROM rec RETURNING item_id),\nev AS (\n  -- następne wystąpienie: przesuń termin, a listy odnawiane (lists[].reset) wyczyść na nowy cykl\n  UPDATE items i SET updated_at = now(),\n    spec = CASE WHEN i.spec->>'event_at' IS NULL THEN i.spec ELSE\n      jsonb_set(i.spec, '{event_at}', to_jsonb(to_char(((i.spec->>'event_at')::timestamptz + oboe_period(i.spec)) AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"'))) END,\n    data = CASE WHEN jsonb_typeof(i.data->'lists') = 'array' THEN\n      jsonb_set(i.data, '{lists}', (SELECT coalesce(jsonb_agg(CASE WHEN (l->>'reset')::boolean IS TRUE\n          THEN jsonb_set(l, '{items}', (SELECT coalesce(jsonb_agg(x || '{\"done\": false}'::jsonb), '[]'::jsonb) FROM jsonb_array_elements(l->'items') x))\n          ELSE l END ORDER BY n), '[]'::jsonb) FROM jsonb_array_elements(i.data->'lists') WITH ORDINALITY AS t(l, n)))\n      ELSE i.data END\n  WHERE i.id IN (SELECT item_id FROM nxt)\n  RETURNING 1)\nSELECT c.id, c.user_id, c.item_id, c.title, coalesce(c.body, '') AS body, u.email, coalesce(u.name, '') AS name,\n  ('email' = ANY(c.channels) OR NOT EXISTS (\n     SELECT 1 FROM push_subscriptions s WHERE s.user_id = c.user_id AND s.failures < 3))\n    AND NOT coalesce((i.spec->>'summarize')::boolean, false)\n    AND c.kind <> 'alarm' AS send_email,   -- alarm (co 20 s) NIGDY mailem — inaczej 180 maili na godzinę\n  ('push' = ANY(c.channels)) AND NOT coalesce((i.spec->>'summarize')::boolean, false) AS send_push,\n  coalesce((i.spec->>'summarize')::boolean, false) AS summarize,\n  (SELECT count(*) FROM ev) AS next_planned\nFROM claimed c JOIN users u ON u.id = c.user_id LEFT JOIN items i ON i.id = c.item_id\nORDER BY c.due_at",
     "options": {}
    },
    "credentials": {
@@ -79,7 +79,7 @@
    }
   },
   {
-   "id": "aabe5308-50cc-4f1f-89a1-c4baa50cc877",
+   "id": "74e64989-9273-4565-851f-9551b2819ad4",
    "name": "Tylko mail",
    "type": "n8n-nodes-base.filter",
    "typeVersion": 2.2,
@@ -97,7 +97,7 @@
      },
      "conditions": [
       {
-       "id": "c7761987-b36e-45d0-8d1e-88f6e3aec3da",
+       "id": "d67e1a60-246b-4fa2-8d96-33e81f1d8c0e",
        "leftValue": "={{ $json.send_email }}",
        "rightValue": "",
        "operator": {
@@ -113,7 +113,7 @@
    }
   },
   {
-   "id": "480a1078-9d95-4127-a075-3dcccd53069b",
+   "id": "9061edd8-15a8-46ab-95c3-a1a225f5c215",
    "name": "Wyślij mail",
    "type": "n8n-nodes-base.emailSend",
    "typeVersion": 2.1,
@@ -140,7 +140,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "f5b7b2ad-07a8-47c3-982e-ebf59d4e842a",
+   "id": "08ffc1a9-3d3f-43c7-9b05-9445a354274d",
    "name": "Oznacz wysłane mailem",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -163,7 +163,7 @@
    }
   },
   {
-   "id": "4625ab0d-0cc0-4fa7-8807-480de9cd9683",
+   "id": "ea8639e0-23e1-416a-9f55-0fcac5261420",
    "name": "Urządzenia",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -187,7 +187,7 @@
    "executeOnce": true
   },
   {
-   "id": "4ab739f8-6988-417e-a70e-1e05ac7f93fc",
+   "id": "21c442f5-13de-422b-bb97-b83761fa3bb8",
    "name": "Podpisz JWT",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -200,7 +200,7 @@
    }
   },
   {
-   "id": "bbd10014-7f0a-4b73-b520-6fa2246e0284",
+   "id": "44220d34-6e2a-4495-a444-b363db3f537b",
    "name": "Podpis ES256",
    "type": "n8n-nodes-base.crypto",
    "typeVersion": 2,
@@ -223,7 +223,7 @@
    }
   },
   {
-   "id": "0a96900f-0941-42e2-90ef-a818d9a7db9b",
+   "id": "6981b1f2-bb1c-4d16-825d-7783823f6830",
    "name": "Złóż nagłówek VAPID",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -236,7 +236,7 @@
    }
   },
   {
-   "id": "de2e6d5a-d882-475c-bb6c-52906b3dcd46",
+   "id": "ac3dd46e-a522-40e7-b1c7-185136211b40",
    "name": "Wyślij push",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -281,7 +281,7 @@
    }
   },
   {
-   "id": "c57d56cd-b58a-4d4b-89b3-b2d9d4e843bb",
+   "id": "ae2c892d-b93d-4e0e-9912-f7c058f93200",
    "name": "Wynik wysyłki",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -294,7 +294,7 @@
    }
   },
   {
-   "id": "d26e3515-b08f-4910-88c9-0a16c1e1ed80",
+   "id": "70ea6b02-92c5-4135-9e06-1462d3087941",
    "name": "Aktualizuj urządzenia",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -317,7 +317,7 @@
    }
   },
   {
-   "id": "142663e3-2b2a-4ac3-a15d-5a2c50172181",
+   "id": "d68d7824-b307-41da-ba65-0468945f5681",
    "name": "Tylko strony do streszczenia",
    "type": "n8n-nodes-base.filter",
    "typeVersion": 2.2,
@@ -335,7 +335,7 @@
      },
      "conditions": [
       {
-       "id": "fe8cdf71-c722-478b-8091-b056f60568bc",
+       "id": "8de97aa5-1740-424d-b6c9-6e15da588835",
        "leftValue": "={{ $json.summarize }}",
        "rightValue": "",
        "operator": {
@@ -351,7 +351,7 @@
    }
   },
   {
-   "id": "d06f77be-bd49-42da-996e-17e6eccaa10b",
+   "id": "a0a50d0b-a803-412b-97e0-ac89883b9db5",
    "name": "Id strony",
    "type": "n8n-nodes-base.set",
    "typeVersion": 3.4,
@@ -365,13 +365,13 @@
     "assignments": {
      "assignments": [
       {
-       "id": "ea4c8646-7272-49c2-afd6-9cf308c49f69",
+       "id": "9b5f1dce-7b93-47f8-964d-01f4917be36f",
        "name": "item_id",
        "type": "string",
        "value": "={{ $json.item_id }}"
       },
       {
-       "id": "23e3ce9b-d1be-47d1-a5a3-b2586fed2bc6",
+       "id": "3dc20008-1f10-4d66-8931-7fd314cb67b7",
        "name": "reason",
        "type": "string",
        "value": "scheduled"
@@ -382,7 +382,7 @@
    }
   },
   {
-   "id": "7d450c80-38f3-4e9f-9a35-dcc045a7b595",
+   "id": "bba2ec21-6490-435a-8e4c-d035e3a9a6f0",
    "name": "Streść stronę (w tle)",
    "type": "n8n-nodes-base.executeWorkflow",
    "typeVersion": 1.2,
