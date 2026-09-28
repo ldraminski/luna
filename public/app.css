@@ -426,3 +426,9 @@ html.locked,html.locked body{overflow:hidden;height:100%}
 .toast-act{border:0;background:rgba(255,255,255,.16);color:#fff;font:inherit;font-weight:600;font-size:14px;border-radius:var(--r-pill);padding:8px 14px;cursor:pointer;flex:none;min-height:36px}
 .done-link{display:block;margin:28px auto 0}
 #done .nudge-list .n small{margin-top:3px}
+
+/* iPhone: strona NIE przesuwa się w bok (28.09, Łukasz). Nic nie wystaje poza ekran — przesuwa ją sam iOS: przekazuje ruch z paska dni
+   na całą stronę (koniec paska) i powiększa po podwójnym dotknięciu. Pasek dni dalej przewija się w bok (ma własne overflow-x). */
+html,body{overflow-x:hidden;overscroll-behavior-x:none}
+body{touch-action:manipulation}
+.days{touch-action:pan-x pan-y}
