@@ -2,7 +2,7 @@
  "name": "Oboe: Dyktowanie",
  "nodes": [
   {
-   "id": "cd981787-3a92-4830-b2f2-92236ce33888",
+   "id": "d17df869-9b5c-41c0-931a-debaed17ebf5",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "dbc83fce-b7dc-4733-b2a5-48686bae7521",
+   "id": "94274680-2da0-4940-bbed-532f5c9a7722",
    "name": "POST transcribe",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -31,10 +31,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "5dad1f25-16d9-4626-a027-9915893a8cb0"
+   "webhookId": "89fe1953-a1ee-4ac1-9b8b-fb1decd76f5d"
   },
   {
-   "id": "e022b6ec-c893-4056-84d4-a1c31a9dfe70",
+   "id": "3a375946-0f41-464f-b630-59ed284b1793",
    "name": "Sesja",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -57,7 +57,7 @@
    }
   },
   {
-   "id": "cf5110e9-3ffb-40dc-98c1-07b2e2c891aa",
+   "id": "6169c18f-6061-4723-8797-2b4d7eb4b158",
    "name": "Zalogowany i jest nagranie?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -75,7 +75,7 @@
      },
      "conditions": [
       {
-       "id": "54455f88-b056-4cf6-b6f4-5b648a87ec3b",
+       "id": "eda0db0d-71d0-4737-a7dc-6b3fe747f0bc",
        "leftValue": "={{ $json.user_id }}",
        "rightValue": "",
        "operator": {
@@ -85,7 +85,7 @@
        }
       },
       {
-       "id": "be0c5208-b9cf-402c-82b4-9285fc99c2b4",
+       "id": "90cf89dc-5bce-4645-a10c-dea602f8ce19",
        "leftValue": "={{ /^data:audio\\/[a-z0-9.+-]+(;[a-z0-9=._-]+)*;base64,[A-Za-z0-9+\\/=]+$/i.test(String($('POST transcribe').item.json.body.audio || '')) }}",
        "rightValue": "",
        "operator": {
@@ -101,7 +101,7 @@
    }
   },
   {
-   "id": "585c4308-bef1-4fe7-8a6c-d4edb197ce6d",
+   "id": "45e61a9e-b3a9-4e32-801f-f7829ff90cbf",
    "name": "Odmów",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -118,7 +118,7 @@
    }
   },
   {
-   "id": "7a04f7ec-475f-4055-9e70-429b6dd11a7c",
+   "id": "bf7e821c-1211-49db-911c-ff41aa23d5ea",
    "name": "Nagranie → plik",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -131,7 +131,7 @@
    }
   },
   {
-   "id": "84d1a9da-950d-4c00-a4cc-9ca89adc2def",
+   "id": "21da4ebf-0c70-4aaa-83f2-2d6a78db0d8e",
    "name": "Whisper",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -174,7 +174,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "fc5801b8-eb15-4c81-ba45-b32407ed2f91",
+   "id": "382be63a-0f04-41e5-96bc-f8b047ed3636",
    "name": "Tekst",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -187,7 +187,7 @@
    }
   },
   {
-   "id": "9efa159e-142d-476a-a9b8-35ae8d2710a2",
+   "id": "7faf11a1-6401-4d73-bb14-36acfb4c4a03",
    "name": "Odpowiedz: tekst",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,

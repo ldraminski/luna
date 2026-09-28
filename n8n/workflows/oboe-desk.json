@@ -2,7 +2,7 @@
  "name": "Oboe: Biurko",
  "nodes": [
   {
-   "id": "a5c62891-cc76-4679-8b9c-5f249b28081a",
+   "id": "0d8ea174-4e74-41f3-b2b7-c419451dc17f",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "c5ec4f1d-e0b6-44fc-9ecf-c155d73552a6",
+   "id": "41c8b66c-d26d-4e95-a821-c6b34e94a10d",
    "name": "POST items/split",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -31,10 +31,10 @@
     "responseMode": "responseNode",
     "options": {}
    },
-   "webhookId": "df91abd0-1b3d-4272-86a5-9722ea49db9e"
+   "webhookId": "0119518a-3fe2-4a65-9a46-9a65757ddb65"
   },
   {
-   "id": "8f92cc5b-51ca-472f-9fd8-b4a0f2bd9a7b",
+   "id": "846b045e-3569-4c1b-92ee-db81d58fb06f",
    "name": "Sesja",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -44,7 +44,7 @@
    ],
    "parameters": {
     "operation": "executeQuery",
-    "query": "WITH me AS (\n  UPDATE sessions SET last_used_at = now()\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id)\nSELECT (SELECT user_id FROM me) AS user_id",
+    "query": "WITH me AS (\n  UPDATE sessions SET last_used_at = now()\n  WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()\n  RETURNING user_id),\nu AS (SELECT id, daily_limit FROM users WHERE id = (SELECT user_id FROM me)),\nused AS (SELECT count(*) AS n FROM usage_log\n         WHERE user_id = (SELECT id FROM u) AND at >= (date_trunc('day', now() AT TIME ZONE 'Europe/Warsaw') AT TIME ZONE 'Europe/Warsaw')),\nok AS (SELECT (SELECT daily_limit FROM u) IS NULL OR (SELECT n FROM used) < (SELECT daily_limit FROM u) AS v),\nlog AS (INSERT INTO usage_log (user_id, kind) SELECT id, 'split' FROM u WHERE (SELECT v FROM ok) RETURNING 1)\nSELECT (SELECT user_id FROM me) AS user_id, coalesce((SELECT v FROM ok), false) AND EXISTS (SELECT 1 FROM u) AS within_limit,\n       (SELECT daily_limit FROM u) AS daily_limit, (SELECT count(*) FROM log) AS logged",
     "options": {
      "queryReplacement": "={{ [ ($json.headers.authorization || '').replace(/^Bearer\\s+/i, '') ] }}"
     }
@@ -57,7 +57,7 @@
    }
   },
   {
-   "id": "bf467951-100b-443a-b594-5c184d845035",
+   "id": "b7774d97-1237-45ae-925b-317afb5dd62b",
    "name": "Zalogowany i jest tekst?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -75,7 +75,7 @@
      },
      "conditions": [
       {
-       "id": "f183aeca-2d9f-40c6-897d-bdcb46e4bd7a",
+       "id": "6f0886c5-8f2a-49d4-8e94-bb2bf26a9c1f",
        "leftValue": "={{ $json.user_id }}",
        "rightValue": "",
        "operator": {
@@ -85,7 +85,17 @@
        }
       },
       {
-       "id": "289b4c18-7190-47af-abe9-fabda635c5fc",
+       "id": "03c0b235-2df3-4736-ba01-eb787ff5c9f0",
+       "leftValue": "={{ $json.within_limit === true }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      },
+      {
+       "id": "3c2dd686-0317-48b1-bc1c-e0083a2ce76d",
        "leftValue": "={{ String($('POST items/split').item.json.body.text || '').trim().length >= 3 && String($('POST items/split').item.json.body.text || '').trim().length <= 20000 }}",
        "rightValue": "",
        "operator": {
@@ -101,7 +111,7 @@
    }
   },
   {
-   "id": "e8a10e70-5586-44b1-9994-c1c039c4aa36",
+   "id": "8682e3cd-a4a7-4226-86c7-32c44c1fa56d",
    "name": "Odmów",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -112,13 +122,13 @@
    "parameters": {
     "respondWith": "json",
     "options": {
-     "responseCode": "={{ $json.user_id ? 400 : 401 }}"
+     "responseCode": "={{ !$json.user_id ? 401 : !$json.within_limit ? 429 : 400 }}"
     },
-    "responseBody": "={{ $json.user_id ? { status: 400, error: String($('POST items/split').item.json.body.text || '').trim().length > 20000 ? 'To za dużo naraz — podziel materiał na części (do 20 000 znaków).' : 'Wklej albo napisz, co mam zapamiętać.' } : { status: 401, error: 'Zaloguj się ponownie' } }}"
+    "responseBody": "={{ $json.user_id && !$json.within_limit ? { status: 429, error: 'Na dziś wystarczy — to konto testowe ma limit ' + $json.daily_limit + ' wpisów dziennie (Luna działa na jednym, prywatnym kluczu). Wróć jutro albo napisz do Łukasza.' } : $json.user_id ? { status: 400, error: String($('POST items/split').item.json.body.text || '').trim().length > 20000 ? 'To za dużo naraz — podziel materiał na części (do 20 000 znaków).' : 'Wklej albo napisz, co mam zapamiętać.' } : { status: 401, error: 'Zaloguj się ponownie' } }}"
    }
   },
   {
-   "id": "030c41a4-d385-42f0-a1fe-28fd3c755db3",
+   "id": "eb42da4a-7b69-4e5b-9ed3-b7f01756d0a7",
    "name": "Kalendarz",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -131,7 +141,7 @@
    }
   },
   {
-   "id": "160a997d-97fa-4c69-abdf-a3d8a103214b",
+   "id": "e48a91f8-8a4a-4ca8-8af0-c8ef7890d957",
    "name": "DeepSeek: rozbij",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -175,7 +185,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "4eb4ead9-f06d-4485-9857-603ad4b0ba4c",
+   "id": "a6a0de05-d292-492a-9e6a-1fe51554f1a7",
    "name": "Sprawdź propozycję",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -188,7 +198,7 @@
    }
   },
   {
-   "id": "54534408-76cc-448c-a221-389954f1b905",
+   "id": "ce392b5c-0bc5-4d4e-a26d-00e803e3a50f",
    "name": "Odpowiedz: propozycja",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,

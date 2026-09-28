@@ -11,6 +11,12 @@ _local = os.path.join(_dir, "config.local.json")
 _use_local = os.path.exists(_local) and os.environ.get("LUNA_CONFIG") != "example"
 C = json.load(open(_local if _use_local else os.path.join(_dir, "config.example.json")))
 
+if os.environ.get("LUNA_CONFIG") == "example":
+    # Stałe UUID-y węzłów w wersji publicznej: plik zmienia się w git tylko wtedy, gdy zmienia się treść workflowu.
+    import random, sys, uuid
+    _rnd = random.Random(os.path.basename(sys.argv[0]))
+    uuid.uuid4 = lambda: uuid.UUID(int=_rnd.getrandbits(128), version=4)
+
 def _cred(key):
     c = C["credentials"].get(key)
     return {c["type"]: {"id": c["id"], "name": c["name"]}} if c and c.get("id") else None

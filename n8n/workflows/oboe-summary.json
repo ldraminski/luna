@@ -2,7 +2,7 @@
  "name": "Oboe: Streść stronę",
  "nodes": [
   {
-   "id": "1933cc30-ae80-4483-bf43-0da36bcc480f",
+   "id": "8eda6533-0599-497b-9ab4-3aef0eb7f7cb",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "4b95b411-d8f2-48c2-a0a1-495badffa719",
+   "id": "de6d7d2a-0bd6-4853-863c-61533104cb48",
    "name": "Z innego workflow",
    "type": "n8n-nodes-base.executeWorkflowTrigger",
    "typeVersion": 1.1,
@@ -30,7 +30,7 @@
    }
   },
   {
-   "id": "056cc3c9-b3ad-4c49-99b2-ef9728360a69",
+   "id": "82f65ccf-b842-4e5c-9668-45887cbed194",
    "name": "POST admin/summarize",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -51,10 +51,10 @@
      "name": "Oboe - admin (X-Admin-Token)"
     }
    },
-   "webhookId": "f0e78995-82c2-4498-b857-df5847b67457"
+   "webhookId": "19c19692-24a8-4946-acee-a3af7aba3eb1"
   },
   {
-   "id": "cd90d7ed-04ec-44b8-a1bd-96c3916cba00",
+   "id": "1d5df7f4-ce3d-469d-9c49-080abb46b6ed",
    "name": "Wejście",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -67,7 +67,7 @@
    }
   },
   {
-   "id": "d944190b-d860-4e3b-b705-75a0c0a5f9fa",
+   "id": "cddce6d5-a78a-4d34-8f71-f9e715d7d98b",
    "name": "Wczytaj",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -90,7 +90,7 @@
    }
   },
   {
-   "id": "b600afa6-2fa3-453b-9a66-23fefaa1a185",
+   "id": "8ee594b4-26d1-44cd-9500-4bcb256fd013",
    "name": "Adres do pobrania",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -103,7 +103,7 @@
    }
   },
   {
-   "id": "bf0ee552-7382-46ad-99ec-7bb0d345bf53",
+   "id": "8669245a-77f1-41bf-8b01-a9e61d6ec081",
    "name": "DNS A",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -137,7 +137,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "9ee4f9ac-29ba-4008-bef6-490c020cb383",
+   "id": "f7a66a97-fc4d-47ab-aa0f-4b5d4fee16b4",
    "name": "DNS AAAA",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -171,7 +171,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "7f1a2dd5-bb68-4546-9e31-977cbef718e6",
+   "id": "455059c0-dae1-4d60-8f9e-fee7cc968dd9",
    "name": "Sprawdź adres",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -184,7 +184,7 @@
    }
   },
   {
-   "id": "6454ac67-0d55-4dd6-892d-8f448093cd3b",
+   "id": "7214ae95-96da-40f2-a271-cb1791394f7f",
    "name": "Adres OK?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -202,7 +202,7 @@
      },
      "conditions": [
       {
-       "id": "f80716c0-1118-4b0b-b949-25644a7cab52",
+       "id": "f70fc960-57e8-427e-893c-3d7b9228f303",
        "leftValue": "={{ $json.ok }}",
        "rightValue": "",
        "operator": {
@@ -218,7 +218,7 @@
    }
   },
   {
-   "id": "5d0941b2-84f9-445e-9f1f-9c63f17329ea",
+   "id": "02f94394-54df-4921-8f01-e1de49ca5a52",
    "name": "Pobierz stronę",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -265,7 +265,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "1ad1c795-386c-4165-863f-8ff3585c9e10",
+   "id": "aff66cb5-81cb-4094-bafa-c3af33397006",
    "name": "Przekierowanie?",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -278,7 +278,7 @@
    }
   },
   {
-   "id": "8eb4e266-45cc-46df-9d7e-068bcf0c6a50",
+   "id": "eb972b1e-da90-4efe-95b7-1f853fedf45b",
    "name": "Jest przekierowanie?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -296,7 +296,7 @@
      },
      "conditions": [
       {
-       "id": "7fd8a272-af05-4f17-b6dc-cffb1d21966f",
+       "id": "e4a67094-6d3a-4f78-b768-75bb3b2ef415",
        "leftValue": "={{ $json.redirect }}",
        "rightValue": "",
        "operator": {
@@ -312,7 +312,7 @@
    }
   },
   {
-   "id": "c556723c-fdbf-4e79-a6a4-d85cf9023c7f",
+   "id": "9e448307-eff9-4dba-9527-6f96a64932f9",
    "name": "Adres do pobrania 2",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -325,7 +325,7 @@
    }
   },
   {
-   "id": "a5237c83-df5d-4848-bb8a-2553d40297bc",
+   "id": "7a09ef90-4f59-4a5c-a68d-afed4273edee",
    "name": "DNS A 2",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -359,7 +359,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "d65fac9a-08e0-45d2-9495-b50a28bede7d",
+   "id": "f7c10b11-3fb9-4416-9e8f-1a756491a8ae",
    "name": "DNS AAAA 2",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -393,7 +393,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "fc7ec116-4f76-408f-8e66-dab3a82d828f",
+   "id": "8d4264b6-fd6c-4cc8-80bb-77e76962da65",
    "name": "Sprawdź adres 2",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -406,7 +406,7 @@
    }
   },
   {
-   "id": "9871c869-4a3b-4714-8e4d-e45e30562d97",
+   "id": "b60fcc78-4747-4ba9-8f64-5bbe5177fb10",
    "name": "Adres OK? 2",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -424,7 +424,7 @@
      },
      "conditions": [
       {
-       "id": "c3160640-83da-421a-993b-a64b7483c670",
+       "id": "a1e8fc59-0ba7-4950-bbf9-fb46e0d92a8d",
        "leftValue": "={{ $json.ok }}",
        "rightValue": "",
        "operator": {
@@ -440,7 +440,7 @@
    }
   },
   {
-   "id": "46850ed6-b605-4391-b753-49e604cd9db7",
+   "id": "6ef24424-5fa0-4bbb-b03b-27f502d611e1",
    "name": "Pobierz stronę 2",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -487,7 +487,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "9190e5b2-f601-4087-a4cd-d4ed4f704ac4",
+   "id": "26c0ce7a-1505-4f3b-84bf-817d8e80d286",
    "name": "Wyciągnij tekst",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -500,7 +500,7 @@
    }
   },
   {
-   "id": "9d292a5c-e30e-4df9-a429-db106b787f61",
+   "id": "80124075-20d6-40a1-84cb-243e60a26f97",
    "name": "Tekst OK?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -518,7 +518,7 @@
      },
      "conditions": [
       {
-       "id": "b77af351-1550-47a0-baee-1ea1c34deff4",
+       "id": "b17805c4-9a31-4af3-8947-be11f228016f",
        "leftValue": "={{ $json.ok }}",
        "rightValue": "",
        "operator": {
@@ -534,7 +534,7 @@
    }
   },
   {
-   "id": "8bbed552-8348-4dd5-b1c3-8dee87a13942",
+   "id": "55aba724-55f2-4404-bdf3-49734ef7f2e3",
    "name": "Bez zmian?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -552,7 +552,7 @@
      },
      "conditions": [
       {
-       "id": "4e2eaba6-578e-49a9-9dfd-46855261b528",
+       "id": "1acc7259-cc28-43c2-aea3-db846d4a95d1",
        "leftValue": "={{ !!$('Wczytaj').first().json.prev && ($('Wczytaj').first().json.prev || {}).hash === $json.hash }}",
        "rightValue": "",
        "operator": {
@@ -568,7 +568,7 @@
    }
   },
   {
-   "id": "6266a7dd-acc3-4816-b60c-bb925ecfe1de",
+   "id": "d10918fa-fe16-488a-908a-d0769cb01865",
    "name": "Zapisz: bez zmian",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -591,7 +591,7 @@
    }
   },
   {
-   "id": "78f229b3-909b-41ec-bff8-7c38ee403722",
+   "id": "77c2c970-5e70-4509-8fe6-ce4464acb5e2",
    "name": "DeepSeek: streść",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -635,7 +635,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "05787496-0381-439f-bb39-fcc7a81de82b",
+   "id": "fc64fa5a-b4b7-43e6-afa1-86aff65993ca",
    "name": "Sprawdź streszczenie",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -648,7 +648,7 @@
    }
   },
   {
-   "id": "0b66a368-4349-48a0-93f2-56633f41a9fb",
+   "id": "4eae0432-ced0-4095-ac71-68d5da4fef73",
    "name": "Streszczenie OK?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -666,7 +666,7 @@
      },
      "conditions": [
       {
-       "id": "226be31f-3f19-4444-9361-e169383de7f5",
+       "id": "fd9c6751-74c7-4e91-8943-0c2f54276466",
        "leftValue": "={{ $json.ok }}",
        "rightValue": "",
        "operator": {
@@ -682,7 +682,7 @@
    }
   },
   {
-   "id": "df224d8a-23e7-4ba8-90c4-5dd4dee10cda",
+   "id": "a18db1e2-7ee8-4c7f-8256-aac5b41c3ad9",
    "name": "Zapisz streszczenie",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -705,7 +705,7 @@
    }
   },
   {
-   "id": "996a47ee-480b-4209-ad4e-51f566e56b13",
+   "id": "5ea9350f-8cd1-488c-b98e-480106017cfd",
    "name": "Powiadomić o zmianie?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -723,7 +723,7 @@
      },
      "conditions": [
       {
-       "id": "872558ae-588a-40ea-8bf7-2da2db7641de",
+       "id": "0f7685b0-0a8c-4c66-951a-776f6afb5811",
        "leftValue": "={{ $('Wejście').first().json.reason === 'scheduled' && $('Sprawdź streszczenie').first().json.summary.changed }}",
        "rightValue": "",
        "operator": {
@@ -739,7 +739,7 @@
    }
   },
   {
-   "id": "50ac6c01-d96c-4d1c-ba58-2a315ed1a26f",
+   "id": "ddd46817-3e2e-45c3-a176-05d3fb03006d",
    "name": "Powiadomienie o zmianie",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -762,7 +762,7 @@
    }
   },
   {
-   "id": "3347b37d-01c1-4645-aab0-1a732e43623e",
+   "id": "c5c3b54f-bfd0-436b-a21c-c1fb8ba13472",
    "name": "Zapisz błąd",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,

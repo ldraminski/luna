@@ -2,7 +2,7 @@
  "name": "Oboe: Generuj widget",
  "nodes": [
   {
-   "id": "4eda3a96-9073-4f30-b390-a3561ea74e3c",
+   "id": "4ceb6274-c2fc-417d-aa5a-b3e59a442383",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "10d29fb8-17c2-4595-8473-508ca9a12d45",
+   "id": "1effa97b-62ee-4b32-ab96-8f5f1676292e",
    "name": "Z API",
    "type": "n8n-nodes-base.executeWorkflowTrigger",
    "typeVersion": 1.1,
@@ -30,7 +30,7 @@
    }
   },
   {
-   "id": "caaa1738-53c7-4cba-8aac-856524c14a6f",
+   "id": "5e0fcfee-b438-4a0a-94a0-4545fc04c3d5",
    "name": "POST admin/widget",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -51,10 +51,10 @@
      "name": "Oboe - admin (X-Admin-Token)"
     }
    },
-   "webhookId": "32ce098f-7649-4ba0-8529-14bc1f047c5c"
+   "webhookId": "4190613d-6692-4f4f-9545-d950f46d3f41"
   },
   {
-   "id": "295dcd3d-f959-4552-97ff-61e6ce32dbf0",
+   "id": "e6d0540f-f781-4750-aff4-24bc1cc9f89a",
    "name": "Wejście",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -67,7 +67,7 @@
    }
   },
   {
-   "id": "1c3043d7-629f-448a-9152-9de65b5ca868",
+   "id": "4005240e-4256-4562-a96b-4e4c2fdebf9b",
    "name": "Poprawka?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -85,7 +85,7 @@
      },
      "conditions": [
       {
-       "id": "7ea1f8c3-8460-4a8b-a0f6-4596ac4633b1",
+       "id": "dc94c8e1-0af0-4418-a5a1-381bf2e22256",
        "leftValue": "={{ $json.mode === 'revise' }}",
        "rightValue": "",
        "operator": {
@@ -101,7 +101,7 @@
    }
   },
   {
-   "id": "bffeef34-a653-4b59-842d-98d7855e7aa6",
+   "id": "51be0923-9d9b-4be7-b9a0-fa53a9143b3f",
    "name": "Wczytaj rzecz i bibliotekę",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -124,7 +124,7 @@
    }
   },
   {
-   "id": "e226d3d8-c350-434a-b882-dc3b69beae40",
+   "id": "1ad1ddab-053c-4945-96c8-40ef5c2271e4",
    "name": "Dobór",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -168,7 +168,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "7b1790ba-371c-428e-bd31-b087a09f22a7",
+   "id": "c9ae3e5d-8902-4e4c-9af9-3f98df1dda8b",
    "name": "Sprawdź dobór",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -181,7 +181,7 @@
    }
   },
   {
-   "id": "ebf00b4c-2318-4f7a-92b6-ecd3ca58a0ce",
+   "id": "4dab6fcb-20a5-4c0e-a735-b60434bb26a0",
    "name": "Tryb",
    "type": "n8n-nodes-base.switch",
    "typeVersion": 3.2,
@@ -202,7 +202,7 @@
         },
         "conditions": [
          {
-          "id": "9b3f7edf-115b-448f-b3ee-1129d038488c",
+          "id": "ba135938-9865-481c-aeab-b802fa690329",
           "leftValue": "={{ $json.mode }}",
           "rightValue": "reuse",
           "operator": {
@@ -226,7 +226,7 @@
         },
         "conditions": [
          {
-          "id": "bfd79a68-60c0-4ed2-a7ec-ea111b9e57e4",
+          "id": "4a0f1b73-ca55-4997-a1ed-9c22c2cb6df6",
           "leftValue": "={{ $json.mode }}",
           "rightValue": "new",
           "operator": {
@@ -250,7 +250,7 @@
         },
         "conditions": [
          {
-          "id": "e834a56c-e807-4f62-8996-3e952d5d81cd",
+          "id": "a294dbc1-8e6c-4ed1-a22d-62fc01c2dec9",
           "leftValue": "={{ $json.mode }}",
           "rightValue": "fail",
           "operator": {
@@ -270,7 +270,7 @@
    }
   },
   {
-   "id": "a0a88b76-01bc-48f6-9b17-925574881bd3",
+   "id": "34f50074-8b2a-443f-b008-2c119911d8f5",
    "name": "Użyj istniejącego",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -293,7 +293,7 @@
    }
   },
   {
-   "id": "b02c0b20-46e7-4c98-9faf-2ab4cbbd054c",
+   "id": "3a38f88c-853e-4801-af34-6de6702b7d67",
    "name": "Wczytaj poprawkę",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -316,7 +316,7 @@
    }
   },
   {
-   "id": "a858a656-d9ca-4a5c-ad0d-99a14dce025a",
+   "id": "19e8f056-64dc-40e3-87a6-c01e458b81c0",
    "name": "Jest stary kod?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -334,7 +334,7 @@
      },
      "conditions": [
       {
-       "id": "0ec59cef-bba3-44d8-9cbb-128726c2d826",
+       "id": "f827a346-4e74-4324-8b33-4384ab68bf43",
        "leftValue": "={{ !!$json.file_path && /^[a-z0-9-]+\\.v\\d+\\.html$/.test($json.file_path) }}",
        "rightValue": "",
        "operator": {
@@ -350,7 +350,7 @@
    }
   },
   {
-   "id": "709655dc-3e05-4048-a1fd-2fd57b007618",
+   "id": "1cb9cacf-0469-4fa1-8901-a97300d599df",
    "name": "Czytaj stary kod",
    "type": "n8n-nodes-base.readWriteFile",
    "typeVersion": 1.1,
@@ -366,7 +366,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "77cc1f8c-455f-4f2b-9011-441088d58d12",
+   "id": "e0e9e30a-ed39-4113-a680-39d6d982d908",
    "name": "Stary kod jako tekst",
    "type": "n8n-nodes-base.extractFromFile",
    "typeVersion": 1.1,
@@ -382,7 +382,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "10739a4e-e01a-4355-b019-947e47ccbeba",
+   "id": "956c34a5-c56a-4b43-833c-36be0f1d795c",
    "name": "Projekt z czatu",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -395,7 +395,7 @@
    }
   },
   {
-   "id": "a6f9bed4-9925-4d6d-b5b3-b4851eeec2b6",
+   "id": "920fd52d-e96c-4bc9-95de-77b7aa308aa4",
    "name": "Projekt",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -408,7 +408,7 @@
    }
   },
   {
-   "id": "068c7e0a-49a4-404a-8f53-5a11ccef36cf",
+   "id": "44b749cd-afd3-4d6f-a4b2-5b9bed43ae63",
    "name": "Programista",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -452,7 +452,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "7cfee38a-f5e0-4e1e-a9b9-0200b448f7bb",
+   "id": "ca0da8fb-63a9-4fb3-ad72-e224acfc450d",
    "name": "Skan",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -465,7 +465,7 @@
    }
   },
   {
-   "id": "848057be-decd-42a8-921b-dfe8dc62273f",
+   "id": "f1e05eef-6186-4bdd-b2fb-4438bdbbc7a6",
    "name": "Guardian",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -509,7 +509,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "e411b063-c61e-4c40-90f5-6df83c98c965",
+   "id": "d589fa9d-9078-468c-86de-285e29b2185a",
    "name": "Werdykt",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -522,7 +522,7 @@
    }
   },
   {
-   "id": "0b24bbcf-478b-44d3-9eeb-1d8f61197647",
+   "id": "1f487754-f8e9-4751-b8c5-5f70b67e0cfd",
    "name": "Zatwierdzony?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -540,7 +540,7 @@
      },
      "conditions": [
       {
-       "id": "49e77f61-3b37-43a4-addc-7890fb9dd267",
+       "id": "2dfbac34-9c98-41a7-9baf-4003e5245c45",
        "leftValue": "={{ $json.approved }}",
        "rightValue": "",
        "operator": {
@@ -556,7 +556,7 @@
    }
   },
   {
-   "id": "aea1f030-4206-42ce-adfa-7bab2c6711a8",
+   "id": "8d4d353f-9c4a-4917-bc4e-ce03d26a06f6",
    "name": "Poprawka",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -600,7 +600,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "893d7426-4f8d-4496-b613-4adaa419d02b",
+   "id": "a67b3340-8c08-49fc-be9f-1cee4217615e",
    "name": "Skan 2",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -613,7 +613,7 @@
    }
   },
   {
-   "id": "33b9585f-8c07-4307-bd04-8436fd60013c",
+   "id": "52a44429-e7b7-43fb-b757-ffc461b8829d",
    "name": "Guardian 2",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -657,7 +657,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "cdc6ee3b-d5bc-4857-a906-3147be22d617",
+   "id": "8fee5fb3-9986-4915-864c-87c7288a4aa8",
    "name": "Werdykt 2",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -670,7 +670,7 @@
    }
   },
   {
-   "id": "4bcbd003-6069-4e5a-8b95-498d5d95d302",
+   "id": "314cc9e5-bc2b-43b2-bbe2-a00594cbec83",
    "name": "Zatwierdzony po poprawce?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -688,7 +688,7 @@
      },
      "conditions": [
       {
-       "id": "07c3a93a-34e1-4c1c-a2ed-427b45f7376f",
+       "id": "4479fe9d-d024-4c44-91d7-75c1a976f098",
        "leftValue": "={{ $json.approved }}",
        "rightValue": "",
        "operator": {
@@ -704,7 +704,7 @@
    }
   },
   {
-   "id": "0707b02d-819f-473b-b1fc-993466ae29c9",
+   "id": "d11ab8a0-f721-40e6-befc-c3f07287c55e",
    "name": "Wersja",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -727,7 +727,7 @@
    }
   },
   {
-   "id": "469e9526-d9fd-4536-baa2-4546a712a936",
+   "id": "7b9d0af2-eab8-4223-8433-7350026c0430",
    "name": "Złóż plik",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -740,7 +740,7 @@
    }
   },
   {
-   "id": "ad437641-589a-4a67-be70-998cdef3127a",
+   "id": "8535304d-6fe1-4f74-af69-d349b69068be",
    "name": "Do pliku",
    "type": "n8n-nodes-base.convertToFile",
    "typeVersion": 1.1,
@@ -759,7 +759,7 @@
    }
   },
   {
-   "id": "26860f22-b41e-4d3f-8671-5a71e336be0f",
+   "id": "6e28c7c9-5f67-404f-974a-06ef0ff0564b",
    "name": "Zapisz plik",
    "type": "n8n-nodes-base.readWriteFile",
    "typeVersion": 1.1,
@@ -775,7 +775,7 @@
    }
   },
   {
-   "id": "5f0cdf34-1e13-448f-9dfc-1c37463b74ca",
+   "id": "284a4781-82f1-4152-99cc-46da38408517",
    "name": "Git add",
    "type": "n8n-nodes-base.git",
    "typeVersion": 1.1,
@@ -790,7 +790,7 @@
    }
   },
   {
-   "id": "a5f47648-77e3-4b46-ac85-50133d56af85",
+   "id": "f0d6739d-c84f-4e43-8c7a-fa7b67e365b8",
    "name": "Git commit",
    "type": "n8n-nodes-base.git",
    "typeVersion": 1.1,
@@ -806,7 +806,7 @@
    }
   },
   {
-   "id": "4979424b-2c51-434d-b8dc-b8d99a6540b7",
+   "id": "4b774d9c-b34a-4588-adca-3afc43b42241",
    "name": "Zapisz w bibliotece",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -829,7 +829,7 @@
    }
   },
   {
-   "id": "ef2b4236-cf33-49e4-822d-993e1529165a",
+   "id": "012fe017-f521-401d-a6e0-0e6ed25df0c3",
    "name": "Dane do zapisu",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -842,7 +842,7 @@
    }
   },
   {
-   "id": "e0679757-48fc-4c3e-8e59-1aafe682e61f",
+   "id": "bb483389-5276-41c2-963e-b05c471fb796",
    "name": "Odrzucony",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,

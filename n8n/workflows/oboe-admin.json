@@ -2,7 +2,7 @@
  "name": "Oboe: Wydaj token",
  "nodes": [
   {
-   "id": "852a3943-f3a8-4dc8-8486-281fe0837c76",
+   "id": "57bad41e-c241-4961-a719-2855134c9a82",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "9839208a-11cd-443d-8814-9cf461e14a8e",
+   "id": "354280ba-bfd7-4f1a-9665-2d3c160d0361",
    "name": "POST admin/token",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -38,10 +38,10 @@
      "name": "Oboe - admin (X-Admin-Token)"
     }
    },
-   "webhookId": "10706b29-9f33-4599-8904-7d3105dca243"
+   "webhookId": "aeb54725-ec1e-46ae-89cf-9a4d93c48f58"
   },
   {
-   "id": "885958a4-753e-4696-b124-a6fbdf344fdc",
+   "id": "f6ec529f-5bf8-454b-b600-f156e1756fa0",
    "name": "Wydaj token",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -64,7 +64,7 @@
    }
   },
   {
-   "id": "7e52d5b5-90ae-43c5-8a37-959d3be0c2d1",
+   "id": "1277b799-4b91-4985-ba8d-f7b71a4b1dab",
    "name": "Wysłać mail?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -82,7 +82,7 @@
      },
      "conditions": [
       {
-       "id": "40fec215-cb3a-41f2-85fe-ad7ec98ed6e0",
+       "id": "97027953-6bdf-4044-8e11-78b842d6e4d5",
        "leftValue": "={{ $json.result.status === 200 && $('POST admin/token').item.json.body.send_email !== false }}",
        "rightValue": "",
        "operator": {
@@ -98,7 +98,7 @@
    }
   },
   {
-   "id": "321a41a9-5052-4f89-81ec-64ddd5cc798a",
+   "id": "8162198a-3218-4611-acab-2e536941aa93",
    "name": "Wyślij token mailem",
    "type": "n8n-nodes-base.emailSend",
    "typeVersion": 2.1,
@@ -125,7 +125,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "76e8e9b3-a3f2-4d9a-908d-6a105d5bd7d2",
+   "id": "8f1091e3-0866-482d-b2c6-0dec2573ef02",
    "name": "Odpowiedz: wysłano",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,
@@ -140,7 +140,7 @@
    }
   },
   {
-   "id": "dbf27357-ff35-4ed3-b324-f0d02ef8600f",
+   "id": "3f9f9f7d-c754-4ef7-af32-b6a1a2510384",
    "name": "Odpowiedz",
    "type": "n8n-nodes-base.respondToWebhook",
    "typeVersion": 1.1,

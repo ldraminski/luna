@@ -2,7 +2,7 @@
  "name": "Oboe: Raport",
  "nodes": [
   {
-   "id": "6c5ab1d4-4c78-412e-a5f4-38d843b4e2bf",
+   "id": "fde0144e-f762-43a4-bc5b-17d658f0b522",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "fcf5a262-345a-4348-a65a-f5f742ffda23",
+   "id": "fe42d938-0267-4147-b907-2eb3b0029b64",
    "name": "Co 5 minut",
    "type": "n8n-nodes-base.scheduleTrigger",
    "typeVersion": 1.2,
@@ -37,7 +37,7 @@
    }
   },
   {
-   "id": "17dd1b8c-b3a0-470e-b6f5-208d12289cc9",
+   "id": "c270cc9b-2088-4337-9d25-4446ee51453c",
    "name": "POST admin/report",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -58,10 +58,10 @@
      "name": "Oboe - admin (X-Admin-Token)"
     }
    },
-   "webhookId": "7801d595-1ea2-4a59-ba71-b2da6f5d5667"
+   "webhookId": "53a8543a-6235-46de-bf76-4a2cc98430b5"
   },
   {
-   "id": "8463f8d8-2cce-44c1-a1f3-a0bd0bb7f1cc",
+   "id": "ee24dc6a-03e5-49e3-94e4-66db1a083821",
    "name": "Parametry",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -74,7 +74,7 @@
    }
   },
   {
-   "id": "eb75cc39-6ccd-47b7-b5dd-93c5fb0a7dd2",
+   "id": "f906c51a-634f-4dd5-bdbd-2991fedcb423",
    "name": "Komu raport",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -97,7 +97,7 @@
    }
   },
   {
-   "id": "8f2babc6-779c-4f77-a32f-e12d28cceb20",
+   "id": "d878e669-bcbc-46b3-a93a-c08f0d52c6dd",
    "name": "Ułóż plan",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -110,7 +110,7 @@
    }
   },
   {
-   "id": "b2228327-0ddc-48f0-a01b-61224d148cd6",
+   "id": "5b3a0633-c184-4778-98af-c68d1344feec",
    "name": "DeepSeek: wstęp",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -154,7 +154,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "a43baefe-de44-4e99-bad2-c47e2f0e82b0",
+   "id": "994783dd-235d-41eb-bf9c-3f48c0eacafc",
    "name": "Dołącz wstęp",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -167,7 +167,7 @@
    }
   },
   {
-   "id": "a49f97f1-b628-491f-97aa-93140b01976a",
+   "id": "7bc418af-782c-4a5c-8438-d83e4acbcc93",
    "name": "Zapisz raport",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,

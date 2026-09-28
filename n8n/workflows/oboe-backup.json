@@ -2,7 +2,7 @@
  "name": "Oboe: Kopia zapasowa",
  "nodes": [
   {
-   "id": "1475005d-74a7-4687-9a20-d839496d5bde",
+   "id": "6eb880d3-b924-4fe9-8cd4-1772c7ffc6a8",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "a510bf6f-0d0c-4a46-a83e-cf7f3fe4ef28",
+   "id": "7f6cef37-0e92-4c34-84e8-ce8468a819b7",
    "name": "Codziennie 3:30",
    "type": "n8n-nodes-base.scheduleTrigger",
    "typeVersion": 1.2,
@@ -37,7 +37,7 @@
    }
   },
   {
-   "id": "85f04bb4-bc21-40f7-afe9-dfb23011611e",
+   "id": "e414a67a-bf64-40a3-8923-5c50d6fed5af",
    "name": "POST admin/backup",
    "type": "n8n-nodes-base.webhook",
    "typeVersion": 2,
@@ -58,10 +58,10 @@
      "name": "Oboe - admin (X-Admin-Token)"
     }
    },
-   "webhookId": "a8a1b9b4-e76f-403f-8c46-45b473e50c7c"
+   "webhookId": "43344d99-dac4-442c-9992-846faf0dd1f8"
   },
   {
-   "id": "55314e8e-766b-4d4f-8eb5-8abd64b98c9a",
+   "id": "1fbe5050-1833-4740-baa3-a257e7908dbe",
    "name": "Eksport tabel",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -82,7 +82,7 @@
    }
   },
   {
-   "id": "e92269db-7d4f-4d4f-88e4-9039367b644f",
+   "id": "e4010756-7ac9-4714-a75a-56cc5334b0bb",
    "name": "Pliki widgetów",
    "type": "n8n-nodes-base.readWriteFile",
    "typeVersion": 1,
@@ -99,7 +99,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "51776173-2e9e-40c2-a3f0-10be17acb116",
+   "id": "d9cb05df-cd64-4612-a48d-2ae132f5f2dd",
    "name": "Złóż kopię",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -112,7 +112,7 @@
    }
   },
   {
-   "id": "4b5646f7-7e88-4f5a-b48a-224e1ff7a0e5",
+   "id": "b6501e90-c19d-4d7f-b514-f49e33d935d9",
    "name": "Gzip",
    "type": "n8n-nodes-base.compression",
    "typeVersion": 1.1,
@@ -128,7 +128,7 @@
    }
   },
   {
-   "id": "cf803e0b-e2c0-44dc-b158-04d0346e5c73",
+   "id": "d02c9a53-a73b-47e7-95e4-bf50e36fb356",
    "name": "Wyślij do R2",
    "type": "n8n-nodes-base.s3",
    "typeVersion": 1,
@@ -146,7 +146,7 @@
    "disabled": true
   },
   {
-   "id": "47ec75d7-3d5a-4fb7-a94a-467123ed9bcc",
+   "id": "7f548930-d319-4ffb-8bb9-e7cd5832f2d1",
    "name": "Wynik",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -159,7 +159,7 @@
    }
   },
   {
-   "id": "c66b90f9-d9fc-4d1e-aaf4-d755fd018bc7",
+   "id": "4f0f7057-efb1-44a9-8c78-929959d3c202",
    "name": "Błąd?",
    "type": "n8n-nodes-base.if",
    "typeVersion": 2.2,
@@ -177,7 +177,7 @@
      },
      "conditions": [
       {
-       "id": "260ea7bd-4b9a-4676-9f20-5150e85ef0e1",
+       "id": "e09b252c-98d7-4bfb-9b96-0ab90b1b5eb3",
        "leftValue": "={{ $json.ok === false }}",
        "rightValue": "",
        "operator": {
@@ -193,7 +193,7 @@
    }
   },
   {
-   "id": "aa987545-3cc7-4548-9898-9a30ab37af47",
+   "id": "af7c87c7-c2a1-4318-bd3c-25e6e9440eb6",
    "name": "Powiadom adminów",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,

@@ -11,9 +11,9 @@ notification — no forms, no fields. It runs in production for a small group of
 [luna.draminski.dev](https://luna.draminski.dev) (access on request).
 
 <p>
-  <img src="docs/img/mobile-home.webp" width="240" alt="Home screen: nearest deadline card and upcoming items">
-  <img src="docs/img/mobile-voice-recording.webp" width="240" alt="Dictation sheet while recording">
-  <img src="docs/img/mobile-voice-summary.webp" width="240" alt="Dictation summary: what Luna heard and what she did">
+  <img src="docs/img/demo-dictation.gif" width="270" alt="Dictation: tap the mic, speak, Luna shows what she heard and what she scheduled">
+  &nbsp;
+  <img src="docs/img/mobile-home.webp" width="270" alt="Home screen: nearest deadline card and upcoming items">
 </p>
 
 ## What it does
@@ -39,7 +39,7 @@ notification — no forms, no fields. It runs in production for a small group of
 - **Works offline** — last state is cached, new entries queue up and send themselves when the connection returns.
 
 <p>
-  <img src="docs/img/desk-review.webp" width="720" alt="Desk: pasted material split into items for review">
+  <img src="docs/img/demo-desk.gif" width="760" alt="Desk: paste an e-mail and a weekly plan, review the items Luna extracted, save them all">
 </p>
 
 ## Architecture
@@ -103,6 +103,8 @@ written. Recurrences, reminder times in the UI and reports are computed determin
   over that network too — so Luna's webhooks are blocked on n8n's public hostname and exist only behind the app's proxy.
   Admin routes are blocked at the proxy and additionally require a header secret. Voice recordings and full-size photos
   are never stored.
+- **Cost guard.** Everything runs on one model key with a spend limit (alerts at 80/95/100 %). New accounts get a daily
+  limit of model-backed actions (`db/014`), checked in the same query that authenticates the request — before any paid call.
 
 ## Repository layout
 
@@ -132,6 +134,15 @@ nginx.conf     static files, /api proxy, per-route body limits, widget CSP
 Vanilla JavaScript PWA (no framework, no bundler) · nginx · n8n · PostgreSQL 16 · OpenRouter (DeepSeek v4.1 Flash for
 understanding, vision and web search; GLM for widget code) · faster-whisper via speaches · Web Push with VAPID ·
 Docker · Cloudflare Tunnel.
+
+## Try it
+
+Luna is live at **[luna.draminski.dev](https://luna.draminski.dev)** (Polish UI). Enter your name and e-mail — I approve
+access requests by hand, usually the same day, and the access key arrives by e-mail. It works best installed on the home
+screen (iOS: *Share → Add to Home Screen*) with notifications on; on a computer try **[/biurko](https://luna.draminski.dev/biurko)**.
+
+It is a private instance on a single model key, so test accounts have a small daily limit — and please don't put anything
+sensitive in it.
 
 ---
 

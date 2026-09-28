@@ -2,7 +2,7 @@
  "name": "Oboe: Harmonogram",
  "nodes": [
   {
-   "id": "3c14735b-89d4-4b4e-829d-9b3cf89ad2db",
+   "id": "db8fa070-949c-4aed-ab31-5c1fbf252092",
    "name": "Opis",
    "type": "n8n-nodes-base.stickyNote",
    "typeVersion": 1,
@@ -17,7 +17,7 @@
    }
   },
   {
-   "id": "f48f6b78-81b8-4100-ba0b-efda3e6948dc",
+   "id": "4b3b2744-0455-4a84-9d57-fffe926ffd71",
    "name": "Co 20 s",
    "type": "n8n-nodes-base.scheduleTrigger",
    "typeVersion": 1.2,
@@ -37,7 +37,7 @@
    }
   },
   {
-   "id": "a33acd6b-1177-4a12-a36d-24a73abd9e56",
+   "id": "2c491443-9b57-4db2-bbf6-a54ee76980e6",
    "name": "Alarmy",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -58,7 +58,7 @@
    }
   },
   {
-   "id": "df04972f-9480-483f-b56a-cc13426369cc",
+   "id": "ba401d8e-117d-4038-9531-90e94afddc33",
    "name": "Weź zaległe",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -79,7 +79,7 @@
    }
   },
   {
-   "id": "53f5fe76-288e-4f4f-86c2-0a3d52a63f91",
+   "id": "157a06da-c45b-48d4-a1aa-9f984c66a428",
    "name": "Tylko mail",
    "type": "n8n-nodes-base.filter",
    "typeVersion": 2.2,
@@ -97,7 +97,7 @@
      },
      "conditions": [
       {
-       "id": "7e8aebc7-deeb-4cdf-a16b-2e092f93e436",
+       "id": "f8d25f6d-92e5-4579-aa5a-4933c622275b",
        "leftValue": "={{ $json.send_email }}",
        "rightValue": "",
        "operator": {
@@ -113,7 +113,7 @@
    }
   },
   {
-   "id": "0d4230e1-3906-4b73-b0fa-644be7bd6690",
+   "id": "97a4df4a-13d2-4a57-821b-36baa90cfac4",
    "name": "Wyślij mail",
    "type": "n8n-nodes-base.emailSend",
    "typeVersion": 2.1,
@@ -140,7 +140,7 @@
    "onError": "continueRegularOutput"
   },
   {
-   "id": "b55510fe-0669-4503-abce-9780d7f0eb72",
+   "id": "cecbe5af-44b3-48c1-b636-89532c9f524b",
    "name": "Oznacz wysłane mailem",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -163,7 +163,7 @@
    }
   },
   {
-   "id": "6289a950-a514-4275-b22a-2d866ed11990",
+   "id": "7f182c47-38e4-41c9-b4b7-2cf4330ca821",
    "name": "Urządzenia",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -187,7 +187,7 @@
    "executeOnce": true
   },
   {
-   "id": "96fcbe6a-7d10-4d0b-a0a8-351ac2389817",
+   "id": "68449bd5-4f24-4435-a7ca-af7414e10eab",
    "name": "Podpisz JWT",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -200,7 +200,7 @@
    }
   },
   {
-   "id": "12481c77-c482-45d9-a76b-3c2a6e0f272d",
+   "id": "a8e8e923-99c6-4bbe-9d83-ca53dcc0d6f3",
    "name": "Podpis ES256",
    "type": "n8n-nodes-base.crypto",
    "typeVersion": 2,
@@ -223,7 +223,7 @@
    }
   },
   {
-   "id": "5a27f561-791e-49af-81c1-e23fcb6598ed",
+   "id": "cead4039-478f-4973-941b-d8d75807953a",
    "name": "Złóż nagłówek VAPID",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -236,7 +236,7 @@
    }
   },
   {
-   "id": "91c23e05-5c43-4dbe-8114-2b8b6190de1b",
+   "id": "d9484b97-b794-4de5-a73f-265a5cb73c5d",
    "name": "Wyślij push",
    "type": "n8n-nodes-base.httpRequest",
    "typeVersion": 4.2,
@@ -281,7 +281,7 @@
    }
   },
   {
-   "id": "50362739-2325-46c9-af7d-847f55b8fde7",
+   "id": "c208d824-fffd-482e-a767-89fc964fbaa8",
    "name": "Wynik wysyłki",
    "type": "n8n-nodes-base.code",
    "typeVersion": 2,
@@ -294,7 +294,7 @@
    }
   },
   {
-   "id": "0187c231-5307-4da4-a3d8-9f1f8a493490",
+   "id": "ab6f5866-9455-4bd5-b402-f6858442f991",
    "name": "Aktualizuj urządzenia",
    "type": "n8n-nodes-base.postgres",
    "typeVersion": 2.6,
@@ -317,7 +317,7 @@
    }
   },
   {
-   "id": "ce9468de-5603-4ffc-abc3-8500c95d0341",
+   "id": "5c1a93e7-a031-4dc9-bc42-5d07fe5efccc",
    "name": "Tylko strony do streszczenia",
    "type": "n8n-nodes-base.filter",
    "typeVersion": 2.2,
@@ -335,7 +335,7 @@
      },
      "conditions": [
       {
-       "id": "5f633eae-fa41-4aa6-84cf-e9a6226a5d3f",
+       "id": "2255a615-24cc-4198-a9a0-a8f74856fb5a",
        "leftValue": "={{ $json.summarize }}",
        "rightValue": "",
        "operator": {
@@ -351,7 +351,7 @@
    }
   },
   {
-   "id": "76422b6a-b013-4663-98c6-a3fb1a9e1fae",
+   "id": "d5ae85bc-48b4-4cda-b80a-c78d73d13239",
    "name": "Id strony",
    "type": "n8n-nodes-base.set",
    "typeVersion": 3.4,
@@ -365,13 +365,13 @@
     "assignments": {
      "assignments": [
       {
-       "id": "a8126724-1dfb-47e2-ba91-0bc13e4b8a1b",
+       "id": "6241c544-2484-4e46-8e9c-7478d44dfd0e",
        "name": "item_id",
        "type": "string",
        "value": "={{ $json.item_id }}"
       },
       {
-       "id": "6cc0c3f8-5f98-4eeb-aa94-48431de669a7",
+       "id": "5a848854-b5a8-41d9-8773-7afd7a2b622f",
        "name": "reason",
        "type": "string",
        "value": "scheduled"
@@ -382,7 +382,7 @@
    }
   },
   {
-   "id": "9b8732f3-bb2a-4be0-858b-10c0a70098e4",
+   "id": "0dabbe4f-b99b-406a-b77d-af1af3001c93",
    "name": "Streść stronę (w tle)",
    "type": "n8n-nodes-base.executeWorkflow",
    "typeVersion": 1.2,

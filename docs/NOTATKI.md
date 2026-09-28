@@ -114,6 +114,17 @@ Decyzja: osobny interfejs, NIE osobna aplikacja (inna domena = osobne logowanie 
 - W widoku z telefonu na ekranie ≥1000 px (po zalogowaniu) link „Biurko — wklej dłuższy materiał →”.
 - Test: Playwright na koncie testowym (mail ze żłobka + plan tygodnia → 8 rzeczy, 0 błędów).
 
+## Dzienny limit dla nowych kont i publiczne repo (28.09.2026, Łukasz)
+
+Kod jest publiczny (github.com/ldraminski/luna), a Luna działa na **jednym** kluczu OpenRoutera (decyzja Łukasza: bez osobnego budżetu dla testerów).
+- Migracja `db/014-limit-dzienny.sql`: `users.daily_limit` (NULL = bez limitu; nowe konta domyślnie **20**, konta sprzed limitu bez limitu) + `usage_log`.
+- `n8n/limit.py` → `session_with_limit(kind)`: jedno zapytanie = sesja + sprawdzenie limitu + zapis zużycia (doba wg Europe/Warsaw).
+  Użyte w `POST items` (item), `items/split` (split) i czacie „Popraw” (chat). Po limicie **429** z komunikatem dla testera.
+- **Poprawka bezpieczeństwa:** czat „Popraw” odczytywał zdjęcie modelem PRZED sprawdzeniem sesji — teraz „Czat: sesja i limit” jest pierwszym węzłem.
+- Zmiana limitu jednej osoby: `UPDATE users SET daily_limit = NULL WHERE email = '...'`.
+- Webhooki `/webhook/oboe/*` i `/webhook-test/oboe/*` na hoście n8n zablokowane regułą WAF Cloudflare „Luna: webhooki tylko przez aplikację”.
+- Ekran startowy: „Poproś o dostęp” (wcześniej „Poproś o klucz”).
+
 ## Raport dnia / tygodnia i przypomnienie o zaległych (28.09.2026, Łukasz)
 
 Workflow „Oboe: Raport” (`n8n/build_report.py`, id w `n8n/.report-wf-id`), migracja `db/011-raporty.sql`.

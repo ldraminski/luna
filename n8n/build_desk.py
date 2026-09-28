@@ -5,6 +5,7 @@ Nic nie zapisuje: biurko pokazuje propozycję do poprawienia, a potem wysyła KA
 (ta sama ścieżka co telefon: termin, przypomnienia, listy, widgety).
 """
 import json, uuid
+from limit import session_with_limit, LIMIT_MSG
 from config import PG, OR, REFERER
 
 TOKEN = "($json.headers.authorization || '').replace(/^Bearer\\s+/i, '')"
@@ -37,19 +38,21 @@ node("Opis", "n8n-nodes-base.stickyNote", 1, [-400, -220], {"width": 520, "heigh
 w = node("POST items/split", "n8n-nodes-base.webhook", 2, [0, 0],
   {"httpMethod": "POST", "path": "oboe/items/split", "responseMode": "responseNode", "options": {}}, webhookId=str(uuid.uuid4()))
 sess = node("Sesja", "n8n-nodes-base.postgres", 2.6, [220, 0],
-  {"operation": "executeQuery", "query": f"WITH {ME}\nSELECT (SELECT user_id FROM me) AS user_id",
+  {"operation": "executeQuery", "query": session_with_limit("split"),
    "options": {"queryReplacement": "={{ [ " + TOKEN + " ] }}"}}, credentials=PG)
 iff = node("Zalogowany i jest tekst?", "n8n-nodes-base.if", 2.2, [440, 0], {
   "conditions": {"options": {"caseSensitive": True, "leftValue": "", "typeValidation": "loose", "version": 2},
     "conditions": [
       {"id": str(uuid.uuid4()), "leftValue": "={{ $json.user_id }}", "rightValue": "",
        "operator": {"type": "string", "operation": "notEmpty", "singleValue": True}},
+      {"id": str(uuid.uuid4()), "leftValue": "={{ $json.within_limit === true }}", "rightValue": "",
+       "operator": {"type": "boolean", "operation": "true", "singleValue": True}},
       {"id": str(uuid.uuid4()), "leftValue": "={{ " + TEXT + ".length >= 3 && " + TEXT + ".length <= " + str(MAX) + " }}", "rightValue": "",
        "operator": {"type": "boolean", "operation": "true", "singleValue": True}}],
     "combinator": "and"}, "options": {}})
 deny = node("Odmów", "n8n-nodes-base.respondToWebhook", 1.1, [660, 180],
-  {"respondWith": "json", "options": {"responseCode": "={{ $json.user_id ? 400 : 401 }}"},
-   "responseBody": "={{ $json.user_id ? { status: 400, error: " + TEXT + ".length > " + str(MAX) + " ? 'To za dużo naraz — podziel materiał na części (do 20 000 znaków).' : 'Wklej albo napisz, co mam zapamiętać.' } : { status: 401, error: 'Zaloguj się ponownie' } }}"})
+  {"respondWith": "json", "options": {"responseCode": "={{ !$json.user_id ? 401 : !$json.within_limit ? 429 : 400 }}"},
+   "responseBody": "={{ $json.user_id && !$json.within_limit ? { status: 429, error: " + LIMIT_MSG + " } : $json.user_id ? { status: 400, error: " + TEXT + ".length > " + str(MAX) + " ? 'To za dużo naraz — podziel materiał na części (do 20 000 znaków).' : 'Wklej albo napisz, co mam zapamiętać.' } : { status: 401, error: 'Zaloguj się ponownie' } }}"})
 cal = node("Kalendarz", "n8n-nodes-base.code", 2, [660, 0],
   {"jsCode": open("kalendarz.js").read().replace("i < 35", "i < 120")})
 llm = node("DeepSeek: rozbij", "n8n-nodes-base.httpRequest", 4.2, [880, 0], {
