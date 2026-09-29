@@ -26,6 +26,11 @@ notification — no forms, no fields. It runs in production for a small group of
   one e-mail says the event has started.
 - **Dictation** — tap the mic, speak, tap *Done*. Audio goes to a self-hosted Whisper (`large-v3-turbo`, CPU), is never
   stored, and the sheet shows *what I heard* and *what I did with it* with a one-tap **Undo**.
+- **Voice notes** — *＋ → Voice note*: record a meeting (up to 20 min, pause/resume, screen kept awake) or upload a
+  file from the phone's recorder. It goes into a server-side queue and is transcribed **in the background**, one at a time
+  (Whisper on CPU needs ~1/3 of the recording's length), so the app stays usable; a slim bar at the top shows what is in
+  progress. The result is a regular item: summary, decisions and a to-do checklist, with the full transcript folded
+  below. Audio is deleted as soon as it is transcribed.
 - **Desk** (`/biurko`) — a desktop page for long material: paste an e-mail from the nursery or a weekly plan, Luna
   splits it into self-contained items with absolute dates, you review and edit, then everything is saved in one go.
 - **Photos** — snap a poster or a receipt; a vision model reads it and the regular pipeline decides whether it is an
@@ -82,6 +87,7 @@ written. Recurrences, reminder times in the UI and reports are computed determin
 | `Oboe: API` | all app routes: items, lists, photos, research, "fix it" chat |
 | `Oboe: Harmonogram` | every 20 s: due reminders and alarms → Web Push (VAPID JWT signed in n8n), e-mail fallback |
 | `Oboe: Dyktowanie` | audio → self-hosted Whisper with VAD → text |
+| `Oboe: Notatki głosowe` | long recordings → queue (`voice_notes`) → one at a time: Whisper → DeepSeek (summary, decisions, to-dos) → item + push |
 | `Oboe: Biurko` | long material → list of self-contained items (nothing saved until reviewed) |
 | `Oboe: Generuj widget` | pick from library → write code → static scan → guardian model → versioned file |
 | `Oboe: Streść stronę` | fetch & summarise watched pages, SSRF-safe |

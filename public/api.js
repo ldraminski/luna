@@ -67,6 +67,11 @@ export const api = {
   accessDecide: (id, accept) => call('access/decide', { method: 'POST', body: { id, accept } }),
   items: () => call('items').then((d) => d.items || []),
   add: (text, image = '', thumb = '') => call('items', { method: 'POST', body: { text, ...(image ? { image, thumb } : {}) }, timeout: 90000 }),
+  // notatki głosowe (długie nagrania, przepisywane w tle)
+  voiceNote: (audio, duration, name = '') => call('voice-notes', { method: 'POST', body: { audio, duration, name }, timeout: 300000 }),
+  voiceNotes: () => call('voice-notes').then((d) => d.notes || []),
+  voiceDismiss: (id) => call('voice-notes/dismiss', { method: 'POST', body: { id } }),
+  voiceRetry: (id) => call('voice-notes/retry', { method: 'POST', body: { id } }),
   transcribe: (audio) => call('transcribe', { method: 'POST', body: { audio }, timeout: 60000 }).then((d) => d.text || ''),
   split: (text) => call('items/split', { method: 'POST', body: { text }, timeout: 130000 }),
   photo: (id) => call('items/photo?id=' + encodeURIComponent(id)).then((d) => d.image),

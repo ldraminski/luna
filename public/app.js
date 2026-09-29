@@ -58,6 +58,7 @@ const I = {
   sport: '<circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18M5.6 5.6c3.5 3.5 3.5 9.3 0 12.8M18.4 5.6c-3.5 3.5-3.5 9.3 0 12.8"/>',
   people: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2c2.8.2 5 2.6 5 5.8"/>',
   doc: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
+  mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
   food: '<path d="M4 3v8a3 3 0 0 0 6 0V3M7 3v18M17 3c-2 2-3 5-3 8h3v10"/>',
   travel: '<path d="M2 16l20-8-8 12-2-5z"/><path d="m12 15-4 5"/>',
   bank: '<path d="M8 24 32 10l24 14z" fill="#fff"/><path d="M12 26v22M22 26v22M32 26v22M42 26v22M52 26v22"/><path d="M7 50h50M5 55h54"/><circle cx="32" cy="19" r="2.5" fill="currentColor"/>',
@@ -166,6 +167,7 @@ function startMain() {
   $('#today').textContent = fDay.format(new Date());
   refreshBell();
   load().then(() => loadReport(true));
+  refreshVn();
   if (!introSeen()) openIntro();
 }
 
@@ -373,7 +375,7 @@ async function load() {
 
 async function logout(msg) { await setToken(null); state.user = null; showHello(msg); }
 
-const eventOf = (it) => dt(it.spec?.event_at) || dt(it.next_at);
+const eventOf = (it) => dt(it.spec?.event_at) || (it.data?.voice ? null : dt(it.next_at));   // notatka głosowa: push „gotowe” to nie termin
 // Po terminie: jednorazowa rzecz z terminem, który już minął (cykliczne przesuwa harmonogram, więc nigdy nie są „po”).
 const isLate = (it) => { const ev = !it.spec?.recurrence && eventOf(it); return !!ev && ev < Date.now(); };
 const lateLabel = (ev) => 'Po terminie · ' + rel(ev) + ', ' + fTime.format(ev);
@@ -395,9 +397,9 @@ function render() {
   const hero = dated.find((i) => !isLate(i));
   const rest = dated.filter((i) => i !== hero && !isLate(i));
   const rec = items.filter((i) => i.spec?.recurrence).sort(byTime);
-  const lists = items.filter((i) => !i.spec?.recurrence && !eventOf(i) && listOf(i).length);
+  const lists = items.filter((i) => !i.spec?.recurrence && !eventOf(i) && listOf(i).length && !i.data?.voice);
   const tracked = items.filter((i) => !i.spec?.recurrence && !eventOf(i) && i.data?.widget && i.data.widget.status !== 'rejected');
-  const saved = items.filter((i) => !i.spec?.recurrence && !eventOf(i) && !listOf(i).length && !tracked.includes(i));
+  const saved = items.filter((i) => !i.spec?.recurrence && !eventOf(i) && (!listOf(i).length || i.data?.voice) && !tracked.includes(i));
 
   let html = '';
   if (late.length) html += `<h2 class="sec sec--late">Po terminie <span>${late.length}</span></h2>` + late.map((i) => card(i)).join('');
@@ -542,6 +544,7 @@ const anyReset = (it) => listsOf(it).some((l) => l.reset);
 const hostOf = (url) => (url || '').replace(/^https?:\/\//, '').replace(/\/$/, '');
 
 function kindLabel(it) {
+  if (it.data?.voice && !it.spec?.event_at) return 'Notatka głosowa';
   const r = it.spec?.recurrence; const ev = eventOf(it);
   if (r) return recLabel(r);
   if (ev && isLate(it)) return lateLabel(ev);
@@ -646,10 +649,16 @@ function partFoot(it) {
   return bits.length ? `<div class="w-f" style="flex-wrap:wrap">${bits.join('')}</div>` : '';
 }
 
+// Notatka głosowa (spotkanie): streszczenie na karcie; w szczególe całe przepisanie pod „Pełna transkrypcja”.
+function partVoice(it) {
+  const v = it.data?.voice; if (!v) return '';
+  const m = Math.max(1, Math.round((v.duration_s || 0) / 60));
+  return `<p class="vn-meta">${svg('mic', 'width:14px;height:14px')}Notatka głosowa${v.duration_s ? ` · ${m} min` : ''}</p>${it.data.summary ? `<p class="sum">${esc(it.data.summary)}</p>` : ''}`;
+}
 function card(it, hero = false) {
   const { tint, icon } = lookOf(it);
   const ev = eventOf(it);
-  const noteText = !listOf(it).length && !it.spec?.url && !ev && !it.spec?.recurrence && !it.data?.research && !it.data?.photo ? `<p class="sum">${esc(it.source_text)}</p>` : '';
+  const noteText = it.data?.voice ? (it.data.summary ? `<p class="sum vn-sum">${esc(it.data.summary)}</p>` : '') : !listOf(it).length && !it.spec?.url && !ev && !it.spec?.recurrence && !it.data?.research && !it.data?.photo ? `<p class="sum">${esc(it.source_text)}</p>` : '';
   if (hero) {
     return `<article class="w w--hero" data-id="${it.id}" data-widget="${esc(it.kind)}" tabindex="0" role="button">
       <p class="kind">${svg('clock', 'width:16px;height:16px')} Najbliższy termin · ${esc(fTime.format(ev))}</p>
@@ -663,7 +672,7 @@ function card(it, hero = false) {
   return `<article class="w${late ? ' w--late' : ''}" data-id="${it.id}" data-widget="${esc(it.kind)}" tabindex="0" role="button">
     <div class="w-h">${it.has_photo ? `<img class="ico thumb" data-photo="${it.id}" alt="">` : `<div class="ico" style="background:var(${late ? '--late-bg' : TINT[tint]})" aria-hidden="true">${svg(icon)}</div>`}
       <div style="min-width:0"><p class="kind">${esc(kindLabel(it))}</p><h3>${esc(it.title)}</h3></div></div>
-    ${partCycle(it)}${partFields(it)}${partPhoto(it)}${partResearch(it)}${partPage(it)}${partWidget(it)}${partList(it)}${it.data?.widget ? '' : noteText}${partFoot(it)}
+    ${partCycle(it)}${partFields(it)}${partPhoto(it)}${partResearch(it)}${partPage(it)}${partWidget(it)}${it.data?.voice ? '' : partList(it)}${it.data?.widget ? '' : noteText}${partFoot(it)}
   </article>`;
 }
 
@@ -698,7 +707,9 @@ function openDetail(id) {
     </div>
     <div class="d-body">
       ${it.has_photo ? `<img class="d-photo" data-photo="${it.id}" alt="Zdjęcie dodane do tej rzeczy">` : ''}
-      <div class="quote">Twoja wiadomość · ${esc(rel(dt(it.created_at)))}, ${esc(fTime.format(dt(it.created_at)))}<q>${esc(it.source_text)}</q></div>
+      ${it.data?.voice ? `<div class="w" style="margin-top:0;cursor:default">${partVoice(it)}</div>
+        <details class="vn-tr"><summary>Pełna transkrypcja · ${esc(String(it.data.voice.words || it.source_text.split(/\s+/).length))} słów</summary><p>${esc(it.source_text)}</p></details>`
+      : `<div class="quote">Twoja wiadomość · ${esc(rel(dt(it.created_at)))}, ${esc(fTime.format(dt(it.created_at)))}<q>${esc(it.source_text)}</q></div>`}
       ${it.data?.photo ? `<div class="w" style="margin-top:12px;cursor:default">${partPhoto(it, true)}</div>` : ''}
       ${it.data?.research ? `<div class="w" style="margin-top:12px;cursor:default">${partResearch(it, true)}</div>` : ''}
       ${it.data?.widget ? `<div class="w" style="margin-top:12px;cursor:default">${partWidget(it)}</div>` : ''}
@@ -893,6 +904,188 @@ async function voiceBtn(side) {
 document.addEventListener('visibilitychange', () => {
   if (document.hidden && rec.mr) { stopRec(true); voiceUi('err', 'Nagranie przerwane', 'Aplikacja zeszła w tło, więc nic nie wysłałam.', ['Zamknij', 'Nagraj jeszcze raz']); }
 });
+
+// ---------- notatki głosowe (Hikari, 29.09): długie nagranie (spotkanie, do 20 min) albo plik z dyktafonu → kolejka na serwerze.
+// Przepisywanie trwa ~1/3 długości nagrania, więc NIE czekamy przed ekranem: nagranie idzie do kolejki, na górze pojawia się
+// pasek „Przepisuję notatkę…”, a gotowa notatka przychodzi jako zwykła rzecz (+ push). Krótkie dyktowanie (mikrofon) działa jak dotąd.
+const VN_MAX = 20 * 60;           // s
+const VN_MAX_BYTES = 11 * 1024 * 1024;
+const vn = { mr: null, stream: null, chunks: [], start: 0, paused: 0, pausedAt: 0, tick: null, wake: null, userStop: false, discard: false, blob: null, secs: 0, armed: false };
+const vnSecs = () => Math.floor(((vn.pausedAt || Date.now()) - vn.start - vn.paused) / 1000);
+const mmss = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+// state: ready | rec | paused | work | err;  btns: [lewy, prawy]
+function vnUi(st, title, lead = '', btns = [null, null]) {
+  const box = $('#vnote .voice-in'); box.dataset.state = st;
+  $('#vn-title').textContent = title;
+  $('#vn-lead').textContent = lead; $('#vn-lead').hidden = !lead;
+  $('#vn-pause').hidden = !(st === 'rec' || st === 'paused'); $('#vn-pause').textContent = st === 'paused' ? 'Wznów nagrywanie' : 'Pauza';
+  $('#vn-upload').hidden = st !== 'ready';
+  const [l, r] = btns; const L = $('[data-vn=left]'); const R = $('[data-vn=right]');
+  L.textContent = l || ''; L.hidden = !l; R.textContent = r || ''; R.hidden = !r;
+  vn.armed = false;
+  if (!$('#vnote').open) $('#vnote').showModal();
+}
+function openVnote() {
+  vn.blob = null;
+  vnUi('ready', 'Notatka głosowa', 'Nagraj spotkanie albo rozmowę — do 20 minut. Przepiszę ją w tle i uporządkuję: streszczenie, ustalenia, co jest do zrobienia. Telefon połóż blisko, ekran zostanie włączony.', ['Anuluj', 'Nagrywaj']);
+}
+async function vnStart() {
+  if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) return vnUi('err', 'Ta przeglądarka nie nagrywa', 'Nagraj notatkę dyktafonem w telefonie i wgraj plik.', ['Zamknij', 'Wgraj plik']);
+  try { vn.stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } }); }
+  catch { return vnUi('err', 'Nie mam dostępu do mikrofonu', 'Zezwól Lunie na mikrofon w ustawieniach telefonu i spróbuj jeszcze raz.', ['Zamknij', null]); }
+  if (!$('#vnote').open) { vn.stream.getTracks().forEach((t) => t.stop()); vn.stream = null; return; }
+  const type = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm'].find((t) => MediaRecorder.isTypeSupported?.(t));
+  try { vn.mr = new MediaRecorder(vn.stream, type ? { mimeType: type, audioBitsPerSecond: 24000 } : undefined); }
+  catch { vn.stream.getTracks().forEach((t) => t.stop()); return vnUi('err', 'Nie udało mi się włączyć nagrywania', 'Nagraj dyktafonem w telefonie i wgraj plik.', ['Zamknij', 'Wgraj plik']); }
+  vn.chunks = []; vn.userStop = false; vn.discard = false; vn.start = Date.now(); vn.paused = 0; vn.pausedAt = 0;
+  vn.mr.ondataavailable = (e) => { if (e.data?.size) vn.chunks.push(e.data); };
+  vn.mr.onstop = vnStopped;
+  // telefon odciął mikrofon (np. zablokowany ekran na iPhonie) — nagranie kończy się samo, zapisane zostaje
+  vn.stream.getAudioTracks()[0]?.addEventListener('ended', () => { if (vn.mr && vn.mr.state !== 'inactive') vn.mr.stop(); });
+  vn.mr.start(5000);
+  try { vn.wake = await navigator.wakeLock?.request('screen'); } catch {}
+  vnUi('rec', 'Nagrywam', 'Mów normalnie, jak na spotkaniu. Nie blokuj telefonu — na iPhonie zablokowany ekran przerywa nagrywanie.', ['Anuluj', 'Zakończ']);
+  clearInterval(vn.tick);
+  vn.tick = setInterval(() => {
+    const s = vnSecs(); $('#vn-time').textContent = mmss(s);
+    if (s >= VN_MAX && vn.mr?.state === 'recording') { toast('Minęło 20 minut — kończę nagrywanie.'); vnStop(); }
+  }, 250);
+  $('#vn-time').textContent = '0:00';
+}
+function vnPause() {
+  if (!vn.mr) return;
+  if (vn.mr.state === 'recording') { vn.mr.pause(); vn.pausedAt = Date.now(); vnUi('paused', 'Pauza', 'Nagranie czeka. Wznów albo zakończ i wyślij to, co mam.', ['Anuluj', 'Zakończ']); }
+  else if (vn.mr.state === 'paused') { vn.paused += Date.now() - vn.pausedAt; vn.pausedAt = 0; vn.mr.resume(); vnUi('rec', 'Nagrywam', '', ['Anuluj', 'Zakończ']); }
+}
+function vnStop(discard = false) {
+  clearInterval(vn.tick);
+  if (!vn.mr) return;
+  vn.userStop = true; vn.discard = discard;
+  if (vn.mr.state !== 'inactive') vn.mr.stop(); else vnStopped();
+}
+function vnRelease() { vn.stream?.getTracks().forEach((t) => t.stop()); vn.stream = null; vn.wake?.release?.().catch(() => {}); vn.wake = null; }
+function vnStopped() {
+  const mr = vn.mr; clearInterval(vn.tick);
+  vn.secs = vnSecs(); vn.mr = null; vnRelease();
+  if (vn.discard) { vn.chunks = []; return; }
+  if (!vn.chunks.length || vn.secs < 3) return vnUi('err', 'Za krótko', 'Nic nie zdążyłam nagrać.', ['Zamknij', 'Nagraj jeszcze raz']);
+  vn.blob = new Blob(vn.chunks, { type: (mr?.mimeType || vn.chunks[0].type || 'audio/webm').split(';')[0] }); vn.chunks = [];
+  vn.name = '';
+  if (!vn.userStop) return vnUi('err', 'Nagrywanie przerwane', `Telefon wyłączył mikrofon (zablokowany ekran albo inna aplikacja). Mam ${mmss(vn.secs)} nagrania — wysłać to?`, ['Odrzuć', 'Wyślij']);
+  vnSend();
+}
+async function vnSend() {
+  if (!vn.blob) return;
+  if (vn.blob.size > VN_MAX_BYTES) return vnUi('err', 'Nagranie jest za duże', 'Limit to około 20 minut (11 MB). Podziel je na krótsze części.', ['Zamknij', null]);
+  vnUi('work', 'Wysyłam nagranie…', `${mmss(vn.secs)} · ${(vn.blob.size / 1048576).toFixed(1).replace('.', ',')} MB — nie zamykaj Luny, to chwilka.`);
+  try {
+    const audio = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsDataURL(vn.blob); });
+    await api.voiceNote(audio, vn.secs, vn.name || '');
+    vn.blob = null; $('#vnote').close();
+    const eta = Math.max(1, Math.round((Math.max(vn.secs, 60) * 0.35 + 30) / 60));
+    toast(`Mam! Przepiszę w tle — to potrwa ok. ${eta} min. Dam znać, gdy notatka będzie gotowa.`);
+    refreshVn();
+  } catch (err) {
+    if (err.status === 401) { $('#vnote').close(); return logout('Klucz przestał działać — wpisz swój e-mail, a wyślę nowy.'); }
+    vnUi('err', 'Nie udało się wysłać', err.status === 0 ? 'Brak połączenia z Luną. Nagranie wciąż mam — spróbuj za chwilę.' : err.message, ['Odrzuć', err.status === 0 || err.status >= 500 ? 'Wyślij jeszcze raz' : null]);
+  }
+}
+// Plik z dyktafonu telefonu (m4a, mp3, wav…): długość z metadanych, reszta jak przy nagraniu.
+async function vnFile(f) {
+  if (!f) return;
+  if (f.size > VN_MAX_BYTES) return vnUi('err', 'Ten plik jest za duży', `Limit to 11 MB (ok. 20 minut z dyktafonu). Ten ma ${(f.size / 1048576).toFixed(0)} MB.`, ['Zamknij', null]);
+  vn.secs = await new Promise((res) => {
+    const a = new Audio(); const url = URL.createObjectURL(f); const done = (v) => { URL.revokeObjectURL(url); res(v); };
+    a.preload = 'metadata'; a.onloadedmetadata = () => done(Number.isFinite(a.duration) ? Math.round(a.duration) : 0); a.onerror = () => done(0);
+    setTimeout(() => done(0), 5000); a.src = url;
+  });
+  if (vn.secs > VN_MAX + 60) return vnUi('err', 'To nagranie jest za długie', `Ma ${mmss(vn.secs)} — przepiszę najwyżej 20 minut naraz. Podziel je na części.`, ['Zamknij', null]);
+  vn.blob = f; vn.name = f.name || '';
+  vnSend();
+}
+async function vnBtn(side) {
+  const st = $('#vnote .voice-in').dataset.state;
+  if (side === 'upload') return $('#vn-file').click();
+  if (st === 'ready') return side === 'right' ? vnStart() : $('#vnote').close();
+  if (st === 'rec' || st === 'paused') {
+    if (side === 'right') return vnStop();
+    // Anuluj długie nagranie dopiero za drugim stuknięciem — łatwo trafić przypadkiem
+    if (vnSecs() > 10 && !vn.armed) { vn.armed = true; $('[data-vn=left]').textContent = 'Na pewno? Stuknij jeszcze raz'; return; }
+    vnStop(true); return $('#vnote').close();
+  }
+  if (st === 'err') {
+    if (side === 'right') {
+      const t = $('[data-vn=right]').textContent;
+      if (/Wgraj/.test(t)) return $('#vn-file').click();
+      if (/Nagraj/.test(t)) return vnStart();
+      return vnSend();
+    }
+    vn.blob = null; return $('#vnote').close();
+  }
+}
+
+// Pasek na górze + lista „notatki w obróbce”. Odpytujemy tylko, gdy coś się przepisuje (co 10 s) — inaczej przy starcie i powrocie do aplikacji.
+const VN_BUSY = ['queued', 'transcribing', 'summarizing'];
+let vnTimer = null;
+async function refreshVn() {
+  clearTimeout(vnTimer);
+  let list;
+  try { list = await api.voiceNotes(); } catch { vnTimer = setTimeout(refreshVn, 30000); return; }
+  const before = new Map((state.vn || []).map((x) => [x.id, x.status]));
+  state.vn = list;
+  // coś właśnie się skończyło — nowa notatka jest na liście rzeczy
+  if (list.some((x) => x.status === 'done' && before.has(x.id) && before.get(x.id) !== 'done')) { load(); toast('Notatka głosowa gotowa ✓'); }
+  renderVn();
+  if (list.some((x) => VN_BUSY.includes(x.status))) vnTimer = setTimeout(refreshVn, 10000);
+}
+const vnWhen = (s) => (s < 60 ? 'mniej niż minutę' : `ok. ${Math.round(s / 60)} min`);
+const vnName = (x) => x.item_title || (x.name ? x.name.replace(/\.[a-z0-9]{2,4}$/i, '') : `Notatka z ${fTime.format(dt(x.created_at))}`);
+function renderVn() {
+  const list = state.vn || [];
+  const busy = list.filter((x) => VN_BUSY.includes(x.status)); const done = list.filter((x) => x.status === 'done'); const bad = list.filter((x) => x.status === 'error');
+  const bar = $('#vn-bar'); let t = ''; let kind = '';
+  if (busy.length) {
+    const cur = busy.find((x) => x.status !== 'queued');
+    kind = 'busy';
+    t = busy.length === 1 ? (cur?.status === 'summarizing' ? 'Porządkuję notatkę głosową…' : cur ? `Przepisuję notatkę głosową · ${vnWhen(cur.eta_s)}` : `Notatka głosowa w kolejce · ${vnWhen(busy[0].eta_s)}`)
+      : `Przepisuję notatki głosowe · w kolejce ${busy.length}`;
+  } else if (done.length) { kind = 'done'; t = done.length === 1 ? `Notatka gotowa: ${vnName(done[0])}` : `Gotowe notatki głosowe: ${done.length}`; }
+  else if (bad.length) { kind = 'bad'; t = 'Nie udało się przepisać notatki głosowej'; }
+  bar.hidden = !kind; bar.dataset.kind = kind; $('#vn-bar-t').textContent = t;
+  $('#vn-bar-n').hidden = busy.length < 2; $('#vn-bar-n').textContent = busy.length;
+  document.documentElement.classList.toggle('has-vn', !!kind);
+  if ($('#vnotes').open) renderVnList();
+}
+function renderVnList() {
+  const list = state.vn || [];
+  const mins = (s) => (s ? ` · ${Math.max(1, Math.round(s / 60))} min` : '');
+  $('#vn-list').innerHTML = list.length ? list.map((x) => {
+    const st = x.status === 'queued' ? `W kolejce${x.place > 1 ? ` (${x.place}.)` : ''} · gotowe za ${vnWhen(x.eta_s)}`
+      : x.status === 'transcribing' ? `Przepisuję… zostało ${vnWhen(x.eta_s)}` : x.status === 'summarizing' ? 'Porządkuję: streszczenie, ustalenia, do zrobienia…'
+      : x.status === 'done' ? 'Gotowe' : (x.error || 'Nie udało się przepisać.');
+    const btns = x.status === 'queued' ? `<button type="button" class="ghost-txt" data-vn-cancel="${x.id}">Anuluj</button>`
+      : x.status === 'done' ? `<button type="button" class="cta" data-vn-open="${x.id}" style="height:40px;padding:0 16px;flex:none">Otwórz</button><button type="button" class="ghost-txt" data-vn-hide="${x.id}">Schowaj</button>`
+      : x.status === 'error' ? `${x.can_retry ? `<button type="button" class="cta alt" data-vn-retry="${x.id}" style="height:40px;padding:0 16px;flex:none">Spróbuj ponownie</button>` : ''}<button type="button" class="ghost-txt" data-vn-hide="${x.id}">Usuń z listy</button>` : '';
+    return `<li class="vn-row vn-row--${x.status}"><span class="n">${esc(vnName(x))}<small>${esc(fShort.format(dt(x.created_at)))}, ${esc(fTime.format(dt(x.created_at)))}${mins(x.duration_s)}</small></span>
+      <p class="vn-st">${VN_BUSY.includes(x.status) ? '<i class="vn-dot" aria-hidden="true"></i>' : ''}${esc(st)}</p>${btns ? `<span class="b">${btns}</span>` : ''}</li>`;
+  }).join('') : '<li><span class="n">Nie ma notatek w obróbce.</span></li>';
+}
+function openVnotes() { renderVnList(); if (!$('#vnotes').open) $('#vnotes').showModal(); refreshVn(); }
+async function vnListAction(e) {
+  const b = e.target.closest('[data-vn-cancel],[data-vn-open],[data-vn-hide],[data-vn-retry]'); if (!b) return;
+  b.disabled = true;
+  try {
+    if (b.dataset.vnRetry) { await api.voiceRetry(b.dataset.vnRetry); toast('Wraca do kolejki.'); }
+    else {
+      const id = b.dataset.vnCancel || b.dataset.vnOpen || b.dataset.vnHide;
+      const x = (state.vn || []).find((n) => n.id === id);
+      await api.voiceDismiss(id);
+      if (b.dataset.vnCancel) toast('Anulowane — nagranie usunięte.');
+      if (b.dataset.vnOpen && x?.item_id) { $('#vnotes').close(); await load(); openDetail(x.item_id); }
+    }
+  } catch (err) { toast(err.message); }
+  refreshVn();
+}
 
 // Zdjęcie do nowej rzeczy: miniatura nad polem; samo zdjęcie też można wysłać (Luna sama zdecyduje: przypomnienie / lista / notatka).
 function setPhoto(url, thumb = null) {
@@ -1100,7 +1293,21 @@ function bind() {
   let monT; $('#days').addEventListener('scroll', () => { cancelAnimationFrame(monT); monT = requestAnimationFrame(updMonth); }, { passive: true });
   addEventListener('resize', updMonth);
   $('#list').addEventListener('click', (e) => { if (e.target.closest('[data-day-clear]')) { state.day = null; render(); } });
-  $('#q-photo').addEventListener('click', () => $('#q-file').click());
+  // ＋ w polu: zdjęcie albo notatka głosowa (Hikari, 29.09)
+  const plusMenu = (open) => { $('#q-menu').hidden = !open; $('#q-plus').setAttribute('aria-expanded', String(open)); };
+  $('#q-plus').addEventListener('click', (e) => { e.stopPropagation(); plusMenu($('#q-menu').hidden); });
+  document.addEventListener('click', (e) => { if (!e.target.closest('#q-menu, #q-plus')) plusMenu(false); });
+  $('#q-menu').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-plus]'); if (!b) return; plusMenu(false);
+    if (b.dataset.plus === 'photo') $('#q-file').click(); else openVnote();
+  });
+  $('#vnote').addEventListener('click', (e) => { const b = e.target.closest('[data-vn]'); if (b) vnBtn(b.dataset.vn); else if (e.target.closest('#vn-pause')) vnPause(); });
+  // w trakcie nagrywania / wysyłania okno nie zamyka się przypadkiem (Esc, tło)
+  $('#vnote').addEventListener('cancel', (e) => { if (['rec', 'paused', 'work'].includes($('#vnote .voice-in').dataset.state)) e.preventDefault(); });
+  $('#vnote').addEventListener('close', () => { if (vn.mr) vnStop(true); });
+  $('#vn-file').addEventListener('change', (e) => { const f = e.target.files?.[0]; e.target.value = ''; vnFile(f); });
+  $('#vn-bar').addEventListener('click', openVnotes);
+  $('#vnotes').addEventListener('click', (e) => { if (e.target.closest('[data-vnotes=close]') || e.target === $('#vnotes')) return $('#vnotes').close(); vnListAction(e); });
   $('#q-file').addEventListener('change', async (e) => {
     const f = e.target.files?.[0]; e.target.value = ''; if (!f) return;
     // do analizy 1600 px; na serwerze zostaje tylko miniatura 800 px (kafelek i szczegół)
@@ -1204,7 +1411,7 @@ function bind() {
   $('#alarm').addEventListener('cancel', (e) => e.preventDefault());   // alarmu nie zamyka się Escape — trzeba wybrać
   setInterval(() => { if (!document.hidden) checkAlarm(); }, 5000);
   setInterval(() => { if (state.user && !document.hidden && (state.offline || outbox().length)) load(); }, 30000);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden && state.user) { load().then(() => loadReport(true)); refreshBell(); } });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && state.user) { load().then(() => loadReport(true)); refreshBell(); refreshVn(); } });
   navigator.serviceWorker?.addEventListener('message', (e) => { if (e.data?.type === 'open') { load().then(() => e.data.id && openDetail(e.data.id)); } });
 }
 

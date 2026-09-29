@@ -17,6 +17,7 @@
 <script type="module" src="/app.js?v=__V__"></script>
 </head>
 <body>
+<button class="vn-bar" type="button" id="vn-bar" hidden><i class="vn-dot" aria-hidden="true"></i><span id="vn-bar-t"></span><b class="vn-n" id="vn-bar-n" hidden></b></button>
 
 <!-- EKRAN · instalacja (Hikari, 28.09): telefon w przeglądarce → przewodnik; /instalacja → zawsze -->
 <section class="hello install" id="screen-install" data-mode="ios" hidden>
@@ -137,12 +138,19 @@
 <div class="dock" id="dock" hidden>
   <div class="q-pic" id="q-pic" hidden><img alt="Wybrane zdjęcie"><span>Zdjęcie — wyślij samo albo dopisz, co z nim zrobić</span>
     <button type="button" id="q-pic-x" aria-label="Usuń zdjęcie">✕</button></div>
+  <div class="q-menu" id="q-menu" hidden>
+    <button type="button" data-plus="photo"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+      <span><b>Dodaj zdjęcie</b><small>paragon, kartka, zrzut ekranu</small></span></button>
+    <button type="button" data-plus="voice"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+      <span><b>Notatka głosowa</b><small>spotkanie, rozmowa — do 20 minut</small></span></button>
+  </div>
   <form id="wpisz" aria-label="Powiedz Lunie, co zapisać">
     <label for="q" class="sr">Napisz, co mam zapamiętać</label>
-    <button class="btn-ic mic" type="button" id="q-photo" aria-label="Dodaj zdjęcie">
-      <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+    <button class="btn-ic mic" type="button" id="q-plus" aria-label="Dodaj: zdjęcie albo notatkę głosową" aria-expanded="false" aria-controls="q-menu">
+      <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
     </button>
     <input type="file" id="q-file" accept="image/*" hidden>
+    <input type="file" id="vn-file" accept="audio/*,.m4a,.mp3,.wav,.ogg,.opus,.webm,.aac" hidden>
     <textarea id="q" rows="1" placeholder="Co mam zapamiętać?" autocomplete="off" enterkeyhint="send" maxlength="1000"></textarea>
     <button class="btn-ic mic" type="button" id="mic" aria-label="Podyktuj">
       <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
@@ -249,6 +257,36 @@
       <button class="cta alt" type="button" data-voice="left">Anuluj</button>
       <button class="cta" type="button" data-voice="right">Gotowe</button>
     </div>
+  </div>
+</dialog>
+
+<!-- NOTATKA GŁOSOWA · długie nagranie (spotkanie) → kolejka na serwerze, przepisuję w tle (Hikari, 29.09) -->
+<dialog class="chat nudge voice vnote" id="vnote" aria-labelledby="vn-title">
+  <div class="chat-in nudge-in voice-in" data-state="ready">
+    <div class="voice-orb" aria-hidden="true">
+      <svg class="i v-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+      <svg class="i v-spin" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9"/></svg>
+      <svg class="i v-pause" viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></svg>
+    </div>
+    <p class="voice-time" id="vn-time">0:00</p>
+    <h2 id="vn-title">Notatka głosowa</h2>
+    <p class="nudge-lead" id="vn-lead"></p>
+    <button class="ghost-txt vn-pause" type="button" id="vn-pause" hidden>Pauza</button>
+    <div class="voice-act">
+      <button class="cta alt" type="button" data-vn="left"></button>
+      <button class="cta" type="button" data-vn="right"></button>
+    </div>
+    <button class="ghost-txt" type="button" data-vn="upload" id="vn-upload">Wgraj nagranie z telefonu</button>
+  </div>
+</dialog>
+
+<!-- NOTATKI W OBRÓBCE · lista pod paskiem na górze -->
+<dialog class="chat nudge" id="vnotes" aria-labelledby="vnotes-title">
+  <div class="chat-in nudge-in">
+    <h2 id="vnotes-title" style="color:var(--ink)">Notatki głosowe</h2>
+    <p class="nudge-lead">Przepisuję je po kolei w tle — możesz w tym czasie normalnie korzystać z Luny. Dam znać, gdy będą gotowe.</p>
+    <ul class="nudge-list" id="vn-list"></ul>
+    <button class="cta alt wide" type="button" data-vnotes="close">Zamknij</button>
   </div>
 </dialog>
 
