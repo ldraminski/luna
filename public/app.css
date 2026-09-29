@@ -538,3 +538,7 @@ html.has-vn .intro,html.has-vn .detail{top:calc(34px + env(safe-area-inset-top))
 .vn-tr p{margin-top:10px;font-size:14px;line-height:1.6;white-space:pre-line;color:var(--ink);max-height:60dvh;overflow:auto}
 @media (prefers-reduced-motion:reduce){.vn-dot{animation:none}}
 .vn-sum{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+/* link na karcie: krótka etykieta, cały wiersz klikalny (29.09) */
+.w-f .lnk{min-width:0;flex:1 1 auto;text-decoration:none;color:var(--navy);gap:6px}
+.w-f .lnk .dom{color:var(--navy);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+.w-f .lnk .i{flex:none}

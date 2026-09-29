@@ -58,6 +58,7 @@ const I = {
   sport: '<circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18M5.6 5.6c3.5 3.5 3.5 9.3 0 12.8M18.4 5.6c-3.5 3.5-3.5 9.3 0 12.8"/>',
   people: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2c2.8.2 5 2.6 5 5.8"/>',
   doc: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
+  pin: '<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
   mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
   food: '<path d="M4 3v8a3 3 0 0 0 6 0V3M7 3v18M17 3c-2 2-3 5-3 8h3v10"/>',
   travel: '<path d="M2 16l20-8-8 12-2-5z"/><path d="m12 15-4 5"/>',
@@ -542,6 +543,20 @@ const listsOf = (it) => (Array.isArray(it.data?.lists) ? it.data.lists : []).fil
 const listOf = (it) => listsOf(it).flatMap((l) => l.items);
 const anyReset = (it) => listsOf(it).some((l) => l.reset);
 const hostOf = (url) => (url || '').replace(/^https?:\/\//, '').replace(/\/$/, '');
+// Krótka, czytelna etykieta linku zamiast całego adresu (Łukasz, 29.09): mapy → „Mapa · Poznańska 156, Komorniki”,
+// reszta → domena (+ krótka ścieżka).
+function linkLabel(url) {
+  let u; try { u = new URL(url); } catch { return { map: false, text: hostOf(url).slice(0, 40) }; }
+  const host = u.hostname.replace(/^www\./, '');
+  const dec = (s) => { try { return decodeURIComponent(s.replace(/\+/g, ' ')); } catch { return s; } };
+  if (/(^|\.)google\.[a-z.]+$/.test(host) && u.pathname.startsWith('/maps') || /^maps\.(app\.goo\.gl|apple\.com)$/.test(host) || host === 'goo.gl') {
+    const q = u.searchParams.get('query') || u.searchParams.get('q') || u.searchParams.get('destination') || u.searchParams.get('daddr')
+      || (u.pathname.match(/\/maps\/(?:search|place|dir\/[^/]*)\/([^/@]+)/) || [])[1];
+    return q ? { map: true, text: 'Mapa · ' + dec(q).replace(/\s+/g, ' ').trim().slice(0, 60) } : { map: true, text: 'Mapa' };
+  }
+  const path = u.pathname.replace(/\/$/, '');
+  return { map: false, text: host + (path && path.length <= 24 ? dec(path) : path ? '/…' : '') };
+}
 
 function kindLabel(it) {
   if (it.data?.voice && !it.spec?.event_at) return 'Notatka głosowa';
@@ -594,10 +609,9 @@ function partPage(it, full = false) {
     }
   }
   const checked = sm?.checked_at ? `Sprawdzono ${rel(dt(sm.checked_at))}, ${fTime.format(dt(sm.checked_at))}` : '';
-  return `${body}<div class="w-f"><span class="meta">${svg('globe', 'width:15px;height:15px')}<span class="dom">${esc(hostOf(url))}</span></span>
-      <span style="display:flex;gap:8px;align-items:center">
-        ${it.spec?.summarize || sm ? `<button type="button" class="chev" data-sum="${it.id}" aria-label="Sprawdź teraz"${d.summary_status === 'working' ? ' disabled' : ''}>${svg('refresh')}</button>` : ''}
-        <a class="chev" href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="Otwórz stronę">${svg('ext')}</a></span></div>
+  const lb = linkLabel(url);
+  return `${body}<div class="w-f"><a class="meta lnk" href="${esc(url)}" target="_blank" rel="noopener noreferrer" title="${esc(url)}">${lb.map ? svg('pin', 'width:15px;height:15px') : svg('globe', 'width:15px;height:15px')}<span class="dom">${esc(lb.text)}</span>${svg('ext', 'width:14px;height:14px')}</a>
+      ${it.spec?.summarize || sm ? `<button type="button" class="chev" data-sum="${it.id}" aria-label="Sprawdź teraz"${d.summary_status === 'working' ? ' disabled' : ''}>${svg('refresh')}</button>` : ''}</div>
     ${checked ? `<p class="dom" style="margin-top:6px">${esc(checked)}${d.summary_status === 'error' && sm ? ' · ostatnia próba: ' + esc(d.summary_error || 'błąd') : ''}</p>` : ''}`;
 }
 // Miniatury zdjęć: lista ich nie zawiera (tylko has_photo) — dociągamy osobno i trzymamy w pamięci.
