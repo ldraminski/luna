@@ -137,7 +137,7 @@ Zmiana nadawcy/credentiala = `n8n/config.local.json` (`sender`, `credentials.smt
 ## Przegląd bezpieczeństwa przed udostępnieniem linku (29.09.2026)
 
 - Wszystkie 31 tras `/api/*` bez klucza → 401; `/api/admin/*` → 404 (nginx); webhooki `/webhook/oboe/*` na hoście n8n → 403 (WAF).
-- Z zewnątrz otwarty tylko SSH (port 58, tylko klucz). Postgres, n8n, Whisper — niedostępne.
+- Z zewnątrz otwarty tylko SSH (niestandardowy port, tylko klucz). Postgres, n8n, Whisper — niedostępne.
 - **Naprawione:** strony nie wysyłały ŻADNYCH nagłówków bezpieczeństwa — `add_header` w `location` kasuje te z poziomu `server`.
   Teraz `security-headers.inc` dołączany w każdej sekcji: CSP (skrypty tylko własne, `frame-ancestors 'none'`), HSTS, nosniff,
   Referrer-Policy, Permissions-Policy. Sprawdzone Playwrightem: zero naruszeń CSP (lista, dodawanie, dyktowanie, biurko, regulamin, widget).

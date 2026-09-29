@@ -128,13 +128,21 @@ nginx.conf     static files, /api proxy, per-route body limits, widget CSP
 ## Running it yourself
 
 1. `cp infra/.env.example infra/.env`, fill it in, then `docker compose -f infra/docker-compose.yml up -d`.
-2. Apply `db/*.sql` migrations in order and mark yourself as admin (see `db/008-prosby-o-dostep.sql`).
+2. The compose file loads `db/schema.sql` on first start; then apply `db/003-…` → `db/015-…` in order
+   (`docker compose exec -T oboe-db psql -U oboe -d oboe < db/003-builtin-widgets.sql`, and so on).
 3. In n8n create credentials: Postgres (`oboe-db`), OpenRouter, SMTP, Header Auth (`X-Admin-Token`) and a Crypto
    credential holding your VAPID private key. Put their IDs and your URLs into `n8n/config.local.json`
    (copy of `config.example.json`), then `cd n8n && python3 build_all.py` and import the generated `oboe-*.json`
    (or import `n8n/workflows/*.json` and pick the credentials in the editor).
 4. Put your VAPID public key in `public/api.js`, pull the Whisper model once (command in the compose file), expose only
    the `luna` service over HTTPS.
+5. Your first key: call the admin workflow from the server (it is not reachable through the app — nginx blocks `/api/admin/`):
+   `curl -X POST http://127.0.0.1:5678/webhook/oboe/admin/token -H "X-Admin-Token: <your Header Auth value>" -H "Content-Type: application/json" -d '{"email":"you@example.com","name":"You","send_email":false}'`
+   — the response contains the key to paste into the app. Then make yourself the admin who approves access requests:
+   `UPDATE users SET is_admin = true WHERE email = 'you@example.com';`
+
+Optional: *Oboe: Kopia zapasowa* needs an S3-compatible bucket (Cloudflare R2) — skip it or point it at your own storage.
+`nginx.conf` sends `Host: n8n.draminski.dev` to n8n — replace it with your `N8N_HOST` (it only has to be consistent).
 
 **Importing the ready-made workflows** (`n8n/workflows/*.json`, 12 files) instead of building them:
 
