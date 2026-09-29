@@ -158,7 +158,7 @@ Workflow „Oboe: Raport” (`n8n/build_report.py`, id w `n8n/.report-wf-id`), m
 ## Kopia zapasowa i pilnowanie limitu (28.09.2026)
 
 **Kopia — „Oboe: Kopia zapasowa”** (`n8n/build_backup.py`, id w `n8n/.backup-wf-id`): codziennie 3:30 eksport WSZYSTKICH tabel oboe-db
-+ pliki widgetów (`/data/oboe-widgets/*.html`) → JSON → gzip → **prywatny** bucket R2 `luna-kopie`, klucz `oboe/RRRR-MM-DD.json.gz` (~180 KB).
++ pliki widgetów (`/data/oboe-widgets/*.html`) → JSON → gzip → **prywatny** bucket R2 `kopie` (wspólny z Bożenką: `oboe/`, `bozena/`), klucz `oboe/RRRR-MM-DD.json.gz` (~180 KB).
 Nic nie zostaje na serwerze (n8n nie ma trwałego katalogu na pliki). Błąd wysyłki → push + mail dla adminów.
 **Stan 28.09: eksport działa, wysyłka CZEKA** na bucket + credential od Łukasza (credential analyzera ma dostęp tylko do publicznego
 `analyzer-images` — tam kopii NIE wrzucamy). Po założeniu: `n8n/.backup-r2.json` = `{"id": "...", "name": "..."}` credentialu,
