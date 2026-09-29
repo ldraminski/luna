@@ -817,6 +817,31 @@ async function add(e) {
   } finally { clearTimeout(slow); form.classList.remove('busy'); }
 }
 
+// Format nagrania: iPhone → mp4/AAC (Safari od iOS 26 umie też webm, ale wychodzi dużo ciszej i Whisper gorzej rozumie — 29.09),
+// reszta → webm/opus (mały plik).
+const recType = () => (IOS ? ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm'] : ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm'])
+  .find((t) => MediaRecorder.isTypeSupported?.(t));
+// Miernik głośności w trakcie nagrywania: głośność mowy = 90. percentyl RMS z okien 100 ms (dBFS), odporny na pojedyncze stuki.
+// Przeglądarka ma własne wzmocnienie (AGC), więc łapiemy tylko wyraźną ciszę: mikrofon słuchawek (Bluetooth), zasłonięty telefon.
+const QUIET_DB = -42;
+function meter(stream) {
+  const rms = []; let ctx, t;
+  try {
+    ctx = new (window.AudioContext || window.webkitAudioContext)(); ctx.resume?.();
+    const an = ctx.createAnalyser(); an.fftSize = 2048; ctx.createMediaStreamSource(stream).connect(an);
+    const buf = new Float32Array(an.fftSize);
+    t = setInterval(() => {
+      if (ctx.state !== 'running') return;
+      an.getFloatTimeDomainData(buf); let sum = 0; for (const v of buf) sum += v * v;
+      rms.push(10 * Math.log10(sum / buf.length + 1e-12)); if (rms.length > 3000) rms.splice(0, 1000);
+    }, 100);
+  } catch { return { peak: () => null, stop() {} }; }
+  return { peak: () => { if (rms.length < 10) return null; const s = [...rms].sort((x, y) => x - y); return s[Math.floor(s.length * 0.9)]; },
+    stop() { clearInterval(t); ctx.close?.().catch(() => {}); } };
+}
+const quiet = (m) => { const p = m?.peak(); return p !== null && p !== undefined && p < QUIET_DB; };
+const QUIET_LEAD = 'Nagranie jest prawie ciche — sprawdź, czy telefon nie nagrywa przez słuchawki (Bluetooth), i mów bliżej telefonu.';
+
 // ---------- dyktowanie (Hikari, 28.09): mikrofon otwiera okno „Słucham” → „Gotowe” → Whisper u nas (/api/transcribe,
 // nagranie nie jest zapisywane) → zwykłe dodanie rzeczy → podsumowanie: co usłyszałam i co z tym zrobiłam (+ „Cofnij”).
 const REC_MAX = 120;   // s — dłuższe nagranie kończy się samo
@@ -842,19 +867,20 @@ async function startRec() {
   if ($('#wpisz').classList.contains('busy')) return;
   if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) return toast('Ta przeglądarka nie pozwala mi nagrywać — użyj mikrofonu na klawiaturze.');
   if (navigator.onLine === false) return toast('Bez internetu nie odsłucham nagrania — napisz, a wyślę, gdy wróci połączenie.');
-  rec.text = ''; rec.item = null; voiceDid('', '');
+  rec.text = ''; rec.item = null; rec.quiet = null; voiceDid('', '');
   voiceUi('rec', 'Słucham', VOICE_HINT, ['Anuluj', 'Gotowe']);
   $('#voice-time').textContent = '0:00';
   try { rec.stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } }); }
   catch { return voiceUi('err', 'Nie mam dostępu do mikrofonu', 'Zezwól Lunie na mikrofon w ustawieniach telefonu i spróbuj jeszcze raz.', [null, 'Zamknij']); }
   if (!$('#voice').open) { rec.stream.getTracks().forEach((t) => t.stop()); rec.stream = null; return; }   // zamknięte, zanim telefon dał mikrofon
   // Android/Chrome: webm/opus (mały plik); iPhone: tylko mp4/aac.
-  const type = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm'].find((t) => MediaRecorder.isTypeSupported?.(t));
+  const type = recType();
   try { rec.mr = new MediaRecorder(rec.stream, type ? { mimeType: type, audioBitsPerSecond: 32000 } : undefined); }
   catch { rec.stream.getTracks().forEach((t) => t.stop()); return voiceUi('err', 'Nie udało mi się włączyć nagrywania', 'Użyj mikrofonu na klawiaturze telefonu.', [null, 'Zamknij']); }
   rec.chunks = []; rec.discard = false; rec.start = Date.now();
   rec.mr.ondataavailable = (e) => { if (e.data?.size) rec.chunks.push(e.data); };
   rec.mr.onstop = onRecStop;
+  rec.meter = meter(rec.stream);
   rec.mr.start(1000);
   clearInterval(rec.tick);
   rec.tick = setInterval(() => {
@@ -871,10 +897,16 @@ function stopRec(discard = false) {
 }
 async function onRecStop() {
   const mr = rec.mr; const secs = (Date.now() - rec.start) / 1000;
+  const wasQuiet = quiet(rec.meter); rec.meter?.stop(); rec.meter = null; rec.quiet = null;
   rec.mr = null; rec.stream?.getTracks().forEach((t) => t.stop()); rec.stream = null;
   if (rec.discard) return;
   if (secs < 1 || !rec.chunks.length) return voiceUi('err', 'Za krótko', 'Stuknij „Nagraj jeszcze raz”, powiedz, co trzeba, i dopiero wtedy „Gotowe”.', ['Zamknij', 'Nagraj jeszcze raz']);
   const blob = new Blob(rec.chunks, { type: (mr.mimeType || rec.chunks[0].type || 'audio/webm').split(';')[0] }); rec.chunks = [];
+  if (wasQuiet) { rec.quiet = blob; return voiceUi('err', 'Bardzo cicho cię słyszę', QUIET_LEAD, ['Wyślij mimo to', 'Nagraj jeszcze raz']); }
+  sendRec(blob);
+}
+async function sendRec(blob) {
+  rec.quiet = null;
   voiceUi('work', 'Odsłuchuję…');
   try {
     const audio = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsDataURL(blob); });
@@ -903,6 +935,7 @@ async function onRecStop() {
 }
 async function voiceBtn(side) {
   const st = $('#voice .voice-in').dataset.state;
+  if (st === 'err' && rec.quiet) return side === 'left' ? sendRec(rec.quiet) : (rec.quiet = null, startRec());
   if (st === 'rec') return side === 'right' ? stopRec() : (stopRec(true), $('#voice').close());
   if (st === 'sum' && side === 'left' && rec.item) {   // Cofnij = rzecz znika (miękko, jak zwykłe usunięcie)
     try { await api.remove(rec.item); toast('Cofnięte — nic nie zapisałam.'); load(); } catch (err) { toast(err.message); }
@@ -948,14 +981,15 @@ async function vnStart() {
   try { vn.stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } }); }
   catch { return vnUi('err', 'Nie mam dostępu do mikrofonu', 'Zezwól Lunie na mikrofon w ustawieniach telefonu i spróbuj jeszcze raz.', ['Zamknij', null]); }
   if (!$('#vnote').open) { vn.stream.getTracks().forEach((t) => t.stop()); vn.stream = null; return; }
-  const type = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm'].find((t) => MediaRecorder.isTypeSupported?.(t));
+  const type = recType();
   try { vn.mr = new MediaRecorder(vn.stream, type ? { mimeType: type, audioBitsPerSecond: 24000 } : undefined); }
   catch { vn.stream.getTracks().forEach((t) => t.stop()); return vnUi('err', 'Nie udało mi się włączyć nagrywania', 'Nagraj dyktafonem w telefonie i wgraj plik.', ['Zamknij', 'Wgraj plik']); }
-  vn.chunks = []; vn.userStop = false; vn.discard = false; vn.start = Date.now(); vn.paused = 0; vn.pausedAt = 0;
+  vn.chunks = []; vn.userStop = false; vn.discard = false; vn.warned = false; vn.start = Date.now(); vn.paused = 0; vn.pausedAt = 0;
   vn.mr.ondataavailable = (e) => { if (e.data?.size) vn.chunks.push(e.data); };
   vn.mr.onstop = vnStopped;
   // telefon odciął mikrofon (np. zablokowany ekran na iPhonie) — nagranie kończy się samo, zapisane zostaje
   vn.stream.getAudioTracks()[0]?.addEventListener('ended', () => { if (vn.mr && vn.mr.state !== 'inactive') vn.mr.stop(); });
+  vn.meter = meter(vn.stream);
   vn.mr.start(5000);
   try { vn.wake = await navigator.wakeLock?.request('screen'); } catch {}
   vnUi('rec', 'Nagrywam', 'Mów normalnie, jak na spotkaniu. Nie blokuj telefonu — na iPhonie zablokowany ekran przerywa nagrywanie.', ['Anuluj', 'Zakończ']);
@@ -963,6 +997,7 @@ async function vnStart() {
   vn.tick = setInterval(() => {
     const s = vnSecs(); $('#vn-time').textContent = mmss(s);
     if (s >= VN_MAX && vn.mr?.state === 'recording') { toast('Minęło 20 minut — kończę nagrywanie.'); vnStop(); }
+    if (s === 15 && !vn.warned && quiet(vn.meter)) { vn.warned = true; $('#vn-lead').textContent = QUIET_LEAD; $('#vn-lead').hidden = false; }
   }, 250);
   $('#vn-time').textContent = '0:00';
 }
@@ -977,7 +1012,7 @@ function vnStop(discard = false) {
   vn.userStop = true; vn.discard = discard;
   if (vn.mr.state !== 'inactive') vn.mr.stop(); else vnStopped();
 }
-function vnRelease() { vn.stream?.getTracks().forEach((t) => t.stop()); vn.stream = null; vn.wake?.release?.().catch(() => {}); vn.wake = null; }
+function vnRelease() { vn.meter?.stop(); vn.meter = null; vn.stream?.getTracks().forEach((t) => t.stop()); vn.stream = null; vn.wake?.release?.().catch(() => {}); vn.wake = null; }
 function vnStopped() {
   const mr = vn.mr; clearInterval(vn.tick);
   vn.secs = vnSecs(); vn.mr = null; vnRelease();
