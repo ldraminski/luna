@@ -234,3 +234,6 @@ gdy AI jest pewne, zwraca `proposal` (plan + nowy schemat + stan przeniesiony z 
 dopiero po `proposal` → „Oboe: Generuj widget” mode=revise: stary kod z pliku + plan → programista → skan → guardian.
 Widget tylko tej rzeczy → nowa wersja tego samego sluga (v2…); współdzielony → kopia z nowym slugiem. Odrzucona poprawka
 zostawia stary widget (`revision_error`). Stan użytkownika zawsze przechodzi (bezpiecznik w „Projekt z czatu”).
+
+## Notatki głosowe (29.09.2026)
+＋ w polu → notatka głosowa (do 20 min, pauza, wake lock) albo plik z dyktafonu → `POST /api/voice-notes` (nginx 16m) → tabela `voice_notes` (db/015) → workflow „Oboe: Notatki głosowe” (`build_voice.py`, id w `.voice-wf-id`): co 30 s jedna notatka naraz (advisory lock), Whisper timeout 40 min, DeepSeek porządkuje → item `note` z `data.voice`, push. Audio kasowane po przepisaniu. Pomiar: 10 min nagrania = 3 min 18 s.
