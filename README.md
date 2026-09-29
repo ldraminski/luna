@@ -136,6 +136,16 @@ nginx.conf     static files, /api proxy, per-route body limits, widget CSP
 4. Put your VAPID public key in `public/api.js`, pull the Whisper model once (command in the compose file), expose only
    the `luna` service over HTTPS.
 
+**Importing the ready-made workflows** (`n8n/workflows/*.json`, 12 files) instead of building them:
+
+- Import `oboe-summary.json` and `oboe-widgets.json` first — the others call them. Then fix three placeholders:
+  `REPLACE_WITH_SUMMARY_WORKFLOW_ID` (in *Oboe: API* and *Oboe: Harmonogram*), `REPLACE_WITH_WIDGETS_WORKFLOW_ID`
+  (in *Oboe: API*) and `REPLACE_WITH_VAPID_PUBLIC_KEY` (in *Oboe: Harmonogram*).
+- Every node with a credential shows `REPLACE_ME` — pick your own Postgres / OpenRouter / SMTP / Header Auth / Crypto credential.
+- Whisper is addressed as `http://whisper:8000` (the compose service name) in *Oboe: Dyktowanie* and *Oboe: Notatki głosowe*.
+- Activate all workflows. The app talks to n8n only through nginx (`/api/*` → `/webhook/oboe/*`), so n8n itself does not
+  need to be public.
+
 ## Stack
 
 Vanilla JavaScript PWA (no framework, no bundler) · nginx · n8n · PostgreSQL 16 · OpenRouter (DeepSeek v4.1 Flash for
