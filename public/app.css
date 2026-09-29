@@ -542,3 +542,8 @@ html.has-vn .intro,html.has-vn .detail{top:calc(34px + env(safe-area-inset-top))
 .w-f .lnk{min-width:0;flex:1 1 auto;text-decoration:none;color:var(--navy);gap:6px}
 .w-f .lnk .dom{color:var(--navy);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
 .w-f .lnk .i{flex:none}
+/* zdjęcie w kółku karty „Najbliższy termin”: przycięte do koła (pionowy zrzut ekranu rozciągał owal na pół karty — 29.09) */
+.blob{overflow:hidden}
+.blob .blob-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* pasek statusu iPhone'a (viewport-fit=cover): pod godziną i baterią nie przewija się treść */
+body::before{content:"";position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:var(--bg);z-index:25;pointer-events:none}
