@@ -6,6 +6,8 @@ const iso = (v) => { const t = Date.parse(v); return Number.isFinite(t) ? new Da
 const now = Date.now();
 const spec = { ...(it.spec || {}) }; const data = { ...(it.data || {}) };
 const title = cut(ch.title, 40) || it.title;
+// link z planu (strona albo mapa Google) — tylko http(s)
+if (typeof ch.url === 'string' && /^https?:\/\/[^\s]{4,}$/i.test(ch.url.trim())) spec.url = ch.url.trim().slice(0, 1000);
 
 // termin, powtarzanie, przypomnienia — tylko gdy plan je zmienia (wtedy cały nowy zestaw przypomnień)
 let notify = []; let replace = false;
