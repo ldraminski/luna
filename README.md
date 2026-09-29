@@ -14,6 +14,7 @@ notification — no forms, no fields. It runs in production for a small group of
   <img src="docs/img/demo-dictation.gif" width="270" alt="Dictation: tap the mic, speak, Luna shows what she heard and what she scheduled">
   &nbsp;
   <img src="docs/img/mobile-home.webp" width="270" alt="Home screen: nearest deadline card and upcoming items">
+  &nbsp;
   <img src="docs/img/demo-voice-note.gif" width="270" alt="Voice note: record a meeting, Luna transcribes it in the background and turns it into a summary with decisions and to-dos">
 </p>
 
