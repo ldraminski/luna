@@ -547,3 +547,7 @@ html.has-vn .intro,html.has-vn .detail{top:calc(34px + env(safe-area-inset-top))
 .blob .blob-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 /* pasek statusu iPhone'a (viewport-fit=cover): pod godziną i baterią nie przewija się treść */
 body::before{content:"";position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:var(--bg);z-index:25;pointer-events:none}
+/* iPhone z Dynamic Island (30.09, zrzut Łukasza): nagłówek pod paskiem statusu, zdjęcie ucięte krawędzią karty, koniec listy pod polem */
+#screen-main{padding-top:calc(18px + env(safe-area-inset-top));padding-bottom:calc(120px + env(safe-area-inset-bottom))}
+html.has-vn #screen-main{padding-top:18px}   /* pasek notatki głosowej już odsuwa ekran o safe-area */
+.blob.blob--photo{right:18px;top:18px;width:92px;height:92px;box-shadow:0 0 0 3px rgba(255,255,255,.6)}

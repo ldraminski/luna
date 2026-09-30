@@ -1149,7 +1149,7 @@
       },
       {
        "name": "X-Title",
-       "value": "Oboe (n8n)"
+       "value": "Luna"
       }
      ]
     },
@@ -1180,7 +1180,7 @@
     3500
    ],
    "parameters": {
-    "jsCode": "// Sprawdza odpowiedź modelu; niczego nie zgaduje — przy błędzie zwraca ok:false z komunikatem.\n// Rzecz składa się z części (termin, lista, strona, szczegóły); `kind` to tylko część główna — do sortowania i sekcji.\nconst src = String($('POST items').first().json.body.text || '').trim().slice(0, 1000) || '📷 Zdjęcie';\nconst fail = (error) => [{ json: { ok: false, error, notify: [], spec: {}, data: {}, source_text: src } }];\n\nconst raw = $json.choices?.[0]?.message?.content;\n// 402 z OpenRoutera = wyczerpany limit klucza Luny (alarm dostaje Łukasz z „Oboe: Limit klucza”)\nif (!raw && /\\b402\\b|insufficient|credits|limit/i.test(JSON.stringify($json.error || $json))) return fail('Mam chwilową przerwę — skończył się limit, z którego korzystam. Łukasz już o tym wie.');\nif (!raw) return fail('Nie udało mi się odpowiedzieć — spróbuj jeszcze raz.');\nlet m;\ntry { m = JSON.parse(raw.replace(/^```(json)?|```$/g, '').trim()); } catch (e) { return fail('Nie zrozumiałam. Spróbuj napisać to inaczej.'); }\n\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst now = Date.now();\nconst iso = (v) => { const t = Date.parse(v); return Number.isFinite(t) ? new Date(t).toISOString() : null; };\n\nconst notify = (Array.isArray(m.notify) ? m.notify : [])\n  .map((n) => ({ at: iso(n.at), title: cut(n.title, 50) || cut(m.title, 50), body: cut(n.body, 120) }))\n  .filter((n) => n.at && Date.parse(n.at) > now - 60000 && Date.parse(n.at) < now + 400 * 864e5)\n  .slice(0, 10);\n\nconst r = m.recurrence;\nconst recurrence = r && Number(r.every) > 0 && ['day', 'week', 'month'].includes(r.unit)\n  ? { every: Math.min(Math.round(Number(r.every)), 365), unit: r.unit } : null;\n\n// Code node nie ma URL — prosta walidacja wyrażeniem.\nconst u = String(m.url || '').trim();\nconst url = /^https?:\\/\\/[a-z0-9.-]+\\.[a-z]{2,}(:\\d+)?(\\/\\S*)?$/i.test(u) ? u.slice(0, 500) : null;\n\nconst checklist = (Array.isArray(m.checklist) ? m.checklist : [])\n  .map((x) => ({ text: cut(String(x), 80), done: false })).filter((x) => x.text).slice(0, 30);\nconst fields = (Array.isArray(m.fields) ? m.fields : [])\n  .map((f) => ({ label: cut(f?.label, 20), value: cut(String(f?.value ?? ''), 60) })).filter((f) => f.label && f.value).slice(0, 4);\n\nconst TINTS = ['lavender', 'mint', 'blue', 'pink', 'sky'];\nconst ICONS = ['clock', 'cycle', 'list', 'globe', 'note', 'building', 'tv', 'health', 'car', 'home', 'cart', 'work', 'money', 'sport', 'people', 'doc', 'food', 'travel'];\nconst event_at = iso(m.event_at);\n\nconst kind = recurrence ? 'reminder-recurring' : event_at || notify.length ? 'reminder-once'\n  : checklist.length ? 'checklist' : url ? 'page-summary' : 'note';\nconst look = {\n  tint: TINTS.includes(m.look?.tint) ? m.look.tint : { 'reminder-recurring': 'mint', checklist: 'pink', 'page-summary': 'blue' }[kind] || 'lavender',\n  icon: ICONS.includes(m.look?.icon) ? m.look.icon : { 'reminder-recurring': 'cycle', checklist: 'list', 'page-summary': 'globe', note: 'note' }[kind] || 'clock',\n};\n\nreturn [{ json: {\n  ok: true, kind, title: cut(m.title, 40) || src.slice(0, 40), source_text: src, widget_slug: kind,\n  spec: { understood: cut(m.understood, 300), event_at, recurrence, url, summarize: m.summarize === true && !!url, model: 'deepseek/deepseek-v4.1-flash',\n    widget_brief: cut(m.widget?.brief, 300) || undefined },\n  data: {\n    tip: cut(m.tip, 80) || null, look, fields,\n    widget: m.widget?.brief ? { status: 'generating' } : undefined,\n    // listy z nazwami (Popraw może dołożyć kolejne); z jednego zdania powstaje najwyżej jedna, bez nazwy\n    photo: (() => { try { return $('Wejście do modelu').first().json.photo || undefined; } catch (e) { return undefined; } })(),   // opis zdjęcia, jeśli było\n    lists: checklist.length ? [{ name: null, items: checklist, reset: !!(recurrence && m.checklist_reset !== false) }] : undefined,\n  },\n  notify,\n  research: cut(m.research?.query, 200) || null,   // tylko sterowanie przepływem — nie trafia do bazy\n} }];\n"
+    "jsCode": "// Sprawdza odpowiedź modelu; niczego nie zgaduje — przy błędzie zwraca ok:false z komunikatem.\n// Rzecz składa się z części (termin, lista, strona, szczegóły); `kind` to tylko część główna — do sortowania i sekcji.\nconst src = String($('POST items').first().json.body.text || '').trim().slice(0, 1000) || '📷 Zdjęcie';\nconst fail = (error, status = 422) => [{ json: { ok: false, status, error, notify: [], spec: {}, data: {}, source_text: src } }];\n\nconst raw = $json.choices?.[0]?.message?.content;\n// 402 z OpenRoutera = wyczerpany limit klucza Luny (alarm dostaje Łukasz z „Oboe: Limit klucza”)\nif (!raw && (!($json).choices && /\\b402\\b|insufficient credits|more credits/i.test(JSON.stringify(($json).error || $json)))) return fail(\"Mam chwilową przerwę — skończył się limit, z którego korzystam. Łukasz już o tym wie.\", 402);   // tekst i test: n8n/komunikaty.py\nif (!raw) return fail('Nie udało mi się odpowiedzieć — spróbuj jeszcze raz.');\nlet m;\ntry { m = JSON.parse(raw.replace(/^```(json)?|```$/g, '').trim()); } catch (e) { return fail('Nie zrozumiałam. Spróbuj napisać to inaczej.'); }\n\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst now = Date.now();\nconst iso = (v) => { const t = Date.parse(v); return Number.isFinite(t) ? new Date(t).toISOString() : null; };\n\nconst notify = (Array.isArray(m.notify) ? m.notify : [])\n  .map((n) => ({ at: iso(n.at), title: cut(n.title, 50) || cut(m.title, 50), body: cut(n.body, 120) }))\n  .filter((n) => n.at && Date.parse(n.at) > now - 60000 && Date.parse(n.at) < now + 400 * 864e5)\n  .slice(0, 10);\n\nconst r = m.recurrence;\nconst recurrence = r && Number(r.every) > 0 && ['day', 'week', 'month'].includes(r.unit)\n  ? { every: Math.min(Math.round(Number(r.every)), 365), unit: r.unit } : null;\n\n// Code node nie ma URL — prosta walidacja wyrażeniem.\nconst u = String(m.url || '').trim();\nconst url = /^https?:\\/\\/[a-z0-9.-]+\\.[a-z]{2,}(:\\d+)?(\\/\\S*)?$/i.test(u) ? u.slice(0, 500) : null;\n\nconst checklist = (Array.isArray(m.checklist) ? m.checklist : [])\n  .map((x) => ({ text: cut(String(x), 80), done: false })).filter((x) => x.text).slice(0, 30);\nconst fields = (Array.isArray(m.fields) ? m.fields : [])\n  .map((f) => ({ label: cut(f?.label, 20), value: cut(String(f?.value ?? ''), 60) })).filter((f) => f.label && f.value).slice(0, 4);\n\nconst TINTS = ['lavender', 'mint', 'blue', 'pink', 'sky'];\nconst ICONS = ['clock', 'cycle', 'list', 'globe', 'note', 'building', 'tv', 'health', 'car', 'home', 'cart', 'work', 'money', 'sport', 'people', 'doc', 'food', 'travel'];\nconst event_at = iso(m.event_at);\n\nconst kind = recurrence ? 'reminder-recurring' : event_at || notify.length ? 'reminder-once'\n  : checklist.length ? 'checklist' : url ? 'page-summary' : 'note';\nconst look = {\n  tint: TINTS.includes(m.look?.tint) ? m.look.tint : { 'reminder-recurring': 'mint', checklist: 'pink', 'page-summary': 'blue' }[kind] || 'lavender',\n  icon: ICONS.includes(m.look?.icon) ? m.look.icon : { 'reminder-recurring': 'cycle', checklist: 'list', 'page-summary': 'globe', note: 'note' }[kind] || 'clock',\n};\n\nreturn [{ json: {\n  ok: true, kind, title: cut(m.title, 40) || src.slice(0, 40), source_text: src, widget_slug: kind,\n  spec: { understood: cut(m.understood, 300), event_at, recurrence, url, summarize: m.summarize === true && !!url, model: 'deepseek/deepseek-v4.1-flash',\n    widget_brief: cut(m.widget?.brief, 300) || undefined },\n  data: {\n    tip: cut(m.tip, 80) || null, look, fields,\n    widget: m.widget?.brief ? { status: 'generating' } : undefined,\n    // listy z nazwami (Popraw może dołożyć kolejne); z jednego zdania powstaje najwyżej jedna, bez nazwy\n    photo: (() => { try { return $('Wejście do modelu').first().json.photo || undefined; } catch (e) { return undefined; } })(),   // opis zdjęcia, jeśli było\n    lists: checklist.length ? [{ name: null, items: checklist, reset: !!(recurrence && m.checklist_reset !== false) }] : undefined,\n  },\n  notify,\n  research: cut(m.research?.query, 200) || null,   // tylko sterowanie przepływem — nie trafia do bazy\n} }];\n"
    }
   },
   {
@@ -1194,9 +1194,9 @@
    ],
    "parameters": {
     "operation": "executeQuery",
-    "query": "WITH it AS (\n  INSERT INTO items (user_id, kind, source_text, title, spec, widget_slug, data)\n  SELECT $1::uuid, $2, $3, $4, $5::jsonb, $6, $7::jsonb WHERE $8::boolean\n  RETURNING *),\nnt AS (\n  INSERT INTO notifications (item_id, user_id, due_at, channels, title, body)\n  SELECT it.id, it.user_id, x.at, coalesce(x.channels, '{push}'), x.title, x.body\n  FROM it, jsonb_to_recordset($9::jsonb) AS x(at timestamptz, title text, body text, channels text[])\n  RETURNING due_at),\nph AS (\n  INSERT INTO item_photos (item_id, user_id, image)\n  SELECT it.id, it.user_id, $11 FROM it WHERE $11 <> '' RETURNING 1)\nSELECT CASE WHEN NOT $8::boolean THEN json_build_object('status', 422, 'error', $10::text)\n  ELSE json_build_object('status', 200, 'item', (SELECT row_to_json(it) FROM it), 'has_photo', EXISTS (SELECT 1 FROM ph),\n       'notifications', coalesce((SELECT json_agg(due_at ORDER BY due_at) FROM nt), '[]'::json)) END AS result",
+    "query": "WITH it AS (\n  INSERT INTO items (user_id, kind, source_text, title, spec, widget_slug, data)\n  SELECT $1::uuid, $2, $3, $4, $5::jsonb, $6, $7::jsonb WHERE $8::boolean\n  RETURNING *),\nnt AS (\n  INSERT INTO notifications (item_id, user_id, due_at, channels, title, body)\n  SELECT it.id, it.user_id, x.at, coalesce(x.channels, '{push}'), x.title, x.body\n  FROM it, jsonb_to_recordset($9::jsonb) AS x(at timestamptz, title text, body text, channels text[])\n  RETURNING due_at),\nph AS (\n  INSERT INTO item_photos (item_id, user_id, image)\n  SELECT it.id, it.user_id, $11 FROM it WHERE $11 <> '' RETURNING 1)\nSELECT CASE WHEN NOT $8::boolean THEN json_build_object('status', $12::int, 'error', $10::text)\n  ELSE json_build_object('status', 200, 'item', (SELECT row_to_json(it) FROM it), 'has_photo', EXISTS (SELECT 1 FROM ph),\n       'notifications', coalesce((SELECT json_agg(due_at ORDER BY due_at) FROM nt), '[]'::json)) END AS result",
     "options": {
-     "queryReplacement": "={{ [ $('Sesja').item.json.user_id, $json.kind, $json.source_text, $json.title, JSON.stringify($json.spec), $json.widget_slug, JSON.stringify($json.data), $json.ok, JSON.stringify($json.notify), $json.error || '', (t => /^data:image\\/jpeg;base64,[A-Za-z0-9+\\/=]+$/.test(t) && t.length < 400000 ? t : '')(String($('POST items').item.json.body.thumb || '')) ] }}"
+     "queryReplacement": "={{ [ $('Sesja').item.json.user_id, $json.kind, $json.source_text, $json.title, JSON.stringify($json.spec), $json.widget_slug, JSON.stringify($json.data), $json.ok, JSON.stringify($json.notify), $json.error || '', (t => /^data:image\\/jpeg;base64,[A-Za-z0-9+\\/=]+$/.test(t) && t.length < 400000 ? t : '')(String($('POST items').item.json.body.thumb || '')), $json.ok ? 200 : ($json.status || 422) ] }}"
     }
    },
    "credentials": {
@@ -1589,7 +1589,7 @@
       },
       {
        "name": "X-Title",
-       "value": "Oboe zdjecie (n8n)"
+       "value": "Luna"
       }
      ]
     },
@@ -1620,7 +1620,7 @@
     3900
    ],
    "parameters": {
-    "jsCode": "const cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst raw = String($json.choices?.[0]?.message?.content || '');\nlet m = {};\ntry { m = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1)); } catch (e) {}\nconst photo = { title: cut(m.title, 60), description: cut(m.description, 600), text: cut(m.text, 3000) };\nreturn [{ json: { photo: photo.title && photo.description ? photo : null } }];"
+    "jsCode": "const cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst raw = String($json.choices?.[0]?.message?.content || '');\nlet m = {};\ntry { m = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1)); } catch (e) {}\nconst photo = { title: cut(m.title, 60), description: cut(m.description, 600), text: cut(m.text, 3000) };\nreturn [{ json: { photo: photo.title && photo.description ? photo : null, key_limit: (!($json).choices && /\\b402\\b|insufficient credits|more credits/i.test(JSON.stringify(($json).error || $json))) } }];"
    }
   },
   {
@@ -1643,7 +1643,7 @@
      "conditions": [
       {
        "id": "19525eee-d8fc-4f6f-91c6-b005661ba720",
-       "leftValue": "={{ !!$json.photo }}",
+       "leftValue": "={{ !!$json.photo && !$json.key_limit }}",
        "rightValue": "",
        "operator": {
         "type": "boolean",
@@ -1680,7 +1680,7 @@
       },
       {
        "name": "X-Title",
-       "value": "Oboe zdjecie (n8n)"
+       "value": "Luna"
       }
      ]
     },
@@ -1711,7 +1711,7 @@
     4060
    ],
    "parameters": {
-    "jsCode": "const cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst raw = String($json.choices?.[0]?.message?.content || '');\nlet m = {};\ntry { m = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1)); } catch (e) {}\nconst photo = { title: cut(m.title, 60), description: cut(m.description, 600), text: cut(m.text, 3000) };\nreturn [{ json: { photo: photo.title && photo.description ? photo : null } }];"
+    "jsCode": "const cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst raw = String($json.choices?.[0]?.message?.content || '');\nlet m = {};\ntry { m = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1)); } catch (e) {}\nconst photo = { title: cut(m.title, 60), description: cut(m.description, 600), text: cut(m.text, 3000) };\nreturn [{ json: { photo: photo.title && photo.description ? photo : null, key_limit: (!($json).choices && /\\b402\\b|insufficient credits|more credits/i.test(JSON.stringify(($json).error || $json))) } }];"
    }
   },
   {
@@ -1734,7 +1734,7 @@
      "conditions": [
       {
        "id": "071ea237-613a-4a13-8c07-db097529429d",
-       "leftValue": "={{ !$json.photo && !String($('POST items').item.json.body.text || '').trim() }}",
+       "leftValue": "={{ $json.key_limit === true || (!$json.photo && !String($('POST items').item.json.body.text || '').trim()) }}",
        "rightValue": "",
        "operator": {
         "type": "boolean",
@@ -1760,9 +1760,9 @@
    "parameters": {
     "respondWith": "json",
     "options": {
-     "responseCode": 422
+     "responseCode": "={{ $json.key_limit ? 402 : 422 }}"
     },
-    "responseBody": "={{ { status: 422, error: 'Nie udało mi się obejrzeć tego zdjęcia. Spróbuj jeszcze raz albo dopisz, co z nim zrobić.' } }}"
+    "responseBody": "={{ $json.key_limit ? { status: 402, error: \"Mam chwilową przerwę — skończył się limit, z którego korzystam. Łukasz już o tym wie.\" } : { status: 422, error: 'Nie udało mi się obejrzeć tego zdjęcia. Spróbuj jeszcze raz albo dopisz, co z nim zrobić.' } }}"
    }
   },
   {
@@ -1835,7 +1835,7 @@
       },
       {
        "name": "X-Title",
-       "value": "Oboe siec (n8n)"
+       "value": "Luna"
       }
      ]
     },
@@ -1892,7 +1892,7 @@
       },
       {
        "name": "X-Title",
-       "value": "Oboe siec (n8n)"
+       "value": "Luna"
       }
      ]
     },
@@ -1923,7 +1923,7 @@
     3100
    ],
    "parameters": {
-    "jsCode": "// Sprawdza odpowiedź modelu; niczego nie zgaduje — przy błędzie zwraca ok:false z komunikatem.\n// Rzecz składa się z części (termin, lista, strona, szczegóły); `kind` to tylko część główna — do sortowania i sekcji.\nconst src = String($('POST items').first().json.body.text || '').trim().slice(0, 1000) || '📷 Zdjęcie';\nconst fail = (error) => [{ json: { ok: false, error, notify: [], spec: {}, data: {}, source_text: src } }];\n\nconst raw = $json.choices?.[0]?.message?.content;\n// 402 z OpenRoutera = wyczerpany limit klucza Luny (alarm dostaje Łukasz z „Oboe: Limit klucza”)\nif (!raw && /\\b402\\b|insufficient|credits|limit/i.test(JSON.stringify($json.error || $json))) return fail('Mam chwilową przerwę — skończył się limit, z którego korzystam. Łukasz już o tym wie.');\nif (!raw) return fail('Nie udało mi się odpowiedzieć — spróbuj jeszcze raz.');\nlet m;\ntry { m = JSON.parse(raw.replace(/^```(json)?|```$/g, '').trim()); } catch (e) { return fail('Nie zrozumiałam. Spróbuj napisać to inaczej.'); }\n\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst now = Date.now();\nconst iso = (v) => { const t = Date.parse(v); return Number.isFinite(t) ? new Date(t).toISOString() : null; };\n\nconst notify = (Array.isArray(m.notify) ? m.notify : [])\n  .map((n) => ({ at: iso(n.at), title: cut(n.title, 50) || cut(m.title, 50), body: cut(n.body, 120) }))\n  .filter((n) => n.at && Date.parse(n.at) > now - 60000 && Date.parse(n.at) < now + 400 * 864e5)\n  .slice(0, 10);\n\nconst r = m.recurrence;\nconst recurrence = r && Number(r.every) > 0 && ['day', 'week', 'month'].includes(r.unit)\n  ? { every: Math.min(Math.round(Number(r.every)), 365), unit: r.unit } : null;\n\n// Code node nie ma URL — prosta walidacja wyrażeniem.\nconst u = String(m.url || '').trim();\nconst url = /^https?:\\/\\/[a-z0-9.-]+\\.[a-z]{2,}(:\\d+)?(\\/\\S*)?$/i.test(u) ? u.slice(0, 500) : null;\n\nconst checklist = (Array.isArray(m.checklist) ? m.checklist : [])\n  .map((x) => ({ text: cut(String(x), 80), done: false })).filter((x) => x.text).slice(0, 30);\nconst fields = (Array.isArray(m.fields) ? m.fields : [])\n  .map((f) => ({ label: cut(f?.label, 20), value: cut(String(f?.value ?? ''), 60) })).filter((f) => f.label && f.value).slice(0, 4);\n\nconst TINTS = ['lavender', 'mint', 'blue', 'pink', 'sky'];\nconst ICONS = ['clock', 'cycle', 'list', 'globe', 'note', 'building', 'tv', 'health', 'car', 'home', 'cart', 'work', 'money', 'sport', 'people', 'doc', 'food', 'travel'];\nconst event_at = iso(m.event_at);\n\nconst kind = recurrence ? 'reminder-recurring' : event_at || notify.length ? 'reminder-once'\n  : checklist.length ? 'checklist' : url ? 'page-summary' : 'note';\nconst look = {\n  tint: TINTS.includes(m.look?.tint) ? m.look.tint : { 'reminder-recurring': 'mint', checklist: 'pink', 'page-summary': 'blue' }[kind] || 'lavender',\n  icon: ICONS.includes(m.look?.icon) ? m.look.icon : { 'reminder-recurring': 'cycle', checklist: 'list', 'page-summary': 'globe', note: 'note' }[kind] || 'clock',\n};\n\nreturn [{ json: {\n  ok: true, kind, title: cut(m.title, 40) || src.slice(0, 40), source_text: src, widget_slug: kind,\n  spec: { understood: cut(m.understood, 300), event_at, recurrence, url, summarize: m.summarize === true && !!url, model: 'deepseek/deepseek-v4.1-flash',\n    widget_brief: cut(m.widget?.brief, 300) || undefined },\n  data: {\n    tip: cut(m.tip, 80) || null, look, fields,\n    widget: m.widget?.brief ? { status: 'generating' } : undefined,\n    // listy z nazwami (Popraw może dołożyć kolejne); z jednego zdania powstaje najwyżej jedna, bez nazwy\n    photo: (() => { try { return $('Wejście do modelu').first().json.photo || undefined; } catch (e) { return undefined; } })(),   // opis zdjęcia, jeśli było\n    lists: checklist.length ? [{ name: null, items: checklist, reset: !!(recurrence && m.checklist_reset !== false) }] : undefined,\n  },\n  notify,\n  research: cut(m.research?.query, 200) || null,   // tylko sterowanie przepływem — nie trafia do bazy\n} }];\n"
+    "jsCode": "// Sprawdza odpowiedź modelu; niczego nie zgaduje — przy błędzie zwraca ok:false z komunikatem.\n// Rzecz składa się z części (termin, lista, strona, szczegóły); `kind` to tylko część główna — do sortowania i sekcji.\nconst src = String($('POST items').first().json.body.text || '').trim().slice(0, 1000) || '📷 Zdjęcie';\nconst fail = (error, status = 422) => [{ json: { ok: false, status, error, notify: [], spec: {}, data: {}, source_text: src } }];\n\nconst raw = $json.choices?.[0]?.message?.content;\n// 402 z OpenRoutera = wyczerpany limit klucza Luny (alarm dostaje Łukasz z „Oboe: Limit klucza”)\nif (!raw && (!($json).choices && /\\b402\\b|insufficient credits|more credits/i.test(JSON.stringify(($json).error || $json)))) return fail(\"Mam chwilową przerwę — skończył się limit, z którego korzystam. Łukasz już o tym wie.\", 402);   // tekst i test: n8n/komunikaty.py\nif (!raw) return fail('Nie udało mi się odpowiedzieć — spróbuj jeszcze raz.');\nlet m;\ntry { m = JSON.parse(raw.replace(/^```(json)?|```$/g, '').trim()); } catch (e) { return fail('Nie zrozumiałam. Spróbuj napisać to inaczej.'); }\n\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst now = Date.now();\nconst iso = (v) => { const t = Date.parse(v); return Number.isFinite(t) ? new Date(t).toISOString() : null; };\n\nconst notify = (Array.isArray(m.notify) ? m.notify : [])\n  .map((n) => ({ at: iso(n.at), title: cut(n.title, 50) || cut(m.title, 50), body: cut(n.body, 120) }))\n  .filter((n) => n.at && Date.parse(n.at) > now - 60000 && Date.parse(n.at) < now + 400 * 864e5)\n  .slice(0, 10);\n\nconst r = m.recurrence;\nconst recurrence = r && Number(r.every) > 0 && ['day', 'week', 'month'].includes(r.unit)\n  ? { every: Math.min(Math.round(Number(r.every)), 365), unit: r.unit } : null;\n\n// Code node nie ma URL — prosta walidacja wyrażeniem.\nconst u = String(m.url || '').trim();\nconst url = /^https?:\\/\\/[a-z0-9.-]+\\.[a-z]{2,}(:\\d+)?(\\/\\S*)?$/i.test(u) ? u.slice(0, 500) : null;\n\nconst checklist = (Array.isArray(m.checklist) ? m.checklist : [])\n  .map((x) => ({ text: cut(String(x), 80), done: false })).filter((x) => x.text).slice(0, 30);\nconst fields = (Array.isArray(m.fields) ? m.fields : [])\n  .map((f) => ({ label: cut(f?.label, 20), value: cut(String(f?.value ?? ''), 60) })).filter((f) => f.label && f.value).slice(0, 4);\n\nconst TINTS = ['lavender', 'mint', 'blue', 'pink', 'sky'];\nconst ICONS = ['clock', 'cycle', 'list', 'globe', 'note', 'building', 'tv', 'health', 'car', 'home', 'cart', 'work', 'money', 'sport', 'people', 'doc', 'food', 'travel'];\nconst event_at = iso(m.event_at);\n\nconst kind = recurrence ? 'reminder-recurring' : event_at || notify.length ? 'reminder-once'\n  : checklist.length ? 'checklist' : url ? 'page-summary' : 'note';\nconst look = {\n  tint: TINTS.includes(m.look?.tint) ? m.look.tint : { 'reminder-recurring': 'mint', checklist: 'pink', 'page-summary': 'blue' }[kind] || 'lavender',\n  icon: ICONS.includes(m.look?.icon) ? m.look.icon : { 'reminder-recurring': 'cycle', checklist: 'list', 'page-summary': 'globe', note: 'note' }[kind] || 'clock',\n};\n\nreturn [{ json: {\n  ok: true, kind, title: cut(m.title, 40) || src.slice(0, 40), source_text: src, widget_slug: kind,\n  spec: { understood: cut(m.understood, 300), event_at, recurrence, url, summarize: m.summarize === true && !!url, model: 'deepseek/deepseek-v4.1-flash',\n    widget_brief: cut(m.widget?.brief, 300) || undefined },\n  data: {\n    tip: cut(m.tip, 80) || null, look, fields,\n    widget: m.widget?.brief ? { status: 'generating' } : undefined,\n    // listy z nazwami (Popraw może dołożyć kolejne); z jednego zdania powstaje najwyżej jedna, bez nazwy\n    photo: (() => { try { return $('Wejście do modelu').first().json.photo || undefined; } catch (e) { return undefined; } })(),   // opis zdjęcia, jeśli było\n    lists: checklist.length ? [{ name: null, items: checklist, reset: !!(recurrence && m.checklist_reset !== false) }] : undefined,\n  },\n  notify,\n  research: cut(m.research?.query, 200) || null,   // tylko sterowanie przepływem — nie trafia do bazy\n} }];\n"
    }
   },
   {
@@ -2087,7 +2087,7 @@
       },
       {
        "name": "X-Title",
-       "value": "Oboe zdjecie (n8n)"
+       "value": "Luna"
       }
      ]
     },
@@ -2231,7 +2231,7 @@
       },
       {
        "name": "X-Title",
-       "value": "Oboe popraw (n8n)"
+       "value": "Luna"
       }
      ]
     },
@@ -2262,7 +2262,7 @@
     4300
    ],
    "parameters": {
-    "jsCode": "\nconst ctx = $('Czat: dopisz wiadomość').first().json.result;\nlet m = {};\ntry { m = JSON.parse(String($json.choices?.[0]?.message?.content || '').replace(/^```(json)?|```$/g, '').trim()); } catch (e) {}\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\nconst reply = cut(String(m.reply || '').replace(/\\*\\*|__/g, ''), 700) || 'Coś mi się pomieszało — napisz jeszcze raz, co zmienić?';   // bez markdownu (wyniki z sieci go przynoszą)\nlet proposal = null;\nconst ch = m.changes && typeof m.changes === 'object' ? m.changes : null;\nif (m.ready === true && ch) {\n  proposal = { summary: cut(m.summary, 1200) || reply, changes: ch, widget: false };\n  const w = ch.widget;\n  // Blokada w kodzie: widget na zamówienie nie może powtarzać wbudowanej listy — listy robimy zawsze wbudowane.\n  const dup = w && /(lista|checklist|odhacz|do zrobienia|zadani)/i.test(String(w.title || '') + ' ' + String(w.description || ''));\n  if (w && typeof w === 'object' && cut(w.spec, 10) && !dup) {\n    const state = w.state && typeof w.state === 'object' ? w.state : (ctx.widget || {}).state || {};\n    if (JSON.stringify(state).length <= 20000) Object.assign(proposal, { widget: true, title: cut(w.title, 40) || ctx.item.title.slice(0, 40),\n      description: cut(w.description, 200), input_schema: w.input_schema && typeof w.input_schema === 'object' ? w.input_schema : {}, state, spec: cut(w.spec, 2000) });\n  }\n  delete proposal.changes.widget;\n}\nreturn [{ json: { chat_id: ctx.chat_id, reply, proposal } }];\n"
+    "jsCode": "\nconst ctx = $('Czat: dopisz wiadomość').first().json.result;\nlet m = {};\ntry { m = JSON.parse(String($json.choices?.[0]?.message?.content || '').replace(/^```(json)?|```$/g, '').trim()); } catch (e) {}\nconst cut = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');\n// 402 = wyczerpany klucz: ten sam komunikat co w głównym polu (n8n/komunikaty.py), bez planu zmian\nif ((!($json).choices && /\\b402\\b|insufficient credits|more credits/i.test(JSON.stringify(($json).error || $json)))) return [{ json: { chat_id: ctx.chat_id, reply: \"Mam chwilową przerwę — skończył się limit, z którego korzystam. Łukasz już o tym wie.\", proposal: null } }];\nconst reply = cut(String(m.reply || '').replace(/\\*\\*|__/g, ''), 700) || 'Coś mi się pomieszało — napisz jeszcze raz, co zmienić?';   // bez markdownu (wyniki z sieci go przynoszą)\nlet proposal = null;\nconst ch = m.changes && typeof m.changes === 'object' ? m.changes : null;\nif (m.ready === true && ch) {\n  proposal = { summary: cut(m.summary, 1200) || reply, changes: ch, widget: false };\n  const w = ch.widget;\n  // Blokada w kodzie: widget na zamówienie nie może powtarzać wbudowanej listy — listy robimy zawsze wbudowane.\n  const dup = w && /(lista|checklist|odhacz|do zrobienia|zadani)/i.test(String(w.title || '') + ' ' + String(w.description || ''));\n  if (w && typeof w === 'object' && cut(w.spec, 10) && !dup) {\n    const state = w.state && typeof w.state === 'object' ? w.state : (ctx.widget || {}).state || {};\n    if (JSON.stringify(state).length <= 20000) Object.assign(proposal, { widget: true, title: cut(w.title, 40) || ctx.item.title.slice(0, 40),\n      description: cut(w.description, 200), input_schema: w.input_schema && typeof w.input_schema === 'object' ? w.input_schema : {}, state, spec: cut(w.spec, 2000) });\n  }\n  delete proposal.changes.widget;\n}\nreturn [{ json: { chat_id: ctx.chat_id, reply, proposal } }];\n"
    }
   },
   {

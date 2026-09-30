@@ -6,9 +6,8 @@ Dwa wejścia:
 Ręcznie z serwera: POST http://127.0.0.1:5678/webhook/oboe/admin/widget {"item_id": ...} + X-Admin-Token.
 """
 import json, uuid
-from config import PG, OR, ADMIN, REFERER
+from config import PG, OR, ADMIN, REFERER, TEXT_MODEL, or_headers
 
-TEXT_MODEL = "deepseek/deepseek-v4.1-flash"
 # Decyzja Łukasza 27.09: na razie GLM 5.3 Flash (tańszy output, mocny w Image-to-WebDev). DO PRZETESTOWANIA na większej
 # próbie vs DeepSeek 4.1 — w pierwszym teście DeepSeek lepiej trzymał kontrakt (GLM rysował własną kartę i tytuł).
 # GLM: rozumowania nie da się wyłączyć, `effort` jest ignorowany — działa tylko reasoning.max_tokens.
@@ -34,8 +33,7 @@ def llm(name, pos, model, system, user_expr, max_tokens, json_mode=True, reasoni
     return node(name, "n8n-nodes-base.httpRequest", 4.2, pos, {
       "method": "POST", "url": "https://openrouter.ai/api/v1/chat/completions",
       "authentication": "predefinedCredentialType", "nodeCredentialType": "openRouterApi",
-      "sendHeaders": True, "headerParameters": {"parameters": [
-        {"name": "HTTP-Referer", "value": REFERER}, {"name": "X-Title", "value": "Oboe widgety (n8n)"}]},
+      "sendHeaders": True, "headerParameters": or_headers(),
       "sendBody": True, "specifyBody": "json", "jsonBody": body, "options": {"timeout": timeout}},
       credentials=OR, retryOnFail=True, maxTries=2, onError="continueRegularOutput")
 def pg(name, pos, sql, params):

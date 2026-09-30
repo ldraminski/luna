@@ -163,7 +163,7 @@
       },
       {
        "name": "X-Title",
-       "value": "Oboe (n8n)"
+       "value": "Luna"
       }
      ]
     },
@@ -194,7 +194,7 @@
     0
    ],
    "parameters": {
-    "jsCode": "const r = $input.first().json;\nconst fail = (status, error) => [{ json: { result: { status, error } } }];\nif (r.error) return fail(String(r.error.message || r.error).includes('402') ? 402 : 502,\n  String(r.error.message || r.error).includes('402') ? 'Mam chwilową przerwę — skończył się limit. Łukasz już o tym wie.' : 'Model nie odpowiedział — spróbuj jeszcze raz.');\nlet m;\ntry { m = JSON.parse(String(r.choices?.[0]?.message?.content || '').replace(/^```(json)?|```$/g, '').trim()); } catch { m = null; }\nif (!m || !Array.isArray(m.parts)) return fail(502, 'Nie udało mi się tego rozebrać na części — spróbuj jeszcze raz.');\nconst cut = (s, n) => String(s || '').replace(/\\s+/g, ' ').trim().slice(0, n);\nconst parts = m.parts.map((p) => ({ text: cut(p?.text, 1000), from: cut(p?.from, 120) })).filter((p) => p.text.length >= 3).slice(0, 30);\nreturn [{ json: { result: { status: 200, parts, skipped: cut(m.skipped, 400) } } }];"
+    "jsCode": "const r = $input.first().json;\nconst fail = (status, error) => [{ json: { result: { status, error } } }];\nif ((!($json).choices && /\\b402\\b|insufficient credits|more credits/i.test(JSON.stringify(($json).error || $json)))) return fail(402, \"Mam chwilową przerwę — skończył się limit, z którego korzystam. Łukasz już o tym wie.\");   // tekst i test: n8n/komunikaty.py\nif (r.error) return fail(502, 'Model nie odpowiedział — spróbuj jeszcze raz.');\nlet m;\ntry { m = JSON.parse(String(r.choices?.[0]?.message?.content || '').replace(/^```(json)?|```$/g, '').trim()); } catch { m = null; }\nif (!m || !Array.isArray(m.parts)) return fail(502, 'Nie udało mi się tego rozebrać na części — spróbuj jeszcze raz.');\nconst cut = (s, n) => String(s || '').replace(/\\s+/g, ' ').trim().slice(0, n);\nconst parts = m.parts.map((p) => ({ text: cut(p?.text, 1000), from: cut(p?.from, 120) })).filter((p) => p.text.length >= 3).slice(0, 30);\nreturn [{ json: { result: { status: 200, parts, skipped: cut(m.skipped, 400) } } }];"
    }
   },
   {

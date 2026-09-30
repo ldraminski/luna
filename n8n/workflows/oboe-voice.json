@@ -542,7 +542,7 @@
       },
       {
        "name": "X-Title",
-       "value": "Oboe notatki glosowe (n8n)"
+       "value": "Luna"
       }
      ]
     },
@@ -590,6 +590,63 @@
     "query": "WITH it AS (\n  INSERT INTO items (user_id, kind, source_text, title, spec, data)\n  SELECT user_id, 'note', $2, $3, $4::jsonb, $5::jsonb FROM voice_notes WHERE id = $1::uuid AND status = 'summarizing'\n  RETURNING id, user_id),\nnt AS (INSERT INTO notifications (item_id, user_id, due_at, title, body) SELECT id, user_id, now(), $6, $7 FROM it RETURNING 1),\nv AS (UPDATE voice_notes SET status = 'done', item_id = (SELECT id FROM it), audio = NULL, finished_at = now()\n      WHERE id = $1::uuid AND EXISTS (SELECT 1 FROM it) RETURNING id)\nSELECT (SELECT id FROM it) AS item_id, (SELECT count(*) FROM nt) AS notified",
     "options": {
      "queryReplacement": "={{ [ $json.id, $json.text, $json.title, JSON.stringify($json.spec), JSON.stringify($json.data), $json.push_title, $json.push_body ] }}"
+    }
+   },
+   "credentials": {
+    "postgres": {
+     "id": "REPLACE_ME",
+     "name": "Oboe - Postgres (oboe-db)"
+    }
+   }
+  },
+  {
+   "id": "5f8f169f-f754-4adf-9b73-1549280cf077",
+   "name": "Limit klucza?",
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2.2,
+   "position": [
+    1650,
+    1200
+   ],
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "loose",
+      "version": 2
+     },
+     "conditions": [
+      {
+       "id": "1c4372c5-224f-47cd-b078-73a61ada9d58",
+       "leftValue": "={{ (!($json).choices && /\\b402\\b|insufficient credits|more credits/i.test(JSON.stringify(($json).error || $json))) }}",
+       "rightValue": "",
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "f5165d77-93ec-4d59-8478-17697d7a1ac4",
+   "name": "Czeka na klucz",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.6,
+   "position": [
+    1760,
+    1400
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "UPDATE voice_notes SET status = 'error', error = $2, finished_at = now()\nWHERE id = $1::uuid AND status = 'summarizing' RETURNING id, status",
+    "options": {
+     "queryReplacement": "={{ [ $('Tekst').first().json.id, \"Mam chwilową przerwę — skończył się limit, z którego korzystam. Łukasz już o tym wie.\" ] }}"
     }
    },
    "credentials": {
@@ -815,6 +872,24 @@
   },
   "Model: uporządkuj": {
    "main": [
+    [
+     {
+      "node": "Limit klucza?",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Limit klucza?": {
+   "main": [
+    [
+     {
+      "node": "Czeka na klucz",
+      "type": "main",
+      "index": 0
+     }
+    ],
     [
      {
       "node": "Złóż notatkę",

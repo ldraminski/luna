@@ -11,10 +11,10 @@ przed ekranem „Odsłuchuję…”. Dlatego kolejka:
 Nagranie leży w bazie tylko do przepisania — po sukcesie `audio = NULL`. Zawieszone (> 45 min) wraca do kolejki, 3. raz = błąd.
 """
 import json, uuid
-from config import PG, OR, REFERER, WHISPER_URL
+from config import PG, OR, REFERER, TEXT_MODEL, or_headers, WHISPER_URL
 from limit import session_with_limit, LIMIT_MSG
+from komunikaty import KEY_LIMIT, is_key_limit_js
 
-TEXT_MODEL = "deepseek/deepseek-v4.1-flash"
 WHISPER_MODEL = "deepdml/faster-whisper-large-v3-turbo-ct2"
 MAX_MB = 11            # po zdekodowaniu; nagranie z aplikacji (opus 24 kb/s) to ~3 MB na 15 min, dyktafon telefonu (AAC) ~7 MB
 MAX_QUEUE = 3          # ile naraz może czekać jedna osoba
@@ -197,7 +197,7 @@ assert "{{" not in SYSTEM
 llm = node("Model: uporządkuj", "n8n-nodes-base.httpRequest", 4.2, [1540, y], {
   "method": "POST", "url": "https://openrouter.ai/api/v1/chat/completions",
   "authentication": "predefinedCredentialType", "nodeCredentialType": "openRouterApi",
-  "sendHeaders": True, "headerParameters": {"parameters": [{"name": "HTTP-Referer", "value": REFERER}, {"name": "X-Title", "value": "Oboe notatki glosowe (n8n)"}]},
+  "sendHeaders": True, "headerParameters": or_headers(),
   "sendBody": True, "specifyBody": "json",
   "jsonBody": "={{ JSON.stringify({ model: '" + TEXT_MODEL + "', temperature: 0.2, max_tokens: 1500, reasoning: { enabled: false }, response_format: { type: 'json_object' }, messages: [ { role: 'system', content: "
     + json.dumps(SYSTEM, ensure_ascii=False) + " }, { role: 'user', content: 'Długość nagrania: ' + Math.round(($('Tekst').first().json.duration_s || 0) / 60) + ' min\\n\\n<<<TRANSKRYPCJA>>>\\n' + $('Tekst').first().json.text.slice(0, 40000) + '\\n<<<KONIEC>>>' } ] }) }}",
@@ -230,7 +230,13 @@ v AS (UPDATE voice_notes SET status = 'done', item_id = (SELECT id FROM it), aud
       WHERE id = $1::uuid AND EXISTS (SELECT 1 FROM it) RETURNING id)
 SELECT (SELECT id FROM it) AS item_id, (SELECT count(*) FROM nt) AS notified""",
   "={{ [ $json.id, $json.text, $json.title, JSON.stringify($json.spec), JSON.stringify($json.data), $json.push_title, $json.push_body ] }}")
-chain(t, claim, plik, wh, txt, tok); link(tok, summ, 0); link(tok, fail, 1); chain(summ, llm, build, save)
+# 402 (wyczerpany klucz Luny): bez notatki z samą transkrypcją i bez kolejnych prób — nagranie zostaje, notatka ma błąd
+# z tym samym komunikatem co reszta Luny, a „Spróbuj ponownie” w aplikacji wraca do kolejki po odnowieniu klucza.
+klim = iff("Limit klucza?", [1650, y], "={{ " + is_key_limit_js() + " }}")
+kfail = pg("Czeka na klucz", [1760, y + 200], """
+UPDATE voice_notes SET status = 'error', error = $2, finished_at = now()
+WHERE id = $1::uuid AND status = 'summarizing' RETURNING id, status""", "={{ [ $('Tekst').first().json.id, " + json.dumps(KEY_LIMIT, ensure_ascii=False) + " ] }}")
+chain(t, claim, plik, wh, txt, tok); link(tok, summ, 0); link(tok, fail, 1); chain(summ, llm, klim); link(klim, kfail, 0); link(klim, build, 1); chain(build, save)
 
 json.dump({"name": "Oboe: Notatki głosowe", "nodes": nodes, "connections": conns,
            "settings": {"executionOrder": "v1", "timezone": "Europe/Warsaw", "saveDataSuccessExecution": "none"}},

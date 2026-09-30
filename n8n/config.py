@@ -32,9 +32,17 @@ APP_URL = C["app_url"]          # adres aplikacji w mailach i linkach
 SENDER = C["sender"]            # nadawca maili, np. "Luna <luna@example.com>"
 VAPID_PUB = C["vapid_public"]   # klucz publiczny VAPID (ten sam w public/api.js)
 VAPID_SUB = C["vapid_subject"]  # „sub” w JWT VAPID (adres kontaktowy albo URL)
-REFERER = C["openrouter_referer"]
+REFERER = C["openrouter_referer"]  # adres aplikacji w aktywności OpenRoutera (kolumna „App” = HTTP-Referer + X-Title)
 WHISPER_URL = C["whisper_url"]
 BACKUP_BUCKET = C.get("backup_bucket", "luna-kopie")
+
+# Model tekstu i obrazów we wszystkich workflowach Luny — jedno miejsce (decyzja Łukasza 27.09: 4.1 zamiast 4.0).
+TEXT_MODEL = "deepseek/deepseek-v4.1-flash"
+
+# Nagłówki OpenRoutera: po nich aktywność rozróżnia Lunę od innych automatyzacji na tym samym koncie (30.09, Łukasz).
+OR_TITLE = "Luna"
+def or_headers():
+    return {"parameters": [{"name": "HTTP-Referer", "value": REFERER}, {"name": "X-Title", "value": OR_TITLE}]}
 
 def workflow_id(name):
     """Id pod-workflowu w n8n (np. „widgets”), zapisane po utworzeniu w `.<name>-wf-id` — poza repo, bo zależy od instancji."""

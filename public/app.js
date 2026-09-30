@@ -325,19 +325,33 @@ function setOutbox(list) { try { localStorage.setItem(OUTBOX_KEY, JSON.stringify
 function setOffline(on, at) {
   state.offline = on;
   const n = outbox().length;
-  $('#offline').hidden = !on && !n;
+  $('#offline').hidden = !on && (!n || !!outboxHold());   // wstrzymana kolejka ma dopisek przy wpisach, bez paska „Wysyłam…”
   $('#offline').textContent = on
     ? `Brak połączenia z Luną${at ? ` — pokazuję stan z ${fTime.format(new Date(at))}` : ''}.${n ? ` ${n} ${pl(n, 'wpis czeka', 'wpisy czekają', 'wpisów czeka')} na wysłanie.` : ' Nowe wpisy wyślę, gdy wróci połączenie.'}`
     : `Wysyłam zaległe wpisy (${n})…`;
 }
+// Wstrzymana kolejka (30.09): 429 = dzienny limit konta → czekamy do następnego dnia; 402 = wyczerpany klucz Luny → próbujemy co 10 min.
+// Wpis NIE znika z kolejki — wyśle się sam przy pierwszym otwarciu, gdy limit się odnowi.
+const HOLD_KEY = 'luna-kolejka-wstrzymana';
+function outboxHold() {
+  try {
+    const h = JSON.parse(localStorage.getItem(HOLD_KEY) || 'null'); if (!h) return null;
+    const over = h.status === 429 ? dayKey(new Date()) !== h.day : Date.now() - h.at > 10 * 60000;
+    if (over) { localStorage.removeItem(HOLD_KEY); return null; }
+    return h;
+  } catch { return null; }
+}
+function setOutboxHold(status) { try { localStorage.setItem(HOLD_KEY, JSON.stringify({ status, day: dayKey(new Date()), at: Date.now() })); } catch {} }
 function renderOutbox() {
   const list = outbox(); if (!list.length || state.day) return;
+  const h = outboxHold();
+  const note = h?.status === 429 ? 'Na dziś wyczerpany limit — wyślę jutro' : h?.status === 402 ? 'Mam chwilową przerwę — wyślę, gdy wróci' : 'Wyślę, gdy wróci połączenie';
   $('#list').insertAdjacentHTML('afterbegin', `<h2 class="sec" style="margin-top:0">Czeka na wysłanie</h2>` + list.map((x) => `
-    <article class="w pending"><p class="kind">${svg('clock', 'width:14px;height:14px')} Wyślę, gdy wróci połączenie</p><h3>${esc(x.text)}</h3></article>`).join(''));
+    <article class="w pending"><p class="kind">${svg('clock', 'width:14px;height:14px')} ${note}</p><h3>${esc(x.text)}</h3></article>`).join(''));
 }
 let flushing = false;
 async function flushOutbox() {
-  if (flushing || !outbox().length) return;
+  if (flushing || !outbox().length || outboxHold()) return;
   flushing = true; setOffline(false);
   try {
     for (const x of outbox()) {
@@ -347,11 +361,16 @@ async function flushOutbox() {
         toast(r.item?.spec?.understood || 'Zapisałam zaległy wpis.');
       } catch (err) {
         if (err.status === 0) { setOffline(true, readCache()?.at); break; }
+        if (err.status === 429 || err.status === 402) {   // limit dnia / klucza: wpis zostaje w kolejce
+          const first = !outboxHold(); setOutboxHold(err.status); render();
+          if (first) toast(err.status === 429 ? `${outbox().length} ${pl(outbox().length, 'wpis czeka', 'wpisy czekają', 'wpisów czeka')} na jutro — ${err.message}` : err.message);
+          break;
+        }
         setOutbox(outbox().filter((y) => y.id !== x.id)); toast(`„${x.text.slice(0, 40)}” — ${err.message}`);
       }
     }
   } finally { flushing = false; }
-  if (!outbox().length) { setOffline(false); load(); }
+  if (!outbox().length) { setOffline(false); load(); } else if (outboxHold()) $('#offline').hidden = true;
 }
 
 async function load() {
@@ -678,7 +697,7 @@ function card(it, hero = false) {
       <p class="kind">${svg('clock', 'width:16px;height:16px')} Najbliższy termin · ${esc(fTime.format(ev))}</p>
       <p class="big">${esc(rel(ev))}</p>
       <h3>${esc(it.title)}</h3>
-      <div class="blob" aria-hidden="true">${it.has_photo ? `<img class="blob-photo" data-photo="${it.id}" alt="">` : `<svg class="i" viewBox="0 0 24 24" style="width:64px;height:64px;stroke-width:1.4;margin:-10px 18px 0 0">${I[icon]}</svg>`}</div>
+      <div class="blob${it.has_photo ? ' blob--photo' : ''}" aria-hidden="true">${it.has_photo ? `<img class="blob-photo" data-photo="${it.id}" alt="">` : `<svg class="i" viewBox="0 0 24 24" style="width:64px;height:64px;stroke-width:1.4;margin:-10px 18px 0 0">${I[icon]}</svg>`}</div>
       ${partFields(it)}${partPhoto(it)}${partResearch(it)}${partWidget(it)}${partList(it)}${partFoot(it)}
     </article>`;
   }
@@ -1157,9 +1176,14 @@ function fitTA(q, frac) {
 const fitQ = () => fitTA($('#q'), 0.8);
 const fitChat = () => fitTA($('#chat-q'), 0.5);
 // iPhone nie zmniejsza układu przy klawiaturze — dok podnosimy ręcznie nad klawiaturę (VisualViewport).
+// 30.09 (zrzut Łukasza): po zamknięciu klawiatury — zwłaszcza po wyborze zdjęcia z SMS-a — iOS potrafi nie wysłać „resize”
+// albo wysłać go ze starymi wymiarami, a dok zostawał w połowie ekranu. Dlatego: odsunięcie tylko, gdy pole ma fokus
+// i wyliczona klawiatura ma sensowną wysokość; po utracie fokusu dok od razu wraca na dół i przeliczamy jeszcze raz po chwili.
+const typing = () => { const a = document.activeElement; return !!a && /^(TEXTAREA|INPUT)$/.test(a.tagName) && !!a.closest('#dock, #chat'); };
 function keepDock() {
   const vv = window.visualViewport; if (!vv) return;
-  const kb = Math.max(0, Math.round(innerHeight - vv.height - vv.offsetTop));
+  let kb = Math.max(0, Math.round(innerHeight - vv.height - vv.offsetTop));
+  if (!typing() || kb < 80) kb = 0;
   $('#dock').style.bottom = kb + 'px';
   $('#dock').classList.toggle('kb', kb > 0);
   // arkusz czatu widgetu też nad klawiaturę i nie wyższy niż widoczny ekran
@@ -1368,6 +1392,10 @@ function bind() {
   $('#q').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); $('#wpisz').requestSubmit(); } });
   window.visualViewport?.addEventListener('resize', keepDock);
   window.visualViewport?.addEventListener('scroll', keepDock);
+  const settleDock = () => { keepDock(); [120, 400, 900].forEach((ms) => setTimeout(keepDock, ms)); };
+  document.addEventListener('focusin', settleDock); document.addEventListener('focusout', settleDock);
+  window.addEventListener('pageshow', settleDock); window.addEventListener('orientationchange', settleDock);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) settleDock(); });
   $('#plus').addEventListener('click', () => $('#q').focus());
   $('#mic').addEventListener('click', startRec);
   $('#screen-install').addEventListener('click', async (e) => {
@@ -1459,7 +1487,7 @@ function bind() {
   });
   $('#alarm').addEventListener('cancel', (e) => e.preventDefault());   // alarmu nie zamyka się Escape — trzeba wybrać
   setInterval(() => { if (!document.hidden) checkAlarm(); }, 5000);
-  setInterval(() => { if (state.user && !document.hidden && (state.offline || outbox().length)) load(); }, 30000);
+  setInterval(() => { if (state.user && !document.hidden && (state.offline || (outbox().length && !outboxHold()))) load(); }, 30000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden && state.user) { load().then(() => loadReport(true)); refreshBell(); refreshVn(); } });
   navigator.serviceWorker?.addEventListener('message', (e) => { if (e.data?.type === 'open') { load().then(() => e.data.id && openDetail(e.data.id)); } });
 }

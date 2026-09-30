@@ -1,11 +1,11 @@
 // Sprawdza odpowiedź modelu; niczego nie zgaduje — przy błędzie zwraca ok:false z komunikatem.
 // Rzecz składa się z części (termin, lista, strona, szczegóły); `kind` to tylko część główna — do sortowania i sekcji.
 const src = String($('POST items').first().json.body.text || '').trim().slice(0, 1000) || '📷 Zdjęcie';
-const fail = (error) => [{ json: { ok: false, error, notify: [], spec: {}, data: {}, source_text: src } }];
+const fail = (error, status = 422) => [{ json: { ok: false, status, error, notify: [], spec: {}, data: {}, source_text: src } }];
 
 const raw = $json.choices?.[0]?.message?.content;
 // 402 z OpenRoutera = wyczerpany limit klucza Luny (alarm dostaje Łukasz z „Oboe: Limit klucza”)
-if (!raw && /\b402\b|insufficient|credits|limit/i.test(JSON.stringify($json.error || $json))) return fail('Mam chwilową przerwę — skończył się limit, z którego korzystam. Łukasz już o tym wie.');
+if (!raw && __IS_KEY_LIMIT__) return fail(__KEY_LIMIT__, 402);   // tekst i test: n8n/komunikaty.py
 if (!raw) return fail('Nie udało mi się odpowiedzieć — spróbuj jeszcze raz.');
 let m;
 try { m = JSON.parse(raw.replace(/^```(json)?|```$/g, '').trim()); } catch (e) { return fail('Nie zrozumiałam. Spróbuj napisać to inaczej.'); }

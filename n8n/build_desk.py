@@ -6,14 +6,15 @@ Nic nie zapisuje: biurko pokazuje propozycję do poprawienia, a potem wysyła KA
 """
 import json, uuid
 from limit import session_with_limit, LIMIT_MSG
-from config import PG, OR, REFERER
+from config import PG, OR, REFERER, TEXT_MODEL, or_headers
+from komunikaty import fill
 
 TOKEN = "($json.headers.authorization || '').replace(/^Bearer\\s+/i, '')"
 ME = """me AS (
   UPDATE sessions SET last_used_at = now()
   WHERE token_hash = encode(digest($1, 'sha256'), 'hex') AND expires_at > now()
   RETURNING user_id)"""
-MODEL = "deepseek/deepseek-v4.1-flash"
+MODEL = TEXT_MODEL
 MAX = 20000
 SYSTEM = open("prompt-rozbij.txt").read()
 assert "{{" not in SYSTEM and "}}" not in SYSTEM, "n8n: {{ }} w prompcie psuje wyrażenie"
@@ -58,25 +59,24 @@ cal = node("Kalendarz", "n8n-nodes-base.code", 2, [660, 0],
 llm = node("DeepSeek: rozbij", "n8n-nodes-base.httpRequest", 4.2, [880, 0], {
   "method": "POST", "url": "https://openrouter.ai/api/v1/chat/completions",
   "authentication": "predefinedCredentialType", "nodeCredentialType": "openRouterApi",
-  "sendHeaders": True, "headerParameters": {"parameters": [
-    {"name": "HTTP-Referer", "value": REFERER}, {"name": "X-Title", "value": "Oboe (n8n)"}]},
+  "sendHeaders": True, "headerParameters": or_headers(),
   "sendBody": True, "specifyBody": "json",
   "jsonBody": ("={{ JSON.stringify({ model: '" + MODEL + "', temperature: 0.1, max_tokens: 6000, reasoning: { enabled: false }, "
                "response_format: { type: 'json_object' }, messages: [ { role: 'system', content: " + json.dumps(SYSTEM, ensure_ascii=False)
                + " }, { role: 'user', content: " + USER_MSG + " } ] }) }}"),
   "options": {"timeout": 120000}},
   credentials=OR, retryOnFail=True, maxTries=2, onError="continueRegularOutput")
-chk = node("Sprawdź propozycję", "n8n-nodes-base.code", 2, [1100, 0], {"jsCode": """
+chk = node("Sprawdź propozycję", "n8n-nodes-base.code", 2, [1100, 0], {"jsCode": fill("""
 const r = $input.first().json;
 const fail = (status, error) => [{ json: { result: { status, error } } }];
-if (r.error) return fail(String(r.error.message || r.error).includes('402') ? 402 : 502,
-  String(r.error.message || r.error).includes('402') ? 'Mam chwilową przerwę — skończył się limit. Łukasz już o tym wie.' : 'Model nie odpowiedział — spróbuj jeszcze raz.');
+if (__IS_KEY_LIMIT__) return fail(402, __KEY_LIMIT__);   // tekst i test: n8n/komunikaty.py
+if (r.error) return fail(502, 'Model nie odpowiedział — spróbuj jeszcze raz.');
 let m;
 try { m = JSON.parse(String(r.choices?.[0]?.message?.content || '').replace(/^```(json)?|```$/g, '').trim()); } catch { m = null; }
 if (!m || !Array.isArray(m.parts)) return fail(502, 'Nie udało mi się tego rozebrać na części — spróbuj jeszcze raz.');
 const cut = (s, n) => String(s || '').replace(/\\s+/g, ' ').trim().slice(0, n);
 const parts = m.parts.map((p) => ({ text: cut(p?.text, 1000), from: cut(p?.from, 120) })).filter((p) => p.text.length >= 3).slice(0, 30);
-return [{ json: { result: { status: 200, parts, skipped: cut(m.skipped, 400) } } }];""".strip()})
+return [{ json: { result: { status: 200, parts, skipped: cut(m.skipped, 400) } } }];""".strip())})
 r = node("Odpowiedz: propozycja", "n8n-nodes-base.respondToWebhook", 1.1, [1320, 0],
   {"respondWith": "json", "responseBody": "={{ $json.result }}", "options": {"responseCode": "={{ $json.result.status || 200 }}"}})
 link(w, sess); link(sess, iff); link(iff, cal, 0); link(iff, deny, 1); link(cal, llm); link(llm, chk); link(chk, r)

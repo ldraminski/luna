@@ -55,7 +55,7 @@ Workflow „Oboe: Dostęp” (`n8n/build_access.py`, id w `n8n/.access-wf-id`), 
 
 ## Luna sprawdza w sieci (27.09.2026)
 
-**Klucz:** Luna ma własny klucz OpenRoutera z limitem ustawionym przez Łukasza (27.09: 2 USD) — credential n8n „OpenRouter - Luna” (ZGSl0yv59gDWZKJG), używany w „Oboe: API”, „Streść stronę”, „Generuj widget”. Po wyczerpaniu limitu OpenRouter odpowiada 402 → Luna pokazuje „Model nie odpowiedział”.
+**Klucz:** Luna ma własny klucz OpenRoutera z limitem ustawionym przez Łukasza (27.09: 2 USD, od 30.09: 5 USD) — credential n8n „OpenRouter - Luna” (ZGSl0yv59gDWZKJG), używany we wszystkich workflowach Luny. Po wyczerpaniu limitu OpenRouter odpowiada 402 → Luna wszędzie pokazuje ten sam komunikat „Mam chwilową przerwę — skończył się limit, z którego korzystam. Łukasz już o tym wie.” (HTTP 402; szczegóły niżej, „Wyczerpany klucz i limit dzienny”).
 
 W „Oboe: API” → POST items: gdy model rozumienia ustawi `research.query` (pytanie albo termin zależny od informacji z internetu),
 DeepSeek 4.1 Flash szuka przez **wtyczkę web OpenRoutera** (`plugins: [{id: 'web', max_results: 5}]`, prompt `n8n/prompt-sieci.txt`),
@@ -117,13 +117,41 @@ Decyzja: osobny interfejs, NIE osobna aplikacja (inna domena = osobne logowanie 
 ## Dzienny limit dla nowych kont i publiczne repo (28.09.2026, Łukasz)
 
 Kod jest publiczny (github.com/ldraminski/luna), a Luna działa na **jednym** kluczu OpenRoutera (decyzja Łukasza: bez osobnego budżetu dla testerów).
-- Migracja `db/014-limit-dzienny.sql`: `users.daily_limit` (NULL = bez limitu; nowe konta domyślnie **20**, konta sprzed limitu bez limitu) + `usage_log`.
+- Migracja `db/014-limit-dzienny.sql`: `users.daily_limit` (NULL = bez limitu; nowe konta domyślnie **40** (do 30.09: 20 — migracja `db/016-limit-40.sql`), konta sprzed limitu bez limitu) + `usage_log`.
 - `n8n/limit.py` → `session_with_limit(kind)`: jedno zapytanie = sesja + sprawdzenie limitu + zapis zużycia (doba wg Europe/Warsaw).
   Użyte w `POST items` (item), `items/split` (split) i czacie „Popraw” (chat). Po limicie **429** z komunikatem dla testera.
 - **Poprawka bezpieczeństwa:** czat „Popraw” odczytywał zdjęcie modelem PRZED sprawdzeniem sesji — teraz „Czat: sesja i limit” jest pierwszym węzłem.
 - Zmiana limitu jednej osoby: `UPDATE users SET daily_limit = NULL WHERE email = '...'`.
 - Webhooki `/webhook/oboe/*` i `/webhook-test/oboe/*` na hoście n8n zablokowane regułą WAF Cloudflare „Luna: webhooki tylko przez aplikację”.
 - Ekran startowy: „Poproś o dostęp” (wcześniej „Poproś o klucz”).
+
+## Wyczerpany klucz i limit dzienny — jeden komunikat, wpisy nie przepadają (30.09.2026, Łukasz)
+
+- **Limit dzienny 40** (`db/016-limit-40.sql`: `DEFAULT 40` + `UPDATE … SET daily_limit = 40 WHERE daily_limit = 20`). Komunikat 429 bierze liczbę z `daily_limit`.
+- **402 = jeden tekst w jednym miejscu:** `n8n/komunikaty.py` (`KEY_LIMIT` + test `is_key_limit_js()`: brak `choices` i `402` / „insufficient credits”;
+  bez słowa „limit”, żeby 429 dostawcy nie udawał wyczerpanego klucza). Znaczniki `__KEY_LIMIT__` / `__IS_KEY_LIMIT__` w plikach `.js` podmienia `fill()`.
+  - główne pole: `walidacja.js` → `status: 402` → „Zapisz” zwraca HTTP 402 (wcześniej 422, więc aplikacja nie odróżniała tego od zwykłego błędu);
+  - samo zdjęcie: „Zdjęcie: wynik” ustawia `key_limit` → bez drugiej próby → HTTP 402 zamiast „Nie udało mi się obejrzeć tego zdjęcia”;
+  - czat „Popraw”: odpowiedź Luny = ten sam tekst, bez planu zmian (wcześniej „Coś mi się pomieszało”);
+  - Biurko: ten sam tekst (wcześniej skrócona wersja);
+  - notatka głosowa: gałąź „Limit klucza?” → notatka w stanie błędu z tym tekstem, nagranie zostaje, bez kolejnych prób; „Spróbuj ponownie” po odnowieniu klucza.
+  Tło (raport, streszczenia stron, widgety) — bez zmian, dalej zużywa klucz poza `usage_log`.
+- **Kolejka offline (`public/app.js` → `flushOutbox()`):** przy 429 lub 402 wpis ZOSTAJE w kolejce, pętla się przerywa, stan w `localStorage`
+  `luna-kolejka-wstrzymana`. Dopisek przy wpisie: „Na dziś wyczerpany limit — wyślę jutro” (429, ponowna próba po zmianie dnia) /
+  „Mam chwilową przerwę — wyślę, gdy wróci” (402, ponowna próba najwcześniej po 10 min). Inne błędy 4xx — jak dotąd (wpis znika z toastem).
+- Test 30.09: 429 na żywo (`items`, `items/split`, `items/widget-chat`) i kolejka w Chromium na luna.draminski.dev (wpis został, bez ponownego POST po odświeżeniu);
+  402 — kod wdrożonych węzłów na prawdziwym formacie błędu węzła HTTP n8n (`{"error":{"message":"402 - …"}}`), 13/13.
+- **Model i nagłówki w jednym miejscu:** `n8n/config.py` → `TEXT_MODEL` (DeepSeek V4.1 Flash) i `or_headers()` (`X-Title: Luna`,
+  `HTTP-Referer` = `openrouter_referer`, u nas `https://luna.draminski.dev`). Kolumna „App” w aktywności OpenRoutera bierze się z tych nagłówków, nie z klucza.
+
+## Pole wpisu na iPhonie (30.09.2026, zrzut Łukasza)
+
+- **Pole „Co mam zapamiętać?” zostawało w połowie ekranu** po zamknięciu klawiatury (np. po wybraniu zdjęcia): `keepDock()` ustawiał `bottom`
+  z `visualViewport`, a iOS nie zawsze wysyła po zamknięciu klawiatury `resize` z aktualnymi wymiarami. Teraz odsunięcie tylko przy fokusie w polu
+  i dla klawiatury ≥ 80 px; `focusin`/`focusout`/`pageshow`/powrót do aplikacji → przeliczenie od razu i po 120/400/900 ms.
+  Zreprodukowane w Chromium atrapą `visualViewport.height`.
+- Nagłówek pod paskiem statusu: `#screen-main` dostał `padding-top: env(safe-area-inset-top)` (a `body::before` zasłaniał datę).
+- Zdjęcie w kółku karty „Najbliższy termin” mieści się w karcie (`.blob--photo`, 92 px, 18 px od krawędzi); dół listy ma zapas na dolne safe-area.
 
 ## Maile przez Resend (29.09.2026)
 
